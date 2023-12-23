@@ -20,7 +20,7 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
       m_ioc,
       [this](yield_context_t yc) {
         handshake("ws.kraken.com", "443", yc);
-        run_heartbeat(yc);
+        heartbeat(yc);
       },
       [](std::exception_ptr ex) {
         if (ex)
@@ -68,15 +68,16 @@ void session_t::handshake(std::string host, std::string port,
     return fail(ec, "handshake");
 }
 
-void session_t::run_heartbeat(yield_context_t yield) {
+void session_t::heartbeat(yield_context_t yield) {
 
   boost::beast::error_code ec;
-
-  // TODO: https://stackoverflow.com/a/30560228
-  // use timer scheme described for ping/pong loop
   boost::beast::flat_buffer buffer;
-  int id = 0;
-  while (id < 42) {
+  boost::asio::deadline_timer timer(m_ioc);
+  size_t id = 0;
+  while (true) {
+    timer.expires_from_now(boost::posix_time::seconds(3));
+    timer.async_wait(yield);
+
     auto ping = nlohmann::json{};
     ping["event"] = "ping";
     ping["reqid"] = ++id;
@@ -93,9 +94,11 @@ void session_t::run_heartbeat(yield_context_t yield) {
     BOOST_LOG_TRIVIAL(info) << boost::beast::make_printable(buffer.data());
   }
 
+  /*
   m_ws.async_close(boost::beast::websocket::close_code::normal, yield[ec]);
   if (ec)
     return fail(ec, "close");
+  */
 }
 
 } // namespace krakpot

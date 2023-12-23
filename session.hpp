@@ -25,7 +25,7 @@ struct session_t final {
 
 private:
   void handshake(std::string host, std::string port, yield_context_t);
-  void run_heartbeat(yield_context_t);
+  void heartbeat(yield_context_t);
 
   ioc_t &m_ioc;
   ssl_context_t &m_ssl_context;
