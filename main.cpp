@@ -1,3 +1,5 @@
+#define BOOST_ASIO_DISABLE_BOOST_COROUTINE
+
 #include "cert.hpp"
 #include "session.hpp"
 
@@ -14,7 +16,6 @@ int main(int argc, char **argv) {
   krakpot::load_root_certificates(ctx);
 
   auto session = krakpot::session_t(ioc, ctx);
-  session.start_heartbeat(host, port);
   ioc.run();
 
   return EXIT_SUCCESS;
