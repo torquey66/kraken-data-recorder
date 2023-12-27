@@ -74,24 +74,20 @@ void session_t::heartbeat(yield_context_t yield) {
   boost::beast::flat_buffer buffer;
   boost::asio::deadline_timer timer(m_ioc);
   size_t id = 0;
+  subscribe(yield);
   while (true) {
-    timer.expires_from_now(boost::posix_time::seconds(3));
-    timer.async_wait(yield);
-
     auto ping = nlohmann::json{};
     ping["event"] = "ping";
     ping["reqid"] = ++id;
+
+    BOOST_LOG_TRIVIAL(debug) << ping.dump();
 
     m_ws.async_write(boost::asio::buffer(ping.dump()), yield[ec]);
     if (ec)
       return fail(ec, "write");
 
-    buffer.clear();
-    m_ws.async_read(buffer, yield[ec]);
-
-    if (ec)
-      return fail(ec, "read");
-    BOOST_LOG_TRIVIAL(info) << boost::beast::make_printable(buffer.data());
+    timer.expires_from_now(boost::posix_time::seconds(60));
+    timer.async_wait(yield);
   }
 
   /*
@@ -99,6 +95,54 @@ void session_t::heartbeat(yield_context_t yield) {
   if (ec)
     return fail(ec, "close");
   */
+}
+
+void session_t::subscribe(yield_context_t yield) {
+
+  boost::beast::error_code ec;
+  boost::beast::flat_buffer buffer;
+
+  const auto subscribe = nlohmann::json::parse(R"(
+  {
+    "event" : "subscribe", "pair" : [ "BTC/USD", "ETH/USD", "SOL/EUR" ], "subscription" : {
+      "name" : "book", "depth" : 100
+    }
+  }
+)");
+
+  m_ws.async_write(boost::asio::buffer(subscribe.dump()), yield[ec]);
+  if (ec)
+    return fail(ec, "write");
+}
+
+void session_t::start_processing() {
+  boost::asio::spawn(
+      m_ioc, [this](yield_context_t yc) { process(yc); },
+      [](std::exception_ptr ex) {
+        if (ex)
+          std::rethrow_exception(ex);
+      });
+}
+
+void session_t::process(yield_context_t yield) {
+  boost::beast::error_code ec;
+  boost::beast::flat_buffer buffer;
+  boost::asio::deadline_timer timer(m_ioc);
+  timer.expires_from_now(boost::posix_time::seconds(3));
+  timer.async_wait(yield);
+
+  while (true) {
+    buffer.clear();
+    m_ws.async_read(buffer, yield[ec]);
+    if (ec) {
+      fail(ec, "read");
+    } else {
+      const auto as_str = boost::beast::buffers_to_string(buffer.data());
+      const auto decoded = nlohmann::json::parse(as_str);
+      BOOST_LOG_TRIVIAL(debug) << decoded.dump();
+      // BOOST_LOG_TRIVIAL(info) << boost::beast::make_printable(buffer.data());
+    }
+  }
 }
 
 } // namespace krakpot

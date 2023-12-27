@@ -34,3 +34,5 @@
 # Misc
 CMakeUserPresets.json
 build
+*~
+

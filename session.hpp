@@ -23,9 +23,13 @@ struct session_t final {
 
   session_t(ioc_t &, ssl_context_t &);
 
+  void start_processing();
+
 private:
   void handshake(std::string host, std::string port, yield_context_t);
   void heartbeat(yield_context_t);
+  void process(yield_context_t);
+  void subscribe(yield_context_t);
 
   ioc_t &m_ioc;
   ssl_context_t &m_ssl_context;

@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
   krakpot::load_root_certificates(ctx);
 
   auto session = krakpot::session_t(ioc, ctx);
+  session.start_processing();
   ioc.run();
 
   return EXIT_SUCCESS;
