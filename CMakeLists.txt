@@ -28,7 +28,7 @@ endif()
 #include_directories(/usr/local/Cellar/nlohmann-json/3.11.3/include)
 
 # Add executable
-add_executable(Krakpot main.cpp cert.cpp session.cpp)
+add_executable(Krakpot main.cpp book.cpp cert.cpp session.cpp)
 
 # Link Boost and OpenSSL libraries
 target_link_libraries(Krakpot Boost::fiber Boost::log Boost::system ${OPENSSL_LIBRARIES})
