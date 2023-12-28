@@ -105,7 +105,7 @@ void session_t::subscribe(yield_context_t yield) {
   const auto subscribe = nlohmann::json::parse(R"(
   {
     "event" : "subscribe", "pair" : [ "BTC/USD", "ETH/USD", "SOL/EUR" ], "subscription" : {
-      "name" : "book", "depth" : 100
+      "name" : "book", "depth" : 10
     }
   }
 )");
