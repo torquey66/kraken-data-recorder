@@ -2,6 +2,8 @@
 
 #define BOOST_ASIO_DISABLE_BOOST_COROUTINE
 
+#include "processor.hpp"
+
 #include <boost/asio.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/beast/core.hpp>
@@ -34,6 +36,8 @@ private:
   ioc_t &m_ioc;
   ssl_context_t &m_ssl_context;
   websocket_t m_ws;
+
+  processor_t m_processor;
 };
 
 } // namespace krakpot

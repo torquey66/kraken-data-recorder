@@ -125,6 +125,7 @@ void session_t::start_processing() {
 }
 
 void session_t::process(yield_context_t yield) {
+
   boost::beast::error_code ec;
   boost::beast::flat_buffer buffer;
   boost::asio::deadline_timer timer(m_ioc);
@@ -137,10 +138,12 @@ void session_t::process(yield_context_t yield) {
     if (ec) {
       fail(ec, "read");
     } else {
-      const auto as_str = boost::beast::buffers_to_string(buffer.data());
-      const auto decoded = nlohmann::json::parse(as_str);
-      BOOST_LOG_TRIVIAL(debug) << decoded.dump();
-      // BOOST_LOG_TRIVIAL(info) << boost::beast::make_printable(buffer.data());
+      auto json = boost::beast::buffers_to_string(buffer.data());
+      try {
+        m_processor.process(json);
+      } catch (const std::exception &ex) {
+        BOOST_LOG_TRIVIAL(error) << ex.what();
+      }
     }
   }
 }
