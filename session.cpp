@@ -1,9 +1,9 @@
 #include "session.hpp"
 
 #include <boost/log/trivial.hpp>
-#include <nlohmann/json.hpp>
 
 #include <chrono>
+#include <sstream>
 
 namespace {
 void fail(boost::beast::error_code ec, char const *what) {
@@ -76,13 +76,13 @@ void session_t::heartbeat(yield_context_t yield) {
   size_t id = 0;
   subscribe(yield);
   while (true) {
-    auto ping = nlohmann::json{};
-    ping["event"] = "ping";
-    ping["reqid"] = ++id;
 
-    BOOST_LOG_TRIVIAL(debug) << ping.dump();
+    std::ostringstream os;
+    os << "{ 'event' : 'ping', 'reqid' :" << ++id << " }";
 
-    m_ws.async_write(boost::asio::buffer(ping.dump()), yield[ec]);
+    BOOST_LOG_TRIVIAL(debug) << os.str();
+
+    m_ws.async_write(boost::asio::buffer(os.str()), yield[ec]);
     if (ec)
       return fail(ec, "write");
 
@@ -102,15 +102,16 @@ void session_t::subscribe(yield_context_t yield) {
   boost::beast::error_code ec;
   boost::beast::flat_buffer buffer;
 
-  const auto subscribe = nlohmann::json::parse(R"(
+  const auto subscribe = std::string(R"(
   {
-    "event" : "subscribe", "pair" : [ "BTC/USD", "ETH/USD", "SOL/EUR" ], "subscription" : {
-      "name" : "book", "depth" : 10
+    "event" : "subscribe",
+      "pair" : [ "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD", "ETH/USD", "SOL/EUR" ],
+      "subscription" : { "name" : "book", "depth" : 1000
     }
   }
 )");
 
-  m_ws.async_write(boost::asio::buffer(subscribe.dump()), yield[ec]);
+  m_ws.async_write(boost::asio::buffer(subscribe), yield[ec]);
   if (ec)
     return fail(ec, "write");
 }
