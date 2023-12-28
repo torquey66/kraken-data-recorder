@@ -24,6 +24,7 @@ add_executable(Krakpot
   cert.cpp
   main.cpp
   processor.cpp
+  record.cpp
   session.cpp
 )
 
