@@ -7,7 +7,7 @@ namespace krakpot {
 
 using channel_id_t = int64_t;
 using channel_name_t = std::string;
-using checksum_t = std::string;
+using checksum_t = uint64_t;
 using pair_t = std::string;
 using update_type_t = std::string;
 
@@ -31,11 +31,13 @@ struct record_t final {
   std::vector<entry_t> bs;
   std::vector<entry_t> a;
   std::vector<entry_t> b;
-  checksum_t c;
+  checksum_t c = 0;
   channel_name_t channel_name;
   pair_t pair;
 
   void reset();
+
+  bool is_snapshot() const { return !as.empty() && !bs.empty(); }
 
   std::string to_string() const;
 };

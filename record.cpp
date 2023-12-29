@@ -10,7 +10,7 @@ void record_t::reset() {
   bs.clear();
   a.clear();
   b.clear();
-  c.clear();
+  c = 0;
   channel_name.clear();
   pair.clear();
 }

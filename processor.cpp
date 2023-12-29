@@ -98,10 +98,13 @@ processor_t::process_book_msg(simdjson::ondemand::document &doc) {
           } else if (field.key() == "bs") {
             copy_entries(src, m_record.bs);
           } else if (field.key() == "c") {
+            m_record.c = src.get_uint64_in_string();
+            /*
             error = copy_string(src, m_record.c);
             if (error) {
               return error;
             }
+            */
           }
         }
       } else {
@@ -110,7 +113,13 @@ processor_t::process_book_msg(simdjson::ondemand::document &doc) {
       }
     }
 
-    BOOST_LOG_TRIVIAL(debug) << m_record.to_string();
+    if (m_record.is_snapshot()) {
+      BOOST_LOG_TRIVIAL(info) << "snapshot: " << m_record.to_string();
+      m_books[m_record.pair] = book_t{m_record};
+    } else {
+      BOOST_LOG_TRIVIAL(info) << "  update: " << m_record.to_string();
+      m_books[m_record.pair].update(m_record);
+    }
   }
   return error;
 }
