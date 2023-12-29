@@ -1,31 +1,37 @@
 #pragma once
 
+#include "record.hpp"
+
+#include <algorithm>
+#include <limits>
 #include <map>
 
 namespace krakpot {
 
-using price_t = double;     // !@# temporary
-using volume_t = double;    // !@# temporary
-using timestamp_t = double; // !@# temporary
-
 enum Side { Ask = 0, Bid = 1 };
-
-struct entry_t final {
-  volume_t volume;
-  timestamp_t tm;
-};
-
-template <typename Compare> struct side_t final {
-
-private:
-  std::map<price_t, entry_t, Compare> m_levels;
-};
 
 struct book_t final {
 
-  //  book_t();
+  struct book_entry_t final {
+    explicit book_entry_t() {}
+    book_entry_t(volume_t in_volume, timestamp_t in_timestamp)
+        : volume(in_volume), timestamp(in_timestamp) {}
 
-  //  void update();
+    volume_t volume = std::numeric_limits<volume_t>::signaling_NaN();
+    timestamp_t timestamp = std::numeric_limits<timestamp_t>::signaling_NaN();
+  };
+
+  explicit book_t() {}
+  book_t(const record_t &);
+
+  void update(const record_t &);
+
+private:
+  using bids_t = std::map<price_t, book_entry_t, std::greater<price_t>>;
+  using asks_t = std::map<price_t, book_entry_t, std::less<price_t>>;
+
+  bids_t m_bids;
+  asks_t m_asks;
 };
 
 } // namespace krakpot

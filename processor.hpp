@@ -1,11 +1,13 @@
 #pragma once
 
+#include "book.hpp"
 #include "record.hpp"
 
 #include <boost/log/trivial.hpp>
 #include <simdjson.h>
 
 #include <string>
+#include <unordered_map>
 
 namespace krakpot {
 
@@ -18,6 +20,8 @@ private:
 
   simdjson::ondemand::parser m_parser;
   record_t m_record;
+
+  std::unordered_map<std::string, book_t> m_books;
 };
 
 } // namespace krakpot

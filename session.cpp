@@ -105,7 +105,9 @@ void session_t::subscribe(yield_context_t yield) {
   const auto subscribe = std::string(R"(
   {
     "event" : "subscribe",
-      "pair" : [ "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD", "ETH/USD", "SOL/EUR" ],
+      "pair" : [ "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD",
+                 "ETH/EUR", "ETH/GBP", "ETH/JPY", "ETH/USD",
+                 "SOL/EUR", "SOL/GBP", "SOL/JPY", "SOL/USD" ],
       "subscription" : { "name" : "book", "depth" : 1000
     }
   }
@@ -144,6 +146,7 @@ void session_t::process(yield_context_t yield) {
         m_processor.process(json);
       } catch (const std::exception &ex) {
         BOOST_LOG_TRIVIAL(error) << ex.what();
+        throw ex;
       }
     }
   }
