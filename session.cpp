@@ -8,6 +8,7 @@
 namespace {
 void fail(boost::beast::error_code ec, char const *what) {
   BOOST_LOG_TRIVIAL(error) << what << ": " << ec.message();
+  throw std::runtime_error(what);
 }
 } // namespace
 

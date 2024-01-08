@@ -12,6 +12,7 @@
 - Profile.
 - Test on EC2 node.
 - Make root certificate configurable.
+- Add raw logging option to capture bytes read from wire (in Parquet?).
 
 ## Ideas
 - ML experiments from Parquet files.
