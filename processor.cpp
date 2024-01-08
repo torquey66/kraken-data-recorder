@@ -30,13 +30,13 @@ template <typename V> simdjson::error_code copy_entry(V &src, entry_t &dst) {
   for (auto value : src) {
     switch (idx) {
     case 0:
-      dst.price = value.get_double_in_string();
+      copy_string(value, dst.price);
       break;
     case 1:
-      dst.volume = value.get_double_in_string();
+      copy_string(value, dst.volume);
       break;
     case 2:
-      dst.timestamp = value.get_double_in_string();
+      copy_string(value, dst.timestamp);
       break;
     case 3:
       copy_string(value, dst.update_type);

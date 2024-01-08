@@ -1,5 +1,7 @@
 #pragma once
 
+#include "decimal.hpp"
+
 #include <string>
 #include <vector>
 
@@ -12,16 +14,16 @@ using pair_t = std::string;
 using update_type_t = std::string;
 
 /* !@# Placeholders for better decimal types. */
-using price_t = double;
-using timestamp_t = double;
-using volume_t = double;
+using price_t = std::string;
+using timestamp_t = std::string;
+using volume_t = std::string;
 
 static constexpr channel_id_t BAD_CHANNEL_ID = -1;
 
 struct entry_t final {
-  price_t price = 0.;
-  volume_t volume = 0.;
-  timestamp_t timestamp = 0.;
+  price_t price;
+  volume_t volume;
+  timestamp_t timestamp;
   update_type_t update_type;
 };
 
