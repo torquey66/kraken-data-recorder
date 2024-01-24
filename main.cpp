@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   auto const port = "443";
 
   boost::asio::io_context ioc;
-  boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv12_client};
+  boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv13_client};
   krakpot::load_root_certificates(ctx);
 
   auto session = krakpot::session_t(ioc, ctx);

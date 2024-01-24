@@ -27,13 +27,16 @@ template <typename V> simdjson::error_code copy_entry(V &src, entry_t &dst) {
   // !@# UGH - there has got to be a better way...
   dst = entry_t{};
   auto idx = 0;
+  std::string buffer; // !@#
   for (auto value : src) {
     switch (idx) {
     case 0:
-      copy_string(value, dst.price);
+      copy_string(value, buffer);
+      dst.price = decimal_t{buffer};
       break;
     case 1:
-      copy_string(value, dst.volume);
+      copy_string(value, buffer);
+      dst.volume = decimal_t{buffer};
       break;
     case 2:
       copy_string(value, dst.timestamp);

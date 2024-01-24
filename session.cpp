@@ -108,7 +108,7 @@ void session_t::subscribe(yield_context_t yield) {
     "event" : "subscribe",
       "pair" : [ "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD",
                  "ETH/EUR", "ETH/GBP", "ETH/JPY", "ETH/USD",
-                 "SOL/EUR", "SOL/GBP", "SOL/JPY", "SOL/USD" ],
+                 "SOL/EUR", "SOL/GBP", "SOL/USD" ],
       "subscription" : { "name" : "book", "depth" : 1000
     }
   }

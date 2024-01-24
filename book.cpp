@@ -1,5 +1,7 @@
 #include "book.hpp"
 
+#include <boost/log/trivial.hpp> // !@#
+
 #include <cstdlib>
 #include <stdexcept>
 
@@ -17,14 +19,14 @@ book_t::book_t(const record_t &record) {
 
 void book_t::update(const record_t &record) {
   for (const auto &entry : record.b) {
-    if (std::atof(entry.volume.c_str()) == 0) {
+    if (entry.volume.as_double() == 0.) {
       m_bids.erase(entry.price);
     } else {
       m_bids[entry.price] = book_entry_t{entry.volume, entry.timestamp};
     }
   }
   for (const auto &entry : record.a) {
-    if (std::atof(entry.volume.c_str()) == 0) {
+    if (entry.volume.as_double() == 0.) {
       m_asks.erase(entry.price);
     } else {
       m_asks[entry.price] = book_entry_t{entry.volume, entry.timestamp};
