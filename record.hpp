@@ -14,9 +14,9 @@ using pair_t = std::string;
 using update_type_t = std::string;
 
 /* !@# Placeholders for better decimal types. */
-using price_t = std::string;
+using price_t = decimal_t;
 using timestamp_t = std::string;
-using volume_t = std::string;
+using volume_t = decimal_t;
 
 static constexpr channel_id_t BAD_CHANNEL_ID = -1;
 
