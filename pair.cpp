@@ -1,6 +1,6 @@
 #include "pair.hpp"
 
-#include <iostream> // !@#
+#include "nlohmann/json.hpp"
 
 namespace krakpot {
 
@@ -75,6 +75,40 @@ pair_t pair_t::from_json(simdjson::ondemand::object &pair_obj) {
   result.m_symbol = std::string(buffer.begin(), buffer.end());
 
   return result;
+}
+
+std::string pair_t::to_json() const {
+  auto result = nlohmann::json{};
+
+  result["base"] = m_base;
+  result["cost_min"] = m_cost_min;
+  result["cost_precision"] = m_cost_precision;
+  result["has_index"] = m_has_index;
+
+  if (m_margin_initial) {
+    result["margin_initial"] = *m_margin_initial;
+  }
+
+  result["marginable"] = m_marginable;
+
+  if (m_position_limit_long) {
+    result["position_limit_long"] = *m_position_limit_long;
+  }
+
+  if (m_position_limit_short) {
+    result["position_limit_short"] = *m_position_limit_short;
+  }
+
+  result["price_increment"] = m_price_increment;
+  result["price_precision"] = m_price_precision;
+  result["qty_increment"] = m_qty_increment;
+  result["qty_min"] = m_qty_min;
+  result["qty_precision"] = m_qty_precision;
+  result["quote"] = m_quote;
+  result["status"] = m_status;
+  result["symbol"] = m_symbol;
+
+  return result.dump();
 }
 
 } // namespace krakpot

@@ -22,6 +22,12 @@ if(simdjson_FOUND)
   include_directories(${simdjson_INCLUDE_DIRS_DEBUG})
 endif()
 
+# jsoncpp
+find_package(nlohmann_json)
+if(nlohmann_json_FOUND)
+  include_directories(${nlohmann_json_INCLUDE_DIRS_DEBUG})
+endif()
+
 add_executable(Krakpot
   book.cpp
   cert.cpp
@@ -36,6 +42,7 @@ target_link_libraries(Krakpot
   Boost::fiber
   Boost::log
   Boost::system
+  ${JSONCPP_LIBRARIES}
   ${OPENSSL_LIBRARIES}
   ${simdjson_LIBRARIES}
 )
