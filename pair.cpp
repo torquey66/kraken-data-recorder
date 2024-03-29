@@ -105,7 +105,14 @@ std::string pair_t::to_json() const {
   result["qty_min"] = m_qty_min;
   result["qty_precision"] = m_qty_precision;
   result["quote"] = m_quote;
-  result["status"] = m_status;
+
+  // TODO: improve error handling in the face of invalid status values
+  const auto it = c_status_to_str.find(m_status);
+  if (it != c_status_to_str.end()) {
+
+    result["status"] = it->second;
+  }
+
   result["symbol"] = m_symbol;
 
   return result.dump();
