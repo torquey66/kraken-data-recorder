@@ -3,6 +3,7 @@
 #define BOOST_ASIO_DISABLE_BOOST_COROUTINE
 
 #include "processor.hpp"
+#include "requests.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/asio/spawn.hpp>
@@ -37,6 +38,7 @@ private:
   ssl_context_t &m_ssl_context;
   websocket_t m_ws;
 
+  req_id_t m_req_id = 0;
   processor_t m_processor;
 };
 
