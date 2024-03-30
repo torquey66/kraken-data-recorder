@@ -17,6 +17,7 @@ struct decimal_t final {
 
   decimal_t(const decimal_t &) = default;
 
+  // TODO: define a concept for this
   template <typename S> decimal_t(S value) {
     assert(value.size() <= m_value.size());
     m_value.fill('\0');
@@ -26,6 +27,10 @@ struct decimal_t final {
   }
 
   double as_double() const { return m_double; }
+
+  std::string str() const {
+    return std::string{m_value.begin(), m_value.end()};
+  }
 
   decimal_t &operator=(const decimal_t &rhs) = default;
 
