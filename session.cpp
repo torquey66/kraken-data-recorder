@@ -3,6 +3,7 @@
 #include <boost/log/trivial.hpp>
 
 #include <chrono>
+#include <format>
 #include <sstream>
 
 namespace {
@@ -64,7 +65,8 @@ void session_t::handshake(std::string host, std::string port,
   boost::beast::get_lowest_layer(m_ws).expires_never();
   m_ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(
       boost::beast::role_type::client));
-  m_ws.async_handshake(host, "/", yield[ec]);
+  //  m_ws.async_handshake(host, "/", yield[ec]);
+  m_ws.async_handshake(host, "/v2", yield[ec]);
   if (ec)
     return fail(ec, "handshake");
 }
@@ -74,12 +76,11 @@ void session_t::heartbeat(yield_context_t yield) {
   boost::beast::error_code ec;
   boost::beast::flat_buffer buffer;
   boost::asio::deadline_timer timer(m_ioc);
-  size_t id = 0;
   subscribe(yield);
   while (true) {
 
     std::ostringstream os;
-    os << "{ 'event' : 'ping', 'reqid' :" << ++id << " }";
+    os << "{ \"method\" : \"ping\", \"req_id\" :" << ++m_req_id << " }";
 
     BOOST_LOG_TRIVIAL(debug) << os.str();
 
@@ -87,15 +88,13 @@ void session_t::heartbeat(yield_context_t yield) {
     if (ec)
       return fail(ec, "write");
 
-    timer.expires_from_now(boost::posix_time::seconds(60));
+    timer.expires_from_now(boost::posix_time::seconds(5));
     timer.async_wait(yield);
   }
 
-  /*
   m_ws.async_close(boost::beast::websocket::close_code::normal, yield[ec]);
   if (ec)
     return fail(ec, "close");
-  */
 }
 
 void session_t::subscribe(yield_context_t yield) {
@@ -103,18 +102,18 @@ void session_t::subscribe(yield_context_t yield) {
   boost::beast::error_code ec;
   boost::beast::flat_buffer buffer;
 
-  const auto subscribe = std::string(R"(
-  {
-    "event" : "subscribe",
-      "pair" : [ "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD",
-                 "ETH/EUR", "ETH/GBP", "ETH/JPY", "ETH/USD",
-                 "SOL/EUR", "SOL/GBP", "SOL/USD" ],
-      "subscription" : { "name" : "book", "depth" : 1000
-    }
-  }
-)");
+  // const subscribe_instrument_t subscribe_inst{++m_req_id};
+  // BOOST_LOG_TRIVIAL(debug) << "send: " << subscribe_inst.str();
 
-  m_ws.async_write(boost::asio::buffer(subscribe), yield[ec]);
+  const auto symbols = std::vector<std::string>{
+      "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD", "ETH/EUR", "ETH/GBP",
+      "ETH/JPY", "ETH/USD", "SOL/EUR", "SOL/GBP", "SOL/USD"};
+  const subscribe_book_t subscribe_book{++m_req_id, subscribe_book_t::e_10,
+                                        true, symbols};
+  BOOST_LOG_TRIVIAL(debug) << "send: " << subscribe_book.str();
+
+  //  m_ws.async_write(boost::asio::buffer(subscribe_inst.str()), yield[ec]);
+  m_ws.async_write(boost::asio::buffer(subscribe_book.str()), yield[ec]);
   if (ec)
     return fail(ec, "write");
 }

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(KrakpotProject)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS ON)
+
 add_compile_options(-fsanitize=address)
 add_link_options(-fsanitize=address)
 
@@ -35,6 +38,7 @@ add_executable(Krakpot
   pair.cpp
   processor.cpp
   record.cpp
+  requests.cpp
   session.cpp
 )
 
