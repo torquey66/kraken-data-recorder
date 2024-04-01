@@ -39,6 +39,7 @@ add_executable(Krakpot
   processor.cpp
   record.cpp
   requests.cpp
+  responses.cpp
   session.cpp
 )
 
@@ -53,6 +54,7 @@ target_link_libraries(Krakpot
 
 add_executable(parse_instrument_snapshot
   pair.cpp
+  responses.cpp
   test/parse_instrument_snapshot.cpp
 )
 

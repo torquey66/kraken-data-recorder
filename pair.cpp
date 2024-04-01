@@ -1,7 +1,5 @@
 #include "pair.hpp"
 
-#include "nlohmann/json.hpp"
-
 namespace krakpot {
 
 const std::unordered_map<std::string, pair_t::status_t>
@@ -35,7 +33,7 @@ pair_t pair_t::from_json(simdjson::ondemand::object &pair_obj) {
   simdjson::ondemand::value optional_val{};
 
   buffer = pair_obj["base"].get_string();
-  result.m_base = std::string(buffer.begin(), buffer.end());
+  result.m_base = std::string{buffer.begin(), buffer.end()};
 
   result.m_cost_min = pair_obj["cost_min"].get_double();
   result.m_cost_precision = pair_obj["cost_precision"].get_int64();
@@ -77,7 +75,7 @@ pair_t pair_t::from_json(simdjson::ondemand::object &pair_obj) {
   return result;
 }
 
-std::string pair_t::to_json() const {
+nlohmann::json pair_t::to_json() const {
   auto result = nlohmann::json{};
 
   result["base"] = m_base;
@@ -115,7 +113,7 @@ std::string pair_t::to_json() const {
 
   result["symbol"] = m_symbol;
 
-  return result.dump();
+  return result;
 }
 
 } // namespace krakpot

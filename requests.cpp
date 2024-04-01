@@ -3,16 +3,17 @@
 #include <nlohmann/json.hpp>
 
 namespace krakpot {
+namespace request {
 
-std::string subscribe_instrument_t::to_json() const {
+nlohmann::json subscribe_instrument_t::to_json() const {
   const nlohmann::json result = {
       {"method", "subscribe"},
       {"params", {{"channel", "instrument"}, {"snapshot", m_snapshot}}},
       {"req_id", m_req_id}};
-  return result.dump();
+  return result;
 }
 
-std::string subscribe_book_t::to_json() const {
+nlohmann::json subscribe_book_t::to_json() const {
   const nlohmann::json result = {{"method", "subscribe"},
                                  {"params",
                                   {{"channel", "book"},
@@ -20,7 +21,8 @@ std::string subscribe_book_t::to_json() const {
                                    {"snapshot", m_snapshot},
                                    {"symbol", m_symbols}}},
                                  {"req_id", m_req_id}};
-  return result.dump();
+  return result;
 }
 
+} // namespace request
 } // namespace krakpot
