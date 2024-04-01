@@ -38,7 +38,7 @@ private:
   ssl_context_t &m_ssl_context;
   websocket_t m_ws;
 
-  req_id_t m_req_id = 0;
+  request::req_id_t m_req_id = 0;
   processor_t m_processor;
 };
 

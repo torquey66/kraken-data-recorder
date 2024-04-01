@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
 #include <simdjson.h>
 
 #include <limits>
@@ -41,8 +42,8 @@ struct pair_t final {
 
   static pair_t from_json(simdjson::ondemand::object &);
 
-  std::string to_json() const;
-  std::string str() const { return to_json(); }
+  nlohmann::json to_json() const;
+  std::string str() const { return to_json().dump(); }
 
   std::string base() const { return m_base; }
   double_t cost_min() const { return m_cost_min; }

@@ -108,8 +108,8 @@ void session_t::subscribe(yield_context_t yield) {
   const auto symbols = std::vector<std::string>{
       "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD", "ETH/EUR", "ETH/GBP",
       "ETH/JPY", "ETH/USD", "SOL/EUR", "SOL/GBP", "SOL/USD"};
-  const subscribe_book_t subscribe_book{++m_req_id, subscribe_book_t::e_10,
-                                        true, symbols};
+  const request::subscribe_book_t subscribe_book{
+      ++m_req_id, request::subscribe_book_t::e_100, true, symbols};
   BOOST_LOG_TRIVIAL(debug) << "send: " << subscribe_book.str();
 
   //  m_ws.async_write(boost::asio::buffer(subscribe_inst.str()), yield[ec]);

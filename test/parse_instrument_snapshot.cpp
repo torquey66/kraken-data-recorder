@@ -1,4 +1,4 @@
-#include "../pair.hpp" // !@# TODO: fix CMake include to eliminate relative path
+#include "../responses.hpp" // !@# TODO: fix CMake include to eliminate relative path
 
 #include <iostream>
 #include <simdjson.h>
@@ -13,10 +13,8 @@ int main(int argc, char *argv[]) {
     auto parser = simdjson::ondemand::parser{};
     auto json = simdjson::padded_string::load(snapshot_file);
     simdjson::ondemand::document doc = parser.iterate(json);
-    for (simdjson::fallback::ondemand::object obj : doc["data"]["pairs"]) {
-      const auto pair = krakpot::pair_t::from_json(obj);
-      std::cout << pair.str() << std::endl;
-    }
+    const auto response = krakpot::response::instrument_t::from_json(doc);
+    std::cout << response.str() << std::endl;
   } catch (const std::exception &ex) {
     std::cerr << ex.what() << std::endl;
     return -1;
