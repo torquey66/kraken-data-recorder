@@ -1,5 +1,6 @@
 #pragma once
 
+#include "asset.hpp"
 #include "pair.hpp"
 
 #include "nlohmann/json.hpp"
@@ -38,8 +39,7 @@ struct instrument_t final {
 
 private:
   header_t m_header;
-  // !@# TODO: define asset_t
-  // std::vector<asset_t> m_assets;
+  std::vector<asset_t> m_assets;
   std::vector<pair_t> m_pairs;
 };
 
