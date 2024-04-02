@@ -5,6 +5,11 @@
 namespace krakpot {
 namespace request {
 
+nlohmann::json ping_t::to_json() const {
+  const nlohmann::json result = {{"method", "ping"}, {"req_id", m_req_id}};
+  return result;
+}
+
 nlohmann::json subscribe_instrument_t::to_json() const {
   const nlohmann::json result = {
       {"method", "subscribe"},

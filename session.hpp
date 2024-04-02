@@ -30,7 +30,7 @@ struct session_t final {
 
 private:
   void handshake(std::string host, std::string port, yield_context_t);
-  void heartbeat(yield_context_t);
+  void ping(yield_context_t);
   void process(yield_context_t);
   void subscribe(yield_context_t);
 
@@ -38,7 +38,7 @@ private:
   ssl_context_t &m_ssl_context;
   websocket_t m_ws;
 
-  request::req_id_t m_req_id = 0;
+  req_id_t m_req_id = 0;
   processor_t m_processor;
 };
 

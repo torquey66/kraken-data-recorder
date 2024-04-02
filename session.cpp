@@ -22,7 +22,7 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
       m_ioc,
       [this](yield_context_t yc) {
         handshake("ws.kraken.com", "443", yc);
-        heartbeat(yc);
+        ping(yc);
       },
       [](std::exception_ptr ex) {
         if (ex)
@@ -32,6 +32,8 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
 
 void session_t::handshake(std::string host, std::string port,
                           yield_context_t yield) {
+
+  BOOST_LOG_TRIVIAL(debug) << "handshake() entered";
 
   boost::beast::error_code ec;
 
@@ -65,26 +67,20 @@ void session_t::handshake(std::string host, std::string port,
   boost::beast::get_lowest_layer(m_ws).expires_never();
   m_ws.set_option(boost::beast::websocket::stream_base::timeout::suggested(
       boost::beast::role_type::client));
-  //  m_ws.async_handshake(host, "/", yield[ec]);
   m_ws.async_handshake(host, "/v2", yield[ec]);
   if (ec)
     return fail(ec, "handshake");
 }
 
-void session_t::heartbeat(yield_context_t yield) {
+void session_t::ping(yield_context_t yield) {
 
   boost::beast::error_code ec;
   boost::beast::flat_buffer buffer;
   boost::asio::deadline_timer timer(m_ioc);
   subscribe(yield);
   while (true) {
-
-    std::ostringstream os;
-    os << "{ \"method\" : \"ping\", \"req_id\" :" << ++m_req_id << " }";
-
-    BOOST_LOG_TRIVIAL(debug) << os.str();
-
-    m_ws.async_write(boost::asio::buffer(os.str()), yield[ec]);
+    const auto ping = request::ping_t{++m_req_id};
+    m_ws.async_write(boost::asio::buffer(ping.str()), yield[ec]);
     if (ec)
       return fail(ec, "write");
 
@@ -102,9 +98,16 @@ void session_t::subscribe(yield_context_t yield) {
   boost::beast::error_code ec;
   boost::beast::flat_buffer buffer;
 
-  // const subscribe_instrument_t subscribe_inst{++m_req_id};
-  // BOOST_LOG_TRIVIAL(debug) << "send: " << subscribe_inst.str();
+  const request::subscribe_instrument_t subscribe_inst{++m_req_id};
+  BOOST_LOG_TRIVIAL(debug) << "send: " << subscribe_inst.str();
 
+  m_ws.async_write(boost::asio::buffer(subscribe_inst.str()), yield[ec]);
+  if (ec)
+    return fail(ec, "write");
+
+  // !@# TODO: subscribe to all pairs returned aboved...to do this we
+  // need to trigger this when after receive the instrument
+  // snapshot...for now we can test here...
   const auto symbols = std::vector<std::string>{
       "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD", "ETH/EUR", "ETH/GBP",
       "ETH/JPY", "ETH/USD", "SOL/EUR", "SOL/GBP", "SOL/USD"};
@@ -112,7 +115,6 @@ void session_t::subscribe(yield_context_t yield) {
       ++m_req_id, request::subscribe_book_t::e_100, true, symbols};
   BOOST_LOG_TRIVIAL(debug) << "send: " << subscribe_book.str();
 
-  //  m_ws.async_write(boost::asio::buffer(subscribe_inst.str()), yield[ec]);
   m_ws.async_write(boost::asio::buffer(subscribe_book.str()), yield[ec]);
   if (ec)
     return fail(ec, "write");
