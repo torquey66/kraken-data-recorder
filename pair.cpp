@@ -77,12 +77,19 @@ pair_t pair_t::from_json(simdjson::ondemand::object &pair_obj) {
 }
 
 nlohmann::json pair_t::to_json() const {
-  auto result = nlohmann::json{};
-
-  result["base"] = m_base;
-  result["cost_min"] = m_cost_min;
-  result["cost_precision"] = m_cost_precision;
-  result["has_index"] = m_has_index;
+  nlohmann::json result{
+      {"base", m_base},
+      {"cost_min", m_cost_min},
+      {"cost_precision", m_cost_precision},
+      {"has_index", m_has_index},
+      {"price_increment", m_price_increment},
+      {"price_precision", m_price_precision},
+      {"qty_increment", m_qty_increment},
+      {"qty_min", m_qty_min},
+      {"qty_precision", m_qty_precision},
+      {"quote", m_quote},
+      {"symbol", m_symbol},
+  };
 
   if (m_margin_initial) {
     result["margin_initial"] = *m_margin_initial;
@@ -98,20 +105,11 @@ nlohmann::json pair_t::to_json() const {
     result["position_limit_short"] = *m_position_limit_short;
   }
 
-  result["price_increment"] = m_price_increment;
-  result["price_precision"] = m_price_precision;
-  result["qty_increment"] = m_qty_increment;
-  result["qty_min"] = m_qty_min;
-  result["qty_precision"] = m_qty_precision;
-  result["quote"] = m_quote;
-
   // TODO: improve error handling in the face of invalid status values
   const auto it = c_status_to_str.find(m_status);
   if (it != c_status_to_str.end()) {
     result["status"] = it->second;
   }
-
-  result["symbol"] = m_symbol;
 
   return result;
 }
