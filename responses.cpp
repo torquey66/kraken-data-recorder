@@ -16,7 +16,7 @@ instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
   // !@# TODO: populate assets here...
 
   for (simdjson::fallback::ondemand::object obj : response["data"]["pairs"]) {
-    const auto pair = krakpot::pair_t::from_json(obj);
+    const auto pair = pair_t::from_json(obj);
     result.m_pairs.push_back(pair);
   }
 

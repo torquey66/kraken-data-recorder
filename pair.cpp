@@ -1,6 +1,7 @@
 #include "pair.hpp"
 
 namespace krakpot {
+namespace response {
 
 const std::unordered_map<std::string, pair_t::status_t>
     pair_t::c_str_to_status = {
@@ -107,7 +108,6 @@ nlohmann::json pair_t::to_json() const {
   // TODO: improve error handling in the face of invalid status values
   const auto it = c_status_to_str.find(m_status);
   if (it != c_status_to_str.end()) {
-
     result["status"] = it->second;
   }
 
@@ -116,4 +116,5 @@ nlohmann::json pair_t::to_json() const {
   return result;
 }
 
+} // namespace response
 } // namespace krakpot

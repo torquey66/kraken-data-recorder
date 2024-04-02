@@ -1,14 +1,16 @@
 #pragma once
 
+#include "types.hpp"
+
 #include "nlohmann/json.hpp"
 #include <simdjson.h>
 
-#include <limits>
 #include <optional>
 #include <string>
 #include <unordered_map>
 
 namespace krakpot {
+namespace response {
 
 /**
  * Internal representation of the "Response Data-Pairs" field desribed here:
@@ -16,15 +18,6 @@ namespace krakpot {
  *     https://docs.kraken.com/websockets-v2/#instrument
  */
 struct pair_t final {
-
-  // I have not yet found a precise description of the integer type
-  // referenced in the Kraken V2 API docs. A signed 64-bit int is
-  // almost certainly sufficient for now.
-  //
-  // TODO: Research this and concoct an appropriate type.
-  using integer_t = uint64_t;
-
-  using double_t = double;
 
   // clang-format off
   enum status_t : int8_t {
@@ -70,9 +63,6 @@ private:
   static const std::unordered_map<std::string, status_t> c_str_to_status;
   static const std::unordered_map<status_t, std::string> c_status_to_str;
 
-  static constexpr double_t c_NaN =
-      std::numeric_limits<double>::signaling_NaN();
-
   std::string m_base;
   double_t m_cost_min = c_NaN;
   integer_t m_cost_precision = 0;
@@ -91,4 +81,5 @@ private:
   std::string m_symbol;
 };
 
+} // namespace response
 } // namespace krakpot
