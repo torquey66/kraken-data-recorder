@@ -5,7 +5,6 @@
 namespace krakpot {
 
 void processor_t::process(std::string &msg) {
-  //  BOOST_LOG_TRIVIAL(debug) << msg;
   simdjson::ondemand::document doc = m_parser.iterate(msg);
   auto error = process_book_msg(doc);
   if (error) {
