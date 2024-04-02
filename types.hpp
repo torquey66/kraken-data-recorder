@@ -11,6 +11,7 @@ namespace krakpot {
 // TODO: Research this and concoct an appropriate type.
 using integer_t = uint64_t;
 using double_t = double;
+using req_id_t = int64_t;
 
 static constexpr double_t c_NaN = std::numeric_limits<double>::signaling_NaN();
 

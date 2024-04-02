@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types.hpp"
+
 #include "nlohmann/json.hpp"
 
 #include <string>
@@ -8,7 +10,19 @@
 namespace krakpot {
 namespace request {
 
-using req_id_t = int64_t;
+/**
+ * See https://docs.kraken.com/websockets-v2/#ping
+ */
+struct ping_t final {
+
+  ping_t(req_id_t req_id) : m_req_id(req_id) {}
+
+  nlohmann::json to_json() const;
+  std::string str() const { return to_json().dump(); }
+
+private:
+  req_id_t m_req_id;
+};
 
 /**
  * See https://docs.kraken.com/websockets-v2/#instrument
