@@ -32,6 +32,7 @@ if(nlohmann_json_FOUND)
 endif()
 
 add_executable(Krakpot
+  asset.cpp
   book.cpp
   cert.cpp
   main.cpp
@@ -53,6 +54,7 @@ target_link_libraries(Krakpot
 )
 
 add_executable(parse_instrument_snapshot
+  asset.cpp
   pair.cpp
   responses.cpp
   test/parse_instrument_snapshot.cpp
