@@ -4,8 +4,11 @@
 
 namespace krakpot {
 
-void processor_t::process(std::string &msg) {
-  simdjson::ondemand::document doc = m_parser.iterate(msg);
+void processor_t::process(std::string_view msg) {
+  // !@# TODO: figure out how to eliminate this copy and still meet
+  // simdjson's padding needs.
+  simdjson::padded_string padded_msg{msg};
+  simdjson::ondemand::document doc = m_parser.iterate(padded_msg);
   auto error = process_book_msg(doc);
   if (error) {
     BOOST_LOG_TRIVIAL(debug) << simdjson::to_json_string(doc);

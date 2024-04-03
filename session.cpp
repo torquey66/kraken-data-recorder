@@ -1,5 +1,7 @@
 #include "session.hpp"
 
+#include "constants.hpp"
+
 #include <boost/log/trivial.hpp>
 
 #include <chrono>
@@ -23,10 +25,10 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
 
   asio::spawn(
       m_ioc,
-      [this](yield_context_t yc) {
-        handshake("ws.kraken.com", "443", yc);
-        subscribe(yc);
-        ping(yc);
+      [this](yield_context_t yield) {
+        handshake("ws.kraken.com", "443", yield);
+        subscribe(yield);
+        ping(yield);
       },
       [](std::exception_ptr ex) {
         if (ex)
@@ -82,14 +84,18 @@ void session_t::ping(yield_context_t yield) {
   bst::error_code ec;
   bst::flat_buffer buffer;
   asio::deadline_timer timer(m_ioc);
-  while (true) {
-    const auto ping = request::ping_t{++m_req_id};
-    m_ws.async_write(asio::buffer(ping.str()), yield[ec]);
-    if (ec)
-      return fail(ec, "write");
 
-    timer.expires_from_now(boost::posix_time::seconds(5));
-    timer.async_wait(yield);
+  bool keep_processing = true;
+  while (keep_processing) {
+    try {
+      const auto ping = request::ping_t{++m_req_id};
+      send(ping.str(), yield);
+      timer.expires_from_now(boost::posix_time::seconds(c_ping_interval_secs));
+      timer.async_wait(yield);
+    } catch (const std::exception &ex) {
+      BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ex.what();
+      keep_processing = false;
+    }
   }
 
   m_ws.async_close(ws::close_code::normal, yield[ec]);
@@ -103,11 +109,7 @@ void session_t::subscribe(yield_context_t yield) {
   bst::flat_buffer buffer;
 
   const request::subscribe_instrument_t subscribe_inst{++m_req_id};
-  BOOST_LOG_TRIVIAL(debug) << "send: " << subscribe_inst.str();
-
-  m_ws.async_write(asio::buffer(subscribe_inst.str()), yield[ec]);
-  if (ec)
-    return fail(ec, "write");
+  send(subscribe_inst.str(), yield);
 
   // !@# TODO: subscribe to all pairs returned aboved...to do this we
   // need to trigger this when after receive the instrument
@@ -117,23 +119,31 @@ void session_t::subscribe(yield_context_t yield) {
       "ETH/JPY", "ETH/USD", "SOL/EUR", "SOL/GBP", "SOL/USD"};
   const request::subscribe_book_t subscribe_book{
       ++m_req_id, request::subscribe_book_t::e_100, true, symbols};
-  BOOST_LOG_TRIVIAL(debug) << "send: " << subscribe_book.str();
-
-  m_ws.async_write(asio::buffer(subscribe_book.str()), yield[ec]);
-  if (ec)
-    return fail(ec, "write");
+  send(subscribe_book.str(), yield);
 }
 
-void session_t::start_processing() {
+void session_t::start_processing(const recv_cb_t &handle_recv) {
   asio::spawn(
-      m_ioc, [this](yield_context_t yc) { process(yc); },
+      m_ioc,
+      [this, handle_recv](yield_context_t yield) {
+        process(handle_recv, yield);
+      },
       [](std::exception_ptr ex) {
         if (ex)
           std::rethrow_exception(ex);
       });
 }
 
-void session_t::process(yield_context_t yield) {
+void session_t::send(msg_t msg, yield_context_t yield) {
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
+  bst::error_code ec;
+  m_ws.async_write(asio::buffer(std::string(msg.data(), msg.size())),
+                   yield[ec]);
+  if (ec)
+    return fail(ec, "write");
+}
+
+void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
 
   bst::error_code ec;
   bst::flat_buffer buffer;
@@ -141,15 +151,16 @@ void session_t::process(yield_context_t yield) {
   timer.expires_from_now(boost::posix_time::seconds(3));
   timer.async_wait(yield);
 
-  while (true) {
+  auto keep_processing = true;
+  while (keep_processing) {
     buffer.clear();
     m_ws.async_read(buffer, yield[ec]);
     if (ec) {
       fail(ec, "read");
     } else {
-      auto json = bst::buffers_to_string(buffer.data());
+      auto msg_str = bst::buffers_to_string(buffer.data());
       try {
-        m_processor.process(json);
+        keep_processing = handle_recv(std::string_view(msg_str));
       } catch (const std::exception &ex) {
         BOOST_LOG_TRIVIAL(error) << ex.what();
         throw ex;
