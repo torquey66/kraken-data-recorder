@@ -1,3 +1,4 @@
+/* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
 #include "record.hpp"

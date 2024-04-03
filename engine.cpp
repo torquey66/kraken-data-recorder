@@ -1,3 +1,5 @@
+/* Copyright (C) 2024 John C. Finley - All rights reserved */
+
 #include "engine.hpp"
 
 #include "requests.hpp"
@@ -115,10 +117,14 @@ bool engine_t::handle_book_msg(doc_t &doc, yield_context_t yield) {
 }
 
 bool engine_t::handle_book_snapshot(doc_t &doc, yield_context_t) {
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << simdjson::to_json_string(doc);
   return true;
 }
 
-bool engine_t::handle_book_update(doc_t &doc, yield_context_t) { return true; }
+bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << simdjson::to_json_string(doc);
+  return true;
+}
 
 bool engine_t::handle_heartbeat_msg(doc_t &doc, yield_context_t) {
   // !@# TODO: track a stat on time between heartbeats?
@@ -129,6 +135,7 @@ bool engine_t::handle_pong_msg(doc_t &, yield_context_t yield) {
   if (!m_subscribed) {
     const request::subscribe_instrument_t subscribe_inst{++m_inst_req_id};
     m_session.send(subscribe_inst.str(), yield);
+    m_subscribed = true;
   }
   return true;
 }
