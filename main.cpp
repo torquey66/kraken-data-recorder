@@ -9,7 +9,6 @@
 #include <boost/log/trivial.hpp>
 
 #include <string>
-#include <string_view>
 
 int main(int argc, char **argv) {
   boost::asio::io_context ioc;

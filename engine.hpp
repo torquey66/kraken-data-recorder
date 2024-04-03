@@ -5,6 +5,14 @@
 
 #include <simdjson.h>
 
+/**
+ * engine_t is our central dispatcher for messages received from the
+ * venue. It also tracks application state, which currently consists
+ * of whether or not we have subscribed to the pairs in the initial
+ * instrument snapshot.
+ *
+ * As functionality expands, this will be broken into submodules.
+ */
 namespace krakpot {
 
 struct engine_t final {
