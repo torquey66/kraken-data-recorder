@@ -4,6 +4,14 @@
 
 namespace krakpot {
 
+/**
+ * If this doesn't work for you, provide your own hardcoded cert for
+ * SSL handshake purposes.
+ *
+ * TODO: ultimately we need to load this from the env in some
+ * fashion - this code is just a placeholder for testing.
+ */
+
 static const std::string cert = R"CERT(
 -----BEGIN CERTIFICATE-----
 MIIEuzCCA6OgAwIBAgIBAjANBgkqhkiG9w0BAQUFADBiMQswCQYDVQQGEwJVUzET

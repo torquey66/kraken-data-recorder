@@ -10,10 +10,18 @@
 #include <string>
 #include <vector>
 
+/**
+ * These are the various messages we currently receive from the
+ * venue. Ideally, this code would be generated from an OpenAPI spec
+ * or the like, but that exercise is currently beyond scope. Also,
+ * according to ChatGPT, Kraken has not released an OpenAPI spec for
+ * its websocket interface.
+ */
 namespace krakpot {
 namespace response {
 
 /**
+ * Fields common to all channel messages.
  */
 struct header_t final {
   header_t() = default;
@@ -29,6 +37,7 @@ private:
 };
 
 /**
+ * See https://docs.kraken.com/websockets-v2/#instrument
  */
 struct instrument_t final {
   instrument_t() = default;
@@ -48,15 +57,11 @@ private:
 };
 
 /**
+ * https://docs.kraken.com/websockets-v2/#book
+ *
+ * !@# TODO: this is a work in progress
  */
 struct book_t final {
-  // !@# TODO: consider moving these to a central "types" header
-  using price_t = double;
-  using qty_t = double;
-  using quote_t = std::pair<price_t, qty_t>;
-  using ask_t = quote_t;
-  using bid_t = quote_t;
-
   book_t() = default;
 
 private:
@@ -68,8 +73,7 @@ private:
   bids_t m_bids;
   uint32_t m_crc32;
   std::string m_symbol;
-  std::string
-      m_tm; // RFC3339 - !@# TODO: consider xlating to binary representation
+  std::string m_tm; // RFC3339 - !@# TODO: consider xlating to nanos since epoch
 };
 
 } // namespace response

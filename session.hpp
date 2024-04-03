@@ -16,6 +16,15 @@
 
 namespace krakpot {
 
+/**
+ * session_t manages our websocket connection to the
+ * venue. Specifically, it:
+ *
+ * - establishes the websocket connection and performs an SSL handshake
+ * - initiates a periodic ping operation
+ * - invokes a callback when it receives messages from the venue
+ * - enables client code to send messages to the venue
+ */
 struct session_t final {
 
   using ioc_t = boost::asio::io_context;
@@ -39,13 +48,12 @@ private:
   void handshake(std::string host, std::string port, yield_context_t);
   void ping(yield_context_t);
   void process(const recv_cb_t &, yield_context_t);
-  void subscribe(yield_context_t);
 
   ioc_t &m_ioc;
   ssl_context_t &m_ssl_context;
   websocket_t m_ws;
 
-  bool m_keep_processing = true;
+  bool m_keep_processing = false;
   req_id_t m_req_id = 0;
 };
 

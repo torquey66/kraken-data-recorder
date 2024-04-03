@@ -10,6 +10,19 @@
 #include <chrono>
 #include <format>
 
+/**
+ * Note that this code was initially derived from the boost::beast
+ * websocket examples, with a little advice from ChatGPT on the
+ * side. I intended it as a foray in to coroutine-flavored asio
+ * programming and in my view the jury's still out on whether the
+ * result is easier to read than the vanilla callback approach.
+ *
+ * Furthermore, the coordination between the ping() and process()
+ * operations is clumsy at best. I thought coroutines were supposed to
+ * make things of this nature easier...
+ *
+ * TODO: figure out a better way
+ */
 namespace asio = boost::asio;
 namespace bst = boost::beast;
 namespace ws = bst::websocket;
@@ -35,6 +48,57 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
         if (ex)
           std::rethrow_exception(ex);
       });
+}
+
+void session_t::start_processing(const recv_cb_t &handle_recv) {
+  asio::spawn(
+      m_ioc,
+      [this, handle_recv](yield_context_t yield) {
+        process(handle_recv, yield);
+      },
+      [](std::exception_ptr ex) {
+        if (ex)
+          std::rethrow_exception(ex);
+      });
+}
+
+void session_t::send(msg_t msg, yield_context_t yield) {
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
+  bst::error_code ec;
+  m_ws.async_write(asio::buffer(std::string(msg.data(), msg.size())),
+                   yield[ec]);
+  if (ec) {
+    return fail(ec, "write");
+  }
+}
+
+void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
+  bst::error_code ec;
+  bst::flat_buffer buffer;
+
+  // Yield until the ping() operation has been scheduled.
+  // TODO: find a better way to handle this.
+  while (!m_keep_processing) {
+    asio::deadline_timer timer(m_ioc);
+    timer.expires_from_now(boost::posix_time::seconds(1));
+    timer.async_wait(yield);
+  }
+
+  while (m_keep_processing) {
+    buffer.clear();
+    m_ws.async_read(buffer, yield[ec]);
+    if (ec) {
+      fail(ec, "read");
+    } else {
+      auto msg_str = bst::buffers_to_string(buffer.data());
+      try {
+        m_keep_processing = handle_recv(std::string_view(msg_str), yield);
+      } catch (const std::exception &ex) {
+        BOOST_LOG_TRIVIAL(error) << ex.what();
+        m_keep_processing = false;
+      }
+    }
+  }
 }
 
 void session_t::handshake(std::string host, std::string port,
@@ -85,6 +149,7 @@ void session_t::ping(yield_context_t yield) {
   bst::flat_buffer buffer;
   asio::deadline_timer timer(m_ioc);
 
+  m_keep_processing = true;
   while (m_keep_processing) {
     try {
       const auto ping = request::ping_t{++m_req_id};
@@ -100,51 +165,6 @@ void session_t::ping(yield_context_t yield) {
   m_ws.async_close(ws::close_code::normal, yield[ec]);
   if (ec)
     return fail(ec, "close");
-}
-
-void session_t::start_processing(const recv_cb_t &handle_recv) {
-  asio::spawn(
-      m_ioc,
-      [this, handle_recv](yield_context_t yield) {
-        process(handle_recv, yield);
-      },
-      [](std::exception_ptr ex) {
-        if (ex)
-          std::rethrow_exception(ex);
-      });
-}
-
-void session_t::send(msg_t msg, yield_context_t yield) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
-  bst::error_code ec;
-  m_ws.async_write(asio::buffer(std::string(msg.data(), msg.size())),
-                   yield[ec]);
-  if (ec)
-    return fail(ec, "write");
-}
-
-void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
-  bst::error_code ec;
-  bst::flat_buffer buffer;
-  asio::deadline_timer timer(m_ioc);
-  timer.expires_from_now(boost::posix_time::seconds(3));
-  timer.async_wait(yield);
-
-  while (m_keep_processing) {
-    buffer.clear();
-    m_ws.async_read(buffer, yield[ec]);
-    if (ec) {
-      fail(ec, "read");
-    } else {
-      auto msg_str = bst::buffers_to_string(buffer.data());
-      try {
-        m_keep_processing = handle_recv(std::string_view(msg_str), yield);
-      } catch (const std::exception &ex) {
-        BOOST_LOG_TRIVIAL(error) << ex.what();
-        m_keep_processing = false;
-      }
-    }
-  }
 }
 
 } // namespace krakpot
