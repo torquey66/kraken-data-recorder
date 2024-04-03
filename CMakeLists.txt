@@ -35,9 +35,9 @@ add_executable(Krakpot
   asset.cpp
   book.cpp
   cert.cpp
+  engine.cpp
   main.cpp
   pair.cpp
-  processor.cpp
   record.cpp
   requests.cpp
   responses.cpp

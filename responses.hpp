@@ -37,6 +37,9 @@ struct instrument_t final {
   nlohmann::json to_json() const;
   std::string str() const { return to_json().dump(); }
 
+  const std::vector<asset_t> &assets() const { return m_assets; }
+  const std::vector<pair_t> &pairs() const { return m_pairs; }
+
 private:
   header_t m_header;
   std::vector<asset_t> m_assets;
