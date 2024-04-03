@@ -1,3 +1,5 @@
+/* Copyright (C) 2024 John C. Finley - All rights reserved */
+
 #include "pair.hpp"
 
 namespace krakpot {

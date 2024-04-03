@@ -1,6 +1,5 @@
+/* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
-
-#define BOOST_ASIO_DISABLE_BOOST_COROUTINE
 
 #include "types.hpp"
 
