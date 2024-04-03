@@ -2,8 +2,7 @@
 
 #define BOOST_ASIO_DISABLE_BOOST_COROUTINE
 
-#include "processor.hpp"
-#include "requests.hpp"
+#include "types.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/asio/spawn.hpp>
@@ -27,7 +26,7 @@ struct session_t final {
   using yield_context_t = boost::asio::yield_context;
 
   using msg_t = std::string_view;
-  using recv_cb_t = std::function<bool(msg_t)>;
+  using recv_cb_t = std::function<bool(msg_t, yield_context_t)>;
 
   session_t(ioc_t &, ssl_context_t &);
 
@@ -47,6 +46,7 @@ private:
   ssl_context_t &m_ssl_context;
   websocket_t m_ws;
 
+  bool m_keep_processing = true;
   req_id_t m_req_id = 0;
 };
 

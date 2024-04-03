@@ -1,6 +1,7 @@
 #include "session.hpp"
 
 #include "constants.hpp"
+#include "requests.hpp"
 
 #include <boost/log/trivial.hpp>
 
@@ -22,12 +23,10 @@ namespace krakpot {
 
 session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
     : m_ioc{ioc}, m_ssl_context{ssl_context}, m_ws{ioc, ssl_context} {
-
   asio::spawn(
       m_ioc,
       [this](yield_context_t yield) {
-        handshake("ws.kraken.com", "443", yield);
-        subscribe(yield);
+        handshake(c_kraken_host, c_kraken_port, yield);
         ping(yield);
       },
       [](std::exception_ptr ex) {
@@ -38,7 +37,6 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
 
 void session_t::handshake(std::string host, std::string port,
                           yield_context_t yield) {
-
   bst::error_code ec;
 
   asio::ip::tcp::resolver resolver(m_ioc);
@@ -85,8 +83,7 @@ void session_t::ping(yield_context_t yield) {
   bst::flat_buffer buffer;
   asio::deadline_timer timer(m_ioc);
 
-  bool keep_processing = true;
-  while (keep_processing) {
+  while (m_keep_processing) {
     try {
       const auto ping = request::ping_t{++m_req_id};
       send(ping.str(), yield);
@@ -94,32 +91,13 @@ void session_t::ping(yield_context_t yield) {
       timer.async_wait(yield);
     } catch (const std::exception &ex) {
       BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ex.what();
-      keep_processing = false;
+      m_keep_processing = false;
     }
   }
 
   m_ws.async_close(ws::close_code::normal, yield[ec]);
   if (ec)
     return fail(ec, "close");
-}
-
-void session_t::subscribe(yield_context_t yield) {
-
-  bst::error_code ec;
-  bst::flat_buffer buffer;
-
-  const request::subscribe_instrument_t subscribe_inst{++m_req_id};
-  send(subscribe_inst.str(), yield);
-
-  // !@# TODO: subscribe to all pairs returned aboved...to do this we
-  // need to trigger this when after receive the instrument
-  // snapshot...for now we can test here...
-  const auto symbols = std::vector<std::string>{
-      "BTC/EUR", "BTC/GBP", "BTC/JPY", "BTC/USD", "ETH/EUR", "ETH/GBP",
-      "ETH/JPY", "ETH/USD", "SOL/EUR", "SOL/GBP", "SOL/USD"};
-  const request::subscribe_book_t subscribe_book{
-      ++m_req_id, request::subscribe_book_t::e_100, true, symbols};
-  send(subscribe_book.str(), yield);
 }
 
 void session_t::start_processing(const recv_cb_t &handle_recv) {
@@ -144,15 +122,13 @@ void session_t::send(msg_t msg, yield_context_t yield) {
 }
 
 void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
-
   bst::error_code ec;
   bst::flat_buffer buffer;
   asio::deadline_timer timer(m_ioc);
   timer.expires_from_now(boost::posix_time::seconds(3));
   timer.async_wait(yield);
 
-  auto keep_processing = true;
-  while (keep_processing) {
+  while (m_keep_processing) {
     buffer.clear();
     m_ws.async_read(buffer, yield[ec]);
     if (ec) {
@@ -160,10 +136,10 @@ void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
     } else {
       auto msg_str = bst::buffers_to_string(buffer.data());
       try {
-        keep_processing = handle_recv(std::string_view(msg_str));
+        m_keep_processing = handle_recv(std::string_view(msg_str), yield);
       } catch (const std::exception &ex) {
         BOOST_LOG_TRIVIAL(error) << ex.what();
-        throw ex;
+        m_keep_processing = false;
       }
     }
   }
