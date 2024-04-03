@@ -7,13 +7,14 @@
 #include <simdjson.h>
 
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 namespace krakpot {
 
 struct processor_t final {
 
-  void process(std::string &);
+  void process(std::string_view);
 
 private:
   simdjson::error_code process_book_msg(simdjson::ondemand::document &);
