@@ -58,8 +58,6 @@ private:
 
 /**
  * https://docs.kraken.com/websockets-v2/#book
- *
- * !@# TODO: this is a work in progress
  */
 struct book_t final {
   book_t() = default;
@@ -79,6 +77,32 @@ private:
   uint64_t m_crc32;
   std::string m_symbol;
   std::string m_tm; // RFC3339 - !@# TODO: consider xlating to nanos since epoch
+};
+
+/**
+ * https://docs.kraken.com/websockets-v2/#trade
+ */
+struct trades_t final {
+  struct trade_t final {
+    std::string ord_type;
+    price_t price;
+    qty_t qty;
+    std::string side; // !@# TODO: create a first class side type
+    std::string symbol;
+    std::string tm; // RFC3339 - !@# TODO: consider xlating to nanos since epoch
+    integer_t trade_id;
+  };
+
+  trades_t() = default;
+
+  static trades_t from_json(simdjson::ondemand::document &);
+
+  nlohmann::json to_json() const;
+  std::string str() const { return to_json().dump(); }
+
+private:
+  header_t m_header;
+  std::vector<trade_t> m_trades;
 };
 
 } // namespace response
