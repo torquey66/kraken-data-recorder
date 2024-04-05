@@ -36,9 +36,10 @@ In theory, building this should be simple given Conan (v2) and a
 reasonably up to date CMake. On MacOS Ventura, I am able to to this by running:
 
 ```
-conan install . --output-folder=build 
+
+conan install . --profile=default --build=missing --output-folder=build -sbuild_type=Debug
 cd ./build
-cmake ..
+cmake -DCMAKE_PREFIX_PATH=<full path to build dir> -DCMAKE_BUILD_TYPE=Debug ..
 make -j
 ```
 
