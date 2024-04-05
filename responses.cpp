@@ -130,5 +130,53 @@ nlohmann::json book_t::to_json() const {
   return result;
 }
 
+trades_t trades_t::from_json(simdjson::ondemand::document &response) {
+  auto result = trades_t{};
+  auto buffer = std::string_view{};
+
+  buffer = response["channel"].get_string();
+  const auto channel = std::string{buffer.begin(), buffer.end()};
+  buffer = response["type"].get_string();
+  const auto type = std::string{buffer.begin(), buffer.end()};
+  result.m_header = header_t{channel, type};
+
+  for (auto obj : response["data"]) {
+    auto trade = trade_t{};
+    buffer = obj["ord_type"].get_string();
+    trade.ord_type = std::string(buffer.begin(), buffer.end());
+    trade.price = obj["price"].get_double();
+    trade.qty = obj["qty"].get_double();
+    buffer = obj["side"].get_string();
+    trade.side = std::string(buffer.begin(), buffer.end());
+    buffer = obj["symbol"].get_string();
+    trade.symbol = std::string(buffer.begin(), buffer.end());
+    buffer = obj["timestamp"].get_string();
+    trade.tm = std::string(buffer.begin(), buffer.end());
+    trade.trade_id = obj["trade_id"].get_uint64();
+    result.m_trades.push_back(trade);
+  }
+
+  return result;
+}
+
+nlohmann::json trades_t::to_json() const {
+
+  auto trades = nlohmann::json::array();
+  for (const auto &trade : m_trades) {
+    const nlohmann::json trade_json = {
+        {"ord_type", trade.ord_type}, {"price", trade.price},
+        {"qty", trade.qty},           {"side", trade.side},
+        {"symbol", trade.symbol},     {"timestamp", trade.tm},
+        {"trade_id", trade.trade_id},
+    };
+    trades.push_back(trade_json);
+  }
+
+  const nlohmann::json result = {{"channel", m_header.channel()},
+                                 {"data", trades},
+                                 {"type", m_header.type()}};
+  return result;
+}
+
 } // namespace response
 } // namespace krakpot
