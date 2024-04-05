@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 project(KrakpotProject)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
+#add_compile_options(-fsanitize=address)
+#add_link_options(-fsanitize=address)
 
 # Boost
 find_package(Boost REQUIRED COMPONENTS fiber log system)
@@ -20,6 +20,7 @@ if(OPENSSL_FOUND)
 endif()
 
 # simdjson
+set(simdjson_DIR, ${CMAKE_CURRENT_BINARY_DIR})
 find_package(simdjson REQUIRED)
 if(simdjson_FOUND)
   include_directories(${simdjson_INCLUDE_DIRS_DEBUG})
@@ -31,6 +32,13 @@ if(nlohmann_json_FOUND)
   include_directories(${nlohmann_json_INCLUDE_DIRS_DEBUG})
 endif()
 
+# doctest
+find_package(doctest REQUIRED)
+if(doctest_FOUND)
+  include_directories(${doctest_INCLUDE_DIRS_DEBUG})
+endif()
+
+# TODO: move most of this code into a library and link against it below
 add_executable(Krakpot
   asset.cpp
   cert.cpp
@@ -59,6 +67,18 @@ add_executable(parse_instrument_snapshot
 )
 
 target_link_libraries(parse_instrument_snapshot
+  ${simdjson_LIBRARIES}
+)
+
+add_executable(response_test
+  asset.cpp
+  pair.cpp
+  responses.cpp
+  test/unit/response_test.cpp
+)
+
+target_link_libraries(response_test
+  ${doctest_LIBRARIES}
   ${simdjson_LIBRARIES}
 )
 
