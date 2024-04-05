@@ -123,7 +123,6 @@ bool engine_t::handle_book_snapshot(doc_t &doc, yield_context_t) {
 
 bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
   const auto response = response::book_t::from_json(doc);
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << response.str();
   return true;
 }
 

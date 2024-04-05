@@ -42,5 +42,5 @@ TEST_CASE("book_t parse") {
 
   const auto test_json = nlohmann::json::parse(test_str);
 
-  CHECK(response_json == result_json);
+  CHECK(test_json == result_json);
 }
