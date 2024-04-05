@@ -31,5 +31,17 @@ nlohmann::json subscribe_book_t::to_json() const {
   return result;
 }
 
+nlohmann::json subscribe_trade_t::to_json() const {
+  const nlohmann::json result = {{"method", "subscribe"},
+                                 {"params",
+                                  {
+                                      {"channel", "trade"},
+                                      {"symbol", m_symbols},
+                                      {"snapshot", m_snapshot},
+                                  }},
+                                 {"req_id", m_req_id}};
+  return result;
+}
+
 } // namespace request
 } // namespace krakpot

@@ -36,6 +36,8 @@ private:
   bool handle_book_snapshot(doc_t &, yield_context_t);
   bool handle_book_update(doc_t &, yield_context_t);
 
+  bool handle_trade_msg(doc_t &, yield_context_t);
+
   bool handle_heartbeat_msg(doc_t &, yield_context_t);
   bool handle_pong_msg(doc_t &, yield_context_t);
 
@@ -47,6 +49,7 @@ private:
 
   req_id_t m_book_req_id = 0;
   req_id_t m_inst_req_id = 0;
+  req_id_t m_trade_req_id = 0;
 };
 
 } // namespace krakpot
