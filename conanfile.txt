@@ -1,5 +1,6 @@
 [requires]
 boost/1.83.0
+doctest/2.4.11
 nlohmann_json/3.11.3
 openssl/3.2.0
 simdjson/3.6.1
