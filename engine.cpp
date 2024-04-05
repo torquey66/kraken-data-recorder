@@ -29,6 +29,9 @@ bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
       if (buffer == "book") {
         return handle_book_msg(doc, yield);
       }
+      if (buffer == "trade") {
+        return handle_trade_msg(doc, yield);
+      }
       if (buffer == "heartbeat") {
         return handle_heartbeat_msg(doc, yield);
       }
@@ -87,6 +90,10 @@ bool engine_t::handle_instrument_snapshot(doc_t &doc, yield_context_t yield) {
       ++m_book_req_id, request::subscribe_book_t::e_1000, true, symbols};
   m_session.send(subscribe_book.str(), yield);
 
+  const request::subscribe_trade_t subscribe_trade{++m_trade_req_id, true,
+                                                   symbols};
+  m_session.send(subscribe_trade.str(), yield);
+
   return true;
 }
 
@@ -123,6 +130,13 @@ bool engine_t::handle_book_snapshot(doc_t &doc, yield_context_t) {
 
 bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
   const auto response = response::book_t::from_json(doc);
+  return true;
+}
+
+bool engine_t::handle_trade_msg(doc_t &doc, yield_context_t) {
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " "
+                           << simdjson::to_json_string(doc);
+  //  const auto response = response::trade_t::from_json(doc);
   return true;
 }
 

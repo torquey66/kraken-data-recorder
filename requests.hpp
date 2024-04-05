@@ -79,5 +79,22 @@ private:
   std::vector<std::string> m_symbols;
 };
 
+/**
+ * See https://docs.kraken.com/websockets-v2/#trade
+ */
+struct subscribe_trade_t final {
+  subscribe_trade_t(req_id_t req_id, bool snapshot,
+                    const std::vector<std::string> &symbols)
+      : m_req_id(req_id), m_snapshot(snapshot), m_symbols(symbols) {}
+
+  nlohmann::json to_json() const;
+  std::string str() const { return to_json().dump(); }
+
+private:
+  req_id_t m_req_id;
+  bool m_snapshot;
+  std::vector<std::string> m_symbols;
+};
+
 } // namespace request
 } // namespace krakpot
