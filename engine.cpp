@@ -98,7 +98,6 @@ bool engine_t::handle_instrument_update(doc_t &doc, yield_context_t) {
 }
 
 bool engine_t::handle_book_msg(doc_t &doc, yield_context_t yield) {
-
   auto buffer = std::string_view{};
   if (doc["type"].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
@@ -117,12 +116,14 @@ bool engine_t::handle_book_msg(doc_t &doc, yield_context_t yield) {
 }
 
 bool engine_t::handle_book_snapshot(doc_t &doc, yield_context_t) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << simdjson::to_json_string(doc);
+  const auto response = response::book_t::from_json(doc);
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << response.str();
   return true;
 }
 
 bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << simdjson::to_json_string(doc);
+  const auto response = response::book_t::from_json(doc);
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << response.str();
   return true;
 }
 

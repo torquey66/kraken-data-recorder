@@ -64,14 +64,19 @@ private:
 struct book_t final {
   book_t() = default;
 
+  static book_t from_json(simdjson::ondemand::document &);
+
+  nlohmann::json to_json() const;
+  std::string str() const { return to_json().dump(); }
+
 private:
-  using asks_t = std::vector<bid_t>;
+  using asks_t = std::vector<ask_t>;
   using bids_t = std::vector<bid_t>;
 
   header_t m_header;
   asks_t m_asks;
   bids_t m_bids;
-  uint32_t m_crc32;
+  uint64_t m_crc32;
   std::string m_symbol;
   std::string m_tm; // RFC3339 - !@# TODO: consider xlating to nanos since epoch
 };
