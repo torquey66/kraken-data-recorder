@@ -135,21 +135,24 @@ bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
 
 bool engine_t::handle_trade_msg(doc_t &doc, yield_context_t) {
   const auto response = response::trades_t::from_json(doc);
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " " << response.str();
+  //  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " " << response.str();
   return true;
 }
 
-bool engine_t::handle_heartbeat_msg(doc_t &doc, yield_context_t) {
+bool engine_t::handle_heartbeat_msg(doc_t &, yield_context_t) {
   // !@# TODO: track a stat on time between heartbeats?
   return true;
 }
 
-bool engine_t::handle_pong_msg(doc_t &, yield_context_t yield) {
+bool engine_t::handle_pong_msg(doc_t &doc, yield_context_t yield) {
+  // !@# TODO: track ping/pong latency
   if (!m_subscribed) {
     const request::subscribe_instrument_t subscribe_inst{++m_inst_req_id};
     m_session.send(subscribe_inst.str(), yield);
     m_subscribed = true;
   }
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << "  "
+                           << simdjson::to_json_string(doc);
   return true;
 }
 

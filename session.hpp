@@ -50,7 +50,6 @@ private:
   void process(const recv_cb_t &, yield_context_t);
 
   ioc_t &m_ioc;
-  ssl_context_t &m_ssl_context;
   websocket_t m_ws;
 
   bool m_keep_processing = false;

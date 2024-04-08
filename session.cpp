@@ -37,7 +37,7 @@ void fail(bst::error_code ec, char const *what) {
 namespace krakpot {
 
 session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
-    : m_ioc{ioc}, m_ssl_context{ssl_context}, m_ws{ioc, ssl_context} {
+    : m_ioc{ioc}, m_ws{ioc, ssl_context} {
   asio::spawn(
       m_ioc,
       [this](yield_context_t yield) {
