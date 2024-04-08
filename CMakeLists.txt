@@ -4,11 +4,14 @@ project(KrakpotProject)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-#add_compile_options(-fsanitize=address)
-#add_link_options(-fsanitize=address)
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
+
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 # Boost
-find_package(Boost REQUIRED COMPONENTS fiber log system)
+#find_package(Boost REQUIRED COMPONENTS fiber log system)
+find_package(Boost REQUIRED)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
@@ -23,19 +26,19 @@ endif()
 set(simdjson_DIR, ${CMAKE_CURRENT_BINARY_DIR})
 find_package(simdjson REQUIRED)
 if(simdjson_FOUND)
-  include_directories(${simdjson_INCLUDE_DIRS_DEBUG})
+  include_directories(${simdjson_INCLUDE_DIRS})
 endif()
 
 # jsoncpp
 find_package(nlohmann_json)
 if(nlohmann_json_FOUND)
-  include_directories(${nlohmann_json_INCLUDE_DIRS_DEBUG})
+  include_directories(${nlohmann_json_INCLUDE_DIRS})
 endif()
 
 # doctest
 find_package(doctest REQUIRED)
 if(doctest_FOUND)
-  include_directories(${doctest_INCLUDE_DIRS_DEBUG})
+  include_directories(${doctest_INCLUDE_DIRS})
 endif()
 
 # TODO: move most of this code into a library and link against it below
