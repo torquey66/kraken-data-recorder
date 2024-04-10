@@ -39,6 +39,7 @@ struct session_t final {
   session_t(ioc_t &, ssl_context_t &);
 
   void start_processing(const recv_cb_t &);
+  void stop_processing() { m_keep_processing = false; }
   void send(msg_t, yield_context_t);
   void send(const std::string &msg, yield_context_t yield) {
     send(std::string_view(msg.data(), msg.size()), yield);
