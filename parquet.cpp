@@ -60,8 +60,8 @@ std::unique_ptr<parquet::StreamWriter> trades_sink_t::open_stream(
       "schema", parquet::Repetition::REQUIRED,
       {
           parquet::schema::PrimitiveNode::Make(
-              "ord_type", parquet::Repetition::REQUIRED,
-              parquet::Type::BYTE_ARRAY, parquet::ConvertedType::UTF8),
+              "ord_type", parquet::Repetition::REQUIRED, parquet::Type::INT32,
+              parquet::ConvertedType::INT_32),
 
           // !@# TODO: revisit best parquet representation for double values
           parquet::schema::PrimitiveNode::Make(
@@ -70,8 +70,8 @@ std::unique_ptr<parquet::StreamWriter> trades_sink_t::open_stream(
               "qty", parquet::Repetition::REQUIRED, parquet::Type::DOUBLE),
 
           parquet::schema::PrimitiveNode::Make(
-              "side", parquet::Repetition::REQUIRED, parquet::Type::BYTE_ARRAY,
-              parquet::ConvertedType::UTF8),
+              "side", parquet::Repetition::REQUIRED, parquet::Type::INT32,
+              parquet::ConvertedType::INT_32),
           parquet::schema::PrimitiveNode::Make(
               "symbol", parquet::Repetition::REQUIRED,
               parquet::Type::BYTE_ARRAY, parquet::ConvertedType::UTF8),

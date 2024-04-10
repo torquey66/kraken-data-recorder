@@ -84,10 +84,10 @@ private:
  */
 struct trades_t final {
   struct trade_t final {
-    std::string ord_type;
+    ord_type_t ord_type;
     price_t price;
     qty_t qty;
-    std::string side; // !@# TODO: create a first class side type
+    side_t side;
     std::string symbol;
     std::string tm; // RFC3339 - !@# TODO: consider xlating to nanos since epoch
     integer_t trade_id;
@@ -104,6 +104,9 @@ struct trades_t final {
   auto end() const { return m_trades.end(); }
 
 private:
+  static ord_type_t parse_ord_type(std::string_view);
+  static side_t parse_side(std::string_view);
+
   header_t m_header;
   std::vector<trade_t> m_trades;
 };

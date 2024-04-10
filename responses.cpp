@@ -130,6 +130,28 @@ nlohmann::json book_t::to_json() const {
   return result;
 }
 
+ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
+  if (ord_type == "market") {
+    return e_market;
+  }
+  if (ord_type == "limit") {
+    return e_limit;
+  }
+  throw std::runtime_error{"unsupported ord_type: " +
+                           std::string{ord_type.data(), ord_type.size()}};
+}
+
+side_t trades_t::parse_side(std::string_view side) {
+  if (side == "buy") {
+    return e_buy;
+  }
+  if (side == "sell") {
+    return e_sell;
+  }
+  throw std::runtime_error{"unsupported side: " +
+                           std::string{side.data(), side.size()}};
+}
+
 trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   auto result = trades_t{};
   auto buffer = std::string_view{};
@@ -143,11 +165,11 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   for (auto obj : response["data"]) {
     auto trade = trade_t{};
     buffer = obj["ord_type"].get_string();
-    trade.ord_type = std::string(buffer.begin(), buffer.end());
+    trade.ord_type = parse_ord_type(buffer);
     trade.price = obj["price"].get_double();
     trade.qty = obj["qty"].get_double();
     buffer = obj["side"].get_string();
-    trade.side = std::string(buffer.begin(), buffer.end());
+    trade.side = parse_side(buffer);
     buffer = obj["symbol"].get_string();
     trade.symbol = std::string(buffer.begin(), buffer.end());
     buffer = obj["timestamp"].get_string();
