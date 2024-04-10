@@ -45,8 +45,9 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
         ping(yield);
       },
       [](std::exception_ptr ex) {
-        if (ex)
+        if (ex) {
           std::rethrow_exception(ex);
+        }
       });
 }
 
@@ -57,8 +58,9 @@ void session_t::start_processing(const recv_cb_t &handle_recv) {
         process(handle_recv, yield);
       },
       [](std::exception_ptr ex) {
-        if (ex)
+        if (ex) {
           std::rethrow_exception(ex);
+        }
       });
 }
 
@@ -83,7 +85,6 @@ void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
     timer.expires_from_now(boost::posix_time::seconds(1));
     timer.async_wait(yield);
   }
-
   while (m_keep_processing) {
     buffer.clear();
     m_ws.async_read(buffer, yield[ec]);
@@ -92,7 +93,9 @@ void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
     } else {
       auto msg_str = bst::buffers_to_string(buffer.data());
       try {
-        m_keep_processing = handle_recv(std::string_view(msg_str), yield);
+        if (!handle_recv(std::string_view(msg_str), yield)) {
+          m_keep_processing = false;
+        }
       } catch (const std::exception &ex) {
         BOOST_LOG_TRIVIAL(error) << ex.what();
         m_keep_processing = false;
@@ -161,6 +164,8 @@ void session_t::ping(yield_context_t yield) {
       m_keep_processing = false;
     }
   }
+  timer.cancel();
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " shutting down";
 
   m_ws.async_close(ws::close_code::normal, yield[ec]);
   if (ec)
