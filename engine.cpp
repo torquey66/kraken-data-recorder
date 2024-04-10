@@ -2,6 +2,7 @@
 
 #include "engine.hpp"
 
+#include "constants.hpp"
 #include "requests.hpp"
 #include "responses.hpp"
 
@@ -13,7 +14,8 @@
 
 namespace krakpot {
 
-engine_t::engine_t(session_t &session) : m_session(session) {}
+engine_t::engine_t(session_t &session)
+    : m_session{session}, m_trades_sink{c_parquet_dir} {}
 
 bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
 
@@ -135,6 +137,7 @@ bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
 
 bool engine_t::handle_trade_msg(doc_t &doc, yield_context_t) {
   const auto response = response::trades_t::from_json(doc);
+  m_trades_sink.accept(response);
   //  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " " << response.str();
   return true;
 }

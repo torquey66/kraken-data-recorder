@@ -1,6 +1,7 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "parquet.hpp"
 #include "session.hpp"
 
 #include <simdjson.h>
@@ -50,6 +51,8 @@ private:
   req_id_t m_book_req_id = 0;
   req_id_t m_inst_req_id = 0;
   req_id_t m_trade_req_id = 0;
+
+  pq::trades_sink_t m_trades_sink;
 };
 
 } // namespace krakpot
