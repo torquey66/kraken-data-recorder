@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 project(KrakpotProject)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -9,36 +9,38 @@ add_link_options(-fsanitize=address)
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
-# Boost
-#find_package(Boost REQUIRED COMPONENTS fiber log system)
+##
+# External dependencies
+#
+find_package(Arrow REQUIRED)
+if (Arrow_FOUND)
+    include_directories(SYSTEM ${Arrow_INCLUDE_DIRS})
+endif()
+
 find_package(Boost REQUIRED)
 if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
+    include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 endif()
 
-# OpenSSL
+find_package(doctest REQUIRED)
+if(doctest_FOUND)
+  include_directories(SYSTEM ${doctest_INCLUDE_DIRS})
+endif()
+
+find_package(nlohmann_json)
+if(nlohmann_json_FOUND)
+  include_directories(SYSTEM ${nlohmann_json_INCLUDE_DIRS})
+endif()
+
 find_package(OpenSSL REQUIRED)
 if(OPENSSL_FOUND)
-    include_directories(${OPENSSL_INCLUDE_DIR})
+    include_directories(SYSTEM ${OPENSSL_INCLUDE_DIR})
 endif()
 
-# simdjson
 set(simdjson_DIR, ${CMAKE_CURRENT_BINARY_DIR})
 find_package(simdjson REQUIRED)
 if(simdjson_FOUND)
-  include_directories(${simdjson_INCLUDE_DIRS})
-endif()
-
-# jsoncpp
-find_package(nlohmann_json)
-if(nlohmann_json_FOUND)
-  include_directories(${nlohmann_json_INCLUDE_DIRS})
-endif()
-
-# doctest
-find_package(doctest REQUIRED)
-if(doctest_FOUND)
-  include_directories(${doctest_INCLUDE_DIRS})
+  include_directories(SYSTEM ${simdjson_INCLUDE_DIRS})
 endif()
 
 # TODO: move most of this code into a library and link against it below
@@ -48,17 +50,26 @@ add_executable(Krakpot
   engine.cpp
   main.cpp
   pair.cpp
+  parquet.cpp
   requests.cpp
   responses.cpp
   session.cpp
 )
 
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
+
 target_link_libraries(Krakpot
   Boost::fiber
   Boost::log
   Boost::system
+  ${arrow_LIBRARIES_DEBUG}
   ${JSONCPP_LIBRARIES}
   ${OPENSSL_LIBRARIES}
+  ${PARQUET_LIBRARIES}
   ${simdjson_LIBRARIES}
 )
 

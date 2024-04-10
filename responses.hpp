@@ -100,6 +100,9 @@ struct trades_t final {
   nlohmann::json to_json() const;
   std::string str() const { return to_json().dump(); }
 
+  auto begin() const { return m_trades.begin(); }
+  auto end() const { return m_trades.end(); }
+
 private:
   header_t m_header;
   std::vector<trade_t> m_trades;
