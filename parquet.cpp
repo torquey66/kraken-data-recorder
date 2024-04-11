@@ -22,7 +22,8 @@ trades_sink_t::trades_sink_t(std::string parquet_dir)
 void trades_sink_t::accept(const response::trades_t &trades) {
   for (const auto &trade : trades) {
     *m_os << trade.ord_type << trade.price << trade.qty << trade.side
-          << trade.symbol << trade.tm << trade.trade_id << parquet::EndRow;
+          << trade.symbol << trade.timestamp << trade.trade_id
+          << parquet::EndRow;
   }
 }
 
@@ -76,8 +77,8 @@ std::unique_ptr<parquet::StreamWriter> trades_sink_t::open_stream(
               "symbol", parquet::Repetition::REQUIRED,
               parquet::Type::BYTE_ARRAY, parquet::ConvertedType::UTF8),
           parquet::schema::PrimitiveNode::Make(
-              "timestamp", parquet::Repetition::REQUIRED,
-              parquet::Type::BYTE_ARRAY, parquet::ConvertedType::UTF8),
+              "timestamp", parquet::Repetition::REQUIRED, parquet::Type::INT64,
+              parquet::ConvertedType::UINT_64),
           parquet::schema::PrimitiveNode::Make(
               "trade_id", parquet::Repetition::REQUIRED, parquet::Type::INT64,
               parquet::ConvertedType::INT_64),

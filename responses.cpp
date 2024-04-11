@@ -2,6 +2,46 @@
 
 #include "responses.hpp"
 
+#include <chrono>
+
+namespace {
+
+/**
+ * TODO: this is derived from a straightforward ChatGPT
+ * example. Timestamp parsing is frequently a perf bottleneck and
+ * krakpot does a *lot* of it, so it's worth measuring and considering
+ * a better approach.
+ */
+krakpot::timestamp_t parse_timestamp(std::string_view ts_str) {
+  using std::chrono::duration_cast;
+  using std::chrono::microseconds;
+  using std::chrono::seconds;
+  using std::chrono::system_clock;
+  using std::chrono::time_point;
+
+  tm tm_time{};
+  static constexpr int c_num_expected = 6;
+  // !@# TODO: get rid of this string alloc
+  const auto buffer = std::string{ts_str.data(), ts_str.size()};
+  const int num_assigned = sscanf(
+      buffer.c_str(), "%d-%d-%dT%d:%d:%d", &tm_time.tm_year, &tm_time.tm_mon,
+      &tm_time.tm_mday, &tm_time.tm_hour, &tm_time.tm_min, &tm_time.tm_sec);
+  if (num_assigned != c_num_expected) {
+    throw std::runtime_error{"unable to parse timestamp: " +
+                             std::string{ts_str.data(), ts_str.size()}};
+  }
+  tm_time.tm_year -= 1900; // Year since 1900
+  tm_time.tm_mon -= 1;     // Month is 0-based
+
+  time_t time_since_epoch = mktime(&tm_time);
+  const auto tp = time_point<system_clock>(seconds(time_since_epoch));
+  const auto result =
+      duration_cast<microseconds>(tp.time_since_epoch()).count();
+  return result;
+}
+
+} // namespace
+
 namespace krakpot {
 namespace response {
 
@@ -91,7 +131,7 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
 
     if (type == "update") {
       buffer = data["timestamp"].get_string();
-      result.m_tm = std::string{buffer.begin(), buffer.end()};
+      result.m_timestamp = parse_timestamp(buffer);
     }
   }
 
@@ -117,9 +157,8 @@ nlohmann::json book_t::to_json() const {
   content["bids"] = bids;
   content["checksum"] = m_crc32;
   content["symbol"] = m_symbol;
-  if (!m_tm.empty()) {
-    content["timestamp"] = m_tm;
-  }
+  content["timestamp"] = m_timestamp;
+
   auto data = nlohmann::json::array();
   data.push_back(content);
 
@@ -173,7 +212,7 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
     buffer = obj["symbol"].get_string();
     trade.symbol = std::string(buffer.begin(), buffer.end());
     buffer = obj["timestamp"].get_string();
-    trade.tm = std::string(buffer.begin(), buffer.end());
+    trade.timestamp = parse_timestamp(buffer);
     trade.trade_id = obj["trade_id"].get_uint64();
     result.m_trades.push_back(trade);
   }
@@ -188,7 +227,7 @@ nlohmann::json trades_t::to_json() const {
     const nlohmann::json trade_json = {
         {"ord_type", trade.ord_type}, {"price", trade.price},
         {"qty", trade.qty},           {"side", trade.side},
-        {"symbol", trade.symbol},     {"timestamp", trade.tm},
+        {"symbol", trade.symbol},     {"timestamp", trade.timestamp},
         {"trade_id", trade.trade_id},
     };
     trades.push_back(trade_json);
