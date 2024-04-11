@@ -76,7 +76,7 @@ private:
   bids_t m_bids;
   uint64_t m_crc32;
   std::string m_symbol;
-  std::string m_tm; // RFC3339 - !@# TODO: consider xlating to nanos since epoch
+  timestamp_t m_timestamp = 0;
 };
 
 /**
@@ -89,7 +89,7 @@ struct trades_t final {
     qty_t qty;
     side_t side;
     std::string symbol;
-    std::string tm; // RFC3339 - !@# TODO: consider xlating to nanos since epoch
+    timestamp_t timestamp;
     integer_t trade_id;
   };
 

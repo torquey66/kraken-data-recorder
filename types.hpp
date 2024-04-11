@@ -17,7 +17,9 @@ namespace krakpot {
 
 using integer_t = int64_t;
 using double_t = double;
+
 using req_id_t = int64_t;
+using timestamp_t = uint64_t; // microseconds since the epoch
 
 using price_t = double_t;
 using qty_t = double_t;
