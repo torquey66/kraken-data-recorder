@@ -1,9 +1,6 @@
 #include "parquet.hpp"
 
-#include <arrow/util/type_fwd.h>
 #include <boost/log/trivial.hpp>
-#include <parquet/api/writer.h>
-#include <parquet/arrow/writer.h>
 
 namespace krakpot {
 namespace pq {
@@ -17,14 +14,51 @@ trades_sink_t::trades_sink_t(std::string parquet_dir)
     : m_parquet_dir{parquet_dir},
       m_trades_filename{m_parquet_dir + "/trades.pq"},
       m_trades_file{open_trades_file(m_trades_filename)},
-      m_os{open_stream(m_trades_file)} {}
+      m_os{open_writer(m_trades_file)} {}
 
 void trades_sink_t::accept(const response::trades_t &trades) {
+  m_ord_type_builder.Reset();
+  m_price_builder.Reset();
+  m_qty_builder.Reset();
+  m_side_builder.Reset();
+  m_symbol_builder.Reset();
+  m_timestamp_builder.Reset();
+  m_trade_id_builder.Reset();
+
   for (const auto &trade : trades) {
-    *m_os << trade.ord_type << trade.price << trade.qty << trade.side
-          << trade.symbol << trade.timestamp << trade.trade_id
-          << parquet::EndRow;
+    PARQUET_THROW_NOT_OK(m_ord_type_builder.Append(trade.ord_type));
+    PARQUET_THROW_NOT_OK(m_price_builder.Append(trade.price));
+    PARQUET_THROW_NOT_OK(m_qty_builder.Append(trade.qty));
+    PARQUET_THROW_NOT_OK(m_side_builder.Append(trade.side));
+    PARQUET_THROW_NOT_OK(m_symbol_builder.Append(trade.symbol));
+    PARQUET_THROW_NOT_OK(m_timestamp_builder.Append(trade.timestamp));
+    PARQUET_THROW_NOT_OK(m_trade_id_builder.Append(trade.trade_id));
   }
+
+  std::shared_ptr<arrow::Array> ord_type_array;
+  std::shared_ptr<arrow::Array> price_array;
+  std::shared_ptr<arrow::Array> qty_array;
+  std::shared_ptr<arrow::Array> side_array;
+  std::shared_ptr<arrow::Array> symbol_array;
+  std::shared_ptr<arrow::Array> timestamp_array;
+  std::shared_ptr<arrow::Array> trade_id_array;
+
+  PARQUET_THROW_NOT_OK(m_ord_type_builder.Finish(&ord_type_array));
+  PARQUET_THROW_NOT_OK(m_price_builder.Finish(&price_array));
+  PARQUET_THROW_NOT_OK(m_qty_builder.Finish(&qty_array));
+  PARQUET_THROW_NOT_OK(m_side_builder.Finish(&side_array));
+  PARQUET_THROW_NOT_OK(m_symbol_builder.Finish(&symbol_array));
+  PARQUET_THROW_NOT_OK(m_timestamp_builder.Finish(&timestamp_array));
+  PARQUET_THROW_NOT_OK(m_trade_id_builder.Finish(&trade_id_array));
+
+  auto columns = std::vector<std::shared_ptr<arrow::Array>>{
+      ord_type_array, price_array,     qty_array,      side_array,
+      symbol_array,   timestamp_array, trade_id_array,
+  };
+
+  std::shared_ptr<arrow::RecordBatch> batch =
+      arrow::RecordBatch::Make(schema(), trades.size(), columns);
+  PARQUET_THROW_NOT_OK(m_os->WriteRecordBatch(*batch));
 }
 
 std::shared_ptr<arrow::io::FileOutputStream>
@@ -39,53 +73,42 @@ trades_sink_t::open_trades_file(std::string trades_filename) {
   throw std::runtime_error(msg);
 }
 
-std::unique_ptr<parquet::StreamWriter> trades_sink_t::open_stream(
+std::unique_ptr<parquet::arrow::FileWriter> trades_sink_t::open_writer(
     std::shared_ptr<arrow::io::FileOutputStream> trades_file) {
-  ///
-  // TODO: properties cribbed from
-  // https://arrow.apache.org/docs/cpp/parquet.html#
-  //
-  // replace these with deliberately chosen ones
-  //
+
   std::shared_ptr<WriterProperties> props =
       WriterProperties::Builder()
-          .max_row_group_length(64 * 1024)
+          .max_row_group_length(32 * 1024)
           ->created_by("Krakpot")
           ->version(ParquetVersion::PARQUET_2_6)
           ->data_page_version(ParquetDataPageVersion::V2)
           ->compression(Compression::SNAPPY)
           ->build();
 
-  std::shared_ptr<parquet::schema::GroupNode> schema = std::static_pointer_cast<
-      parquet::schema::GroupNode>(parquet::schema::GroupNode::Make(
-      "schema", parquet::Repetition::REQUIRED,
-      {
-          parquet::schema::PrimitiveNode::Make(
-              "ord_type", parquet::Repetition::REQUIRED, parquet::Type::INT32,
-              parquet::ConvertedType::INT_32),
+  std::shared_ptr<parquet::ArrowWriterProperties> arrow_props =
+      parquet::ArrowWriterProperties::Builder().store_schema()->build();
 
-          // !@# TODO: revisit best parquet representation for double values
-          parquet::schema::PrimitiveNode::Make(
-              "price", parquet::Repetition::REQUIRED, parquet::Type::DOUBLE),
-          parquet::schema::PrimitiveNode::Make(
-              "qty", parquet::Repetition::REQUIRED, parquet::Type::DOUBLE),
+  arrow::Result<std::unique_ptr<parquet::arrow::FileWriter>> result =
+      parquet::arrow::FileWriter::Open(*schema(), arrow::default_memory_pool(),
+                                       trades_file, props, arrow_props);
 
-          parquet::schema::PrimitiveNode::Make(
-              "side", parquet::Repetition::REQUIRED, parquet::Type::INT32,
-              parquet::ConvertedType::INT_32),
-          parquet::schema::PrimitiveNode::Make(
-              "symbol", parquet::Repetition::REQUIRED,
-              parquet::Type::BYTE_ARRAY, parquet::ConvertedType::UTF8),
-          parquet::schema::PrimitiveNode::Make(
-              "timestamp", parquet::Repetition::REQUIRED, parquet::Type::INT64,
-              parquet::ConvertedType::UINT_64),
-          parquet::schema::PrimitiveNode::Make(
-              "trade_id", parquet::Repetition::REQUIRED, parquet::Type::INT64,
-              parquet::ConvertedType::INT_64),
-      }));
+  return std::move(result.ValueOrDie()); // TODO this is all really hinky
+}
 
-  return std::make_unique<parquet::StreamWriter>(
-      parquet::ParquetFileWriter::Open(trades_file, schema, props));
+std::shared_ptr<arrow::Schema> trades_sink_t::schema() {
+  // TODO: add KeyValueMetadata for enum fields
+
+  auto field_vector = arrow::FieldVector{
+      arrow::field("ord_type", arrow::uint8(), false),
+      arrow::field("price", arrow::float64(), false),
+      arrow::field("qty", arrow::float64(), false),
+      arrow::field("side", arrow::uint8(), false),
+      arrow::field("symbol", arrow::utf8(), false),
+      arrow::field("timestamp", arrow::uint64(),
+                   false), // TODO: replace with timestamp type
+      arrow::field("trade_id", arrow::uint64(), false),
+  };
+  return arrow::schema(field_vector);
 }
 
 } // namespace pq

@@ -4,7 +4,7 @@
 #include "asset.hpp"
 #include "pair.hpp"
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 #include <simdjson.h>
 
 #include <string>
@@ -102,6 +102,7 @@ struct trades_t final {
 
   auto begin() const { return m_trades.begin(); }
   auto end() const { return m_trades.end(); }
+  auto size() const { return m_trades.size(); }
 
 private:
   static ord_type_t parse_ord_type(std::string_view);
