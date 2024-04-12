@@ -36,7 +36,7 @@ static constexpr double_t c_NaN = std::numeric_limits<double>::signaling_NaN();
  *
  * https://www.onixs.biz/fix-dictionary/5.0/tagNum_40.html
  */
-enum ord_type_t : int32_t {
+enum ord_type_t : char {
   // clang-format off
   e_market                = '1',
   e_limit                 = '2',
@@ -55,7 +55,7 @@ enum ord_type_t : int32_t {
  *
  * https://www.onixs.biz/fix-dictionary/5.0/tagNum_54.html
  */
-enum side_t : int32_t {
+enum side_t : char {
   // clang-format off
   e_buy                = '1',
   e_sell               = '2',

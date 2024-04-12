@@ -34,10 +34,12 @@ private:
   std::shared_ptr<arrow::io::FileOutputStream> m_trades_file;
   std::unique_ptr<parquet::arrow::FileWriter> m_os;
 
-  arrow::UInt8Builder m_ord_type_builder;
+  std::shared_ptr<arrow::Schema> m_schema;
+
+  arrow::StringBuilder m_ord_type_builder;
   arrow::DoubleBuilder m_price_builder;
   arrow::DoubleBuilder m_qty_builder;
-  arrow::UInt8Builder m_side_builder;
+  arrow::StringBuilder m_side_builder;
   arrow::StringBuilder m_symbol_builder;
   arrow::UInt64Builder m_timestamp_builder;
   arrow::UInt64Builder m_trade_id_builder;

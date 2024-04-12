@@ -14,7 +14,7 @@ trades_sink_t::trades_sink_t(std::string parquet_dir)
     : m_parquet_dir{parquet_dir},
       m_trades_filename{m_parquet_dir + "/trades.pq"},
       m_trades_file{open_trades_file(m_trades_filename)},
-      m_os{open_writer(m_trades_file)} {}
+      m_os{open_writer(m_trades_file)}, m_schema{schema()} {}
 
 void trades_sink_t::accept(const response::trades_t &trades) {
   m_ord_type_builder.Reset();
@@ -26,10 +26,11 @@ void trades_sink_t::accept(const response::trades_t &trades) {
   m_trade_id_builder.Reset();
 
   for (const auto &trade : trades) {
-    PARQUET_THROW_NOT_OK(m_ord_type_builder.Append(trade.ord_type));
+    PARQUET_THROW_NOT_OK(
+        m_ord_type_builder.Append(std::string(1, trade.ord_type)));
     PARQUET_THROW_NOT_OK(m_price_builder.Append(trade.price));
     PARQUET_THROW_NOT_OK(m_qty_builder.Append(trade.qty));
-    PARQUET_THROW_NOT_OK(m_side_builder.Append(trade.side));
+    PARQUET_THROW_NOT_OK(m_side_builder.Append(std::string(1, trade.side)));
     PARQUET_THROW_NOT_OK(m_symbol_builder.Append(trade.symbol));
     PARQUET_THROW_NOT_OK(m_timestamp_builder.Append(trade.timestamp));
     PARQUET_THROW_NOT_OK(m_trade_id_builder.Append(trade.trade_id));
@@ -57,7 +58,7 @@ void trades_sink_t::accept(const response::trades_t &trades) {
   };
 
   std::shared_ptr<arrow::RecordBatch> batch =
-      arrow::RecordBatch::Make(schema(), trades.size(), columns);
+      arrow::RecordBatch::Make(m_schema, trades.size(), columns);
   PARQUET_THROW_NOT_OK(m_os->WriteRecordBatch(*batch));
 }
 
@@ -99,10 +100,10 @@ std::shared_ptr<arrow::Schema> trades_sink_t::schema() {
   // TODO: add KeyValueMetadata for enum fields
 
   auto field_vector = arrow::FieldVector{
-      arrow::field("ord_type", arrow::uint8(), false),
+      arrow::field("ord_type", arrow::utf8(), false),
       arrow::field("price", arrow::float64(), false),
       arrow::field("qty", arrow::float64(), false),
-      arrow::field("side", arrow::uint8(), false),
+      arrow::field("side", arrow::utf8(), false),
       arrow::field("symbol", arrow::utf8(), false),
       arrow::field("timestamp", arrow::uint64(),
                    false), // TODO: replace with timestamp type
