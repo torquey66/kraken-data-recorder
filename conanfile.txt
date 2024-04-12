@@ -7,8 +7,8 @@ openssl/3.2.0
 simdjson/3.6.1
 
 [generators]
-CMakeDeps
 CMakeToolchain
+CMakeDeps
 
 [options]
 arrow/*:parquet=True

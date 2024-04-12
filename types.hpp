@@ -1,7 +1,9 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include <cstdint>
 #include <limits>
+#include <utility>
 
 /**
  * The Kraken API spec references types such as 'float' and 'integer'
