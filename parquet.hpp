@@ -21,6 +21,8 @@ struct trades_sink_t final {
   void accept(const response::trades_t &);
 
 private:
+  void reset_builders();
+
   static std::shared_ptr<arrow::Schema> schema();
 
   static std::shared_ptr<arrow::io::FileOutputStream>
@@ -36,12 +38,13 @@ private:
 
   std::shared_ptr<arrow::Schema> m_schema;
 
+  arrow::Int64Builder m_recv_tm_builder;
   arrow::StringBuilder m_ord_type_builder;
   arrow::DoubleBuilder m_price_builder;
   arrow::DoubleBuilder m_qty_builder;
   arrow::StringBuilder m_side_builder;
   arrow::StringBuilder m_symbol_builder;
-  arrow::UInt64Builder m_timestamp_builder;
+  arrow::Int64Builder m_timestamp_builder;
   arrow::UInt64Builder m_trade_id_builder;
 };
 

@@ -83,17 +83,19 @@ enum side_t : char {
  */
 struct timestamp_t final {
   timestamp_t() {}
-  timestamp_t(uint64_t in_micros) : m_micros(in_micros) {}
+  timestamp_t(int64_t in_micros) : m_micros(in_micros) {}
 
   std::string str() const { return to_iso_8601(m_micros); };
 
-  uint64_t micros() const { return m_micros; }
+  int64_t micros() const { return m_micros; }
 
-  static std::string to_iso_8601(uint64_t);
-  static uint64_t from_iso_8601(const std::string &);
+  static std::string to_iso_8601(int64_t);
+  static int64_t from_iso_8601(const std::string &);
+
+  static timestamp_t now();
 
 private:
-  uint64_t m_micros = 0;
+  int64_t m_micros = 0;
 };
 
 } // namespace krakpot

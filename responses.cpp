@@ -15,7 +15,7 @@ instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
   const auto channel = std::string{buffer.begin(), buffer.end()};
   buffer = response["type"].get_string();
   const auto type = std::string{buffer.begin(), buffer.end()};
-  result.m_header = header_t{channel, type};
+  result.m_header = header_t{timestamp_t::now(), channel, type};
 
   for (simdjson::fallback::ondemand::object obj : response["data"]["assets"]) {
     const auto asset = asset_t::from_json(obj);
@@ -61,7 +61,7 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
   const auto channel = std::string{buffer.begin(), buffer.end()};
   buffer = response["type"].get_string();
   const auto type = std::string{buffer.begin(), buffer.end()};
-  result.m_header = header_t{channel, type};
+  result.m_header = header_t{timestamp_t::now(), channel, type};
 
   // TODO: it is entirely unclear to me why `data` is an array since
   // it only ever seems to contain a single entry.
@@ -162,7 +162,7 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   const auto channel = std::string{buffer.begin(), buffer.end()};
   buffer = response["type"].get_string();
   const auto type = std::string{buffer.begin(), buffer.end()};
-  result.m_header = header_t{channel, type};
+  result.m_header = header_t{timestamp_t::now(), channel, type};
 
   for (auto obj : response["data"]) {
     auto trade = trade_t{};

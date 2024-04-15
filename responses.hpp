@@ -25,13 +25,15 @@ namespace response {
  */
 struct header_t final {
   header_t() = default;
-  header_t(std::string channel, std::string type)
-      : m_channel(channel), m_type(type) {}
+  header_t(timestamp_t recv_tm, std::string channel, std::string type)
+      : m_recv_tm(recv_tm), m_channel(channel), m_type(type) {}
 
+  const timestamp_t recv_tm() const { return m_recv_tm; }
   const std::string &channel() const { return m_channel; }
   const std::string &type() const { return m_type; }
 
 private:
+  timestamp_t m_recv_tm;
   std::string m_channel;
   std::string m_type;
 };
@@ -94,6 +96,8 @@ struct trades_t final {
   };
 
   trades_t() = default;
+
+  const header_t &header() const { return m_header; }
 
   static trades_t from_json(simdjson::ondemand::document &);
 
