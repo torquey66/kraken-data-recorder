@@ -1,6 +1,7 @@
 [requires]
 arrow/15.0.0
 boost/1.84.0
+date/3.0.1
 doctest/2.4.11
 nlohmann_json/3.11.3
 openssl/3.2.0

@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <string>
 #include <utility>
 
 /**
@@ -21,8 +22,6 @@ using integer_t = int64_t;
 using double_t = double;
 
 using req_id_t = int64_t;
-using timestamp_t = uint64_t; // microseconds since the epoch
-
 using price_t = double_t;
 using qty_t = double_t;
 using quote_t = std::pair<price_t, qty_t>;
@@ -74,6 +73,27 @@ enum side_t : char {
   e_lend               = 'F',
   e_borrow             = 'G',
   // clang-format on
+};
+
+/**
+ * AFAIK, Kraken timetamps are always ISO 8601 strings in GMT.
+ *
+ * TODO: consider using chrono timepoints in some fashion instead of
+ * raw micros.
+ */
+struct timestamp_t final {
+  timestamp_t() {}
+  timestamp_t(uint64_t in_micros) : m_micros(in_micros) {}
+
+  std::string str() const { return to_iso_8601(m_micros); };
+
+  uint64_t micros() const { return m_micros; }
+
+  static std::string to_iso_8601(uint64_t);
+  static uint64_t from_iso_8601(const std::string &);
+
+private:
+  uint64_t m_micros = 0;
 };
 
 } // namespace krakpot
