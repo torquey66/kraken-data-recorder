@@ -45,6 +45,11 @@ private:
   std::unique_ptr<parquet::arrow::FileWriter> m_os;
 
   arrow::Int64Builder m_recv_tm_builder;
+
+  std::shared_ptr<arrow::DoubleBuilder> m_ask_px_builder;
+  std::shared_ptr<arrow::DoubleBuilder> m_ask_qty_builder;
+  arrow::MapBuilder m_asks_builder;
+
   arrow::UInt64Builder m_crc32_builder;
   arrow::StringBuilder m_symbol_builder;
   arrow::Int64Builder m_timestamp_builder;

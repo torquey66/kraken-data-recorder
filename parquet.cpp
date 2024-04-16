@@ -58,29 +58,46 @@ book_sink_t::book_sink_t(std::string parquet_dir)
     : m_schema{schema()}, m_parquet_dir{parquet_dir},
       m_book_filename{m_parquet_dir + "/book.pq"},
       m_book_file{open_sink_file(m_book_filename)},
-      m_os{open_writer(m_book_file, m_schema)} {}
+      m_os{open_writer(m_book_file, m_schema)},
+      m_ask_px_builder{std::make_shared<arrow::DoubleBuilder>()},
+      m_ask_qty_builder{std::make_shared<arrow::DoubleBuilder>()},
+      m_asks_builder{arrow::default_memory_pool(), m_ask_px_builder,
+                     m_ask_qty_builder, true} {}
 
 void book_sink_t::accept(const response::book_t &book) {
   reset_builders();
 
   PARQUET_THROW_NOT_OK(
       m_recv_tm_builder.Append(book.header().recv_tm().micros()));
+
+  PARQUET_THROW_NOT_OK(m_asks_builder.Append());
+  for (const auto &ask : book.asks()) {
+    PARQUET_THROW_NOT_OK(m_ask_px_builder->Append(ask.first));
+    PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second));
+  }
+
   PARQUET_THROW_NOT_OK(m_crc32_builder.Append(book.crc32()));
   PARQUET_THROW_NOT_OK(m_symbol_builder.Append(book.symbol()));
   PARQUET_THROW_NOT_OK(m_timestamp_builder.Append(book.timestamp().micros()));
 
   std::shared_ptr<arrow::Array> recv_tm_array;
+  std::shared_ptr<arrow::Array> ask_px_array;
+  std::shared_ptr<arrow::Array> ask_qty_array;
+  std::shared_ptr<arrow::Array> asks_array;
   std::shared_ptr<arrow::Array> crc32_array;
   std::shared_ptr<arrow::Array> symbol_array;
   std::shared_ptr<arrow::Array> timestamp_array;
 
   PARQUET_THROW_NOT_OK(m_recv_tm_builder.Finish(&recv_tm_array));
+  PARQUET_THROW_NOT_OK(m_ask_px_builder->Finish(&ask_px_array));
+  PARQUET_THROW_NOT_OK(m_ask_qty_builder->Finish(&ask_qty_array));
+  PARQUET_THROW_NOT_OK(m_asks_builder.Finish(&asks_array));
   PARQUET_THROW_NOT_OK(m_crc32_builder.Finish(&crc32_array));
   PARQUET_THROW_NOT_OK(m_symbol_builder.Finish(&symbol_array));
   PARQUET_THROW_NOT_OK(m_timestamp_builder.Finish(&timestamp_array));
 
   auto columns = std::vector<std::shared_ptr<arrow::Array>>{
-      recv_tm_array, crc32_array, symbol_array, timestamp_array};
+      recv_tm_array, asks_array, crc32_array, symbol_array, timestamp_array};
 
   std::shared_ptr<arrow::RecordBatch> batch =
       arrow::RecordBatch::Make(m_schema, 1, columns);
@@ -89,6 +106,9 @@ void book_sink_t::accept(const response::book_t &book) {
 
 void book_sink_t::reset_builders() {
   m_recv_tm_builder.Reset();
+  m_ask_px_builder->Reset();
+  m_ask_qty_builder->Reset();
+  m_asks_builder.Reset();
   m_crc32_builder.Reset();
   m_symbol_builder.Reset();
   m_timestamp_builder.Reset();
@@ -100,6 +120,8 @@ std::shared_ptr<arrow::Schema> book_sink_t::schema() {
   auto field_vector = arrow::FieldVector{
       arrow::field("recv_tm", arrow::int64(),
                    false), // TODO: replace with timestamp type
+      arrow::field("asks", arrow::map(arrow::float64(), arrow::float64(), true),
+                   false),
       arrow::field("crc32", arrow::uint64(), false),
       arrow::field("symbol", arrow::utf8(), false),
       arrow::field("timestamp", arrow::int64(),
@@ -191,5 +213,5 @@ std::shared_ptr<arrow::Schema> trades_sink_t::schema() {
   return arrow::schema(field_vector);
 }
 
-} // namespace pq
+  } // namespace pq
 } // namespace krakpot

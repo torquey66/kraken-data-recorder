@@ -65,6 +65,7 @@ struct book_t final {
   book_t() = default;
 
   const header_t &header() const { return m_header; }
+  const std::vector<ask_t> &asks() const { return m_asks; }
   uint64_t crc32() const { return m_crc32; }
   const std::string &symbol() const { return m_symbol; }
   timestamp_t timestamp() const { return m_timestamp; }
