@@ -15,7 +15,8 @@
 namespace krakpot {
 
 engine_t::engine_t(session_t &session)
-    : m_session{session}, m_trades_sink{c_parquet_dir} {}
+    : m_session{session}, m_book_sink{c_parquet_dir},
+      m_trades_sink{c_parquet_dir} {}
 
 bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
 
@@ -126,12 +127,14 @@ bool engine_t::handle_book_msg(doc_t &doc, yield_context_t yield) {
 
 bool engine_t::handle_book_snapshot(doc_t &doc, yield_context_t) {
   const auto response = response::book_t::from_json(doc);
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << response.str();
+  // BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << response.str();
+  m_book_sink.accept(response);
   return true;
 }
 
 bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
   const auto response = response::book_t::from_json(doc);
+  m_book_sink.accept(response);
   return true;
 }
 
