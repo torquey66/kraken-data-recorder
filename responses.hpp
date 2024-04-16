@@ -64,6 +64,11 @@ private:
 struct book_t final {
   book_t() = default;
 
+  const header_t &header() const { return m_header; }
+  uint64_t crc32() const { return m_crc32; }
+  const std::string &symbol() const { return m_symbol; }
+  timestamp_t timestamp() const { return m_timestamp; }
+
   static book_t from_json(simdjson::ondemand::document &);
 
   nlohmann::json to_json() const;
@@ -78,7 +83,7 @@ private:
   bids_t m_bids;
   uint64_t m_crc32;
   std::string m_symbol;
-  timestamp_t m_timestamp = 0;
+  timestamp_t m_timestamp;
 };
 
 /**

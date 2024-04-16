@@ -52,6 +52,7 @@ private:
   req_id_t m_inst_req_id = 0;
   req_id_t m_trade_req_id = 0;
 
+  pq::book_sink_t m_book_sink;
   pq::trades_sink_t m_trades_sink;
 };
 

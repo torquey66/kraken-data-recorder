@@ -94,6 +94,9 @@ void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
       auto msg_str = bst::buffers_to_string(buffer.data());
       try {
         if (!handle_recv(std::string_view(msg_str), yield)) {
+          BOOST_LOG_TRIVIAL(error)
+              << __FUNCTION__
+              << "handle_recv() returned false -- stop processing";
           m_keep_processing = false;
         }
       } catch (const std::exception &ex) {
@@ -102,6 +105,7 @@ void session_t::process(const recv_cb_t &handle_recv, yield_context_t yield) {
       }
     }
   }
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " returning";
 }
 
 void session_t::handshake(std::string host, std::string port,
