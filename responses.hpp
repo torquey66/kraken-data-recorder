@@ -64,8 +64,12 @@ private:
 struct book_t final {
   book_t() = default;
 
+  using asks_t = std::vector<ask_t>;
+  using bids_t = std::vector<bid_t>;
+
   const header_t &header() const { return m_header; }
-  const std::vector<ask_t> &asks() const { return m_asks; }
+  const bids_t &bids() const { return m_bids; }
+  const asks_t &asks() const { return m_asks; }
   uint64_t crc32() const { return m_crc32; }
   const std::string &symbol() const { return m_symbol; }
   timestamp_t timestamp() const { return m_timestamp; }
@@ -76,9 +80,6 @@ struct book_t final {
   std::string str() const { return to_json().dump(); }
 
 private:
-  using asks_t = std::vector<ask_t>;
-  using bids_t = std::vector<bid_t>;
-
   header_t m_header;
   asks_t m_asks;
   bids_t m_bids;

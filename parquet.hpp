@@ -29,13 +29,8 @@ struct book_sink_t final {
 private:
   void reset_builders();
 
+  static std::shared_ptr<arrow::DataType> quote_struct();
   static std::shared_ptr<arrow::Schema> schema();
-
-  // static std::shared_ptr<arrow::io::FileOutputStream>
-  // open_book_file(std::string book_filename);
-
-  //  static std::unique_ptr<parquet::arrow::FileWriter>
-  //  open_writer(std::shared_ptr<arrow::io::FileOutputStream> book_file);
 
   std::shared_ptr<arrow::Schema> m_schema;
 
@@ -44,15 +39,21 @@ private:
   std::shared_ptr<arrow::io::FileOutputStream> m_book_file;
   std::unique_ptr<parquet::arrow::FileWriter> m_os;
 
-  arrow::Int64Builder m_recv_tm_builder;
+  std::shared_ptr<arrow::Int64Builder> m_recv_tm_builder;
 
-  std::shared_ptr<arrow::DoubleBuilder> m_ask_px_builder;
+  std::shared_ptr<arrow::DoubleBuilder> m_bid_price_builder;
+  std::shared_ptr<arrow::DoubleBuilder> m_bid_qty_builder;
+  std::shared_ptr<arrow::StructBuilder> m_bid_builder;
+  std::shared_ptr<arrow::ListBuilder> m_bids_builder;
+
+  std::shared_ptr<arrow::DoubleBuilder> m_ask_price_builder;
   std::shared_ptr<arrow::DoubleBuilder> m_ask_qty_builder;
-  arrow::MapBuilder m_asks_builder;
+  std::shared_ptr<arrow::StructBuilder> m_ask_builder;
+  std::shared_ptr<arrow::ListBuilder> m_asks_builder;
 
-  arrow::UInt64Builder m_crc32_builder;
-  arrow::StringBuilder m_symbol_builder;
-  arrow::Int64Builder m_timestamp_builder;
+  std::shared_ptr<arrow::UInt64Builder> m_crc32_builder;
+  std::shared_ptr<arrow::StringBuilder> m_symbol_builder;
+  std::shared_ptr<arrow::Int64Builder> m_timestamp_builder;
 };
 
 struct trades_sink_t final {
@@ -64,12 +65,6 @@ private:
   void reset_builders();
 
   static std::shared_ptr<arrow::Schema> schema();
-
-  // static std::shared_ptr<arrow::io::FileOutputStream>
-  // open_trades_file(std::string trades_filename);
-
-  // static std::unique_ptr<parquet::arrow::FileWriter>
-  // open_writer(std::shared_ptr<arrow::io::FileOutputStream> trades_file);
 
   std::shared_ptr<arrow::Schema> m_schema;
 
