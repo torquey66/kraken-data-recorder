@@ -19,21 +19,24 @@ find_package(nlohmann_json)
 find_package(OpenSSL)                                                                                                                        
 find_package(simdjson)                                                                                                                       
 
-# TODO: move most of this code into a library and link against it below
-add_executable(Krakpot
+# TODO: split these into 'src' and 'include' directories or the like
+include_directories(${CMAKE_SOURCE_DIR})
+add_library(krakpot_base
   asset.cpp
   cert.cpp
   engine.cpp
-  main.cpp
   pair.cpp
   parquet.cpp
   requests.cpp
   responses.cpp
   session.cpp
   types.cpp
+  responses.hpp
+  parquet.hpp
 )
 
-target_link_libraries(Krakpot
+target_link_libraries(krakpot_base
+  PUBLIC
   arrow::arrow
   boost::boost
   date::date
@@ -43,32 +46,15 @@ target_link_libraries(Krakpot
   simdjson::simdjson
 )
 
-add_executable(parse_instrument_snapshot
-  asset.cpp
-  pair.cpp
-  responses.cpp
-  types.cpp
-  test/parse_instrument_snapshot.cpp
-)
+add_executable(Krakpot main.cpp)
+target_link_libraries(Krakpot krakpot_base)
 
-target_link_libraries(parse_instrument_snapshot
-  date::date
-  nlohmann_json::nlohmann_json
-  simdjson::simdjson
-)
+add_executable(parse_instrument_snapshot test/parse_instrument_snapshot.cpp)
+target_link_libraries(parse_instrument_snapshot krakpot_base)
 
-add_executable(response_test
-  asset.cpp
-  pair.cpp
-  responses.cpp
-  types.cpp
-  test/unit/response_test.cpp
-)
+add_executable(parquet_test test/unit/parquet_test.cpp)
+target_link_libraries(parquet_test krakpot_base)
 
-target_link_libraries(response_test
-  date::date
-  doctest::doctest
-  nlohmann_json::nlohmann_json
-  simdjson::simdjson
-)
+add_executable(response_test test/unit/response_test.cpp)
+target_link_libraries(response_test krakpot_base)
 

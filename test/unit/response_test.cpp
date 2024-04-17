@@ -2,7 +2,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
-#include "../../responses.hpp" // !@# TODO: fix this when we put responses.cpp into a library
+#include <responses.hpp>
 
 #include <nlohmann/json.hpp>
 #include <simdjson.h>
