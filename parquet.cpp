@@ -1,6 +1,7 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #include "parquet.hpp"
 
+#include <arrow/scalar.h>
 #include <boost/log/trivial.hpp>
 
 using arrow::Compression;
@@ -59,45 +60,90 @@ book_sink_t::book_sink_t(std::string parquet_dir)
       m_book_filename{m_parquet_dir + "/book.pq"},
       m_book_file{open_sink_file(m_book_filename)},
       m_os{open_writer(m_book_file, m_schema)},
-      m_ask_px_builder{std::make_shared<arrow::DoubleBuilder>()},
+      m_recv_tm_builder{std::make_shared<arrow::Int64Builder>()},
+      m_bid_price_builder{std::make_shared<arrow::DoubleBuilder>()},
+      m_bid_qty_builder{std::make_shared<arrow::DoubleBuilder>()},
+      m_bid_builder{std::make_shared<arrow::StructBuilder>(
+          quote_struct(), arrow::default_memory_pool(),
+          std::vector<std::shared_ptr<arrow::ArrayBuilder>>{
+              m_bid_price_builder, m_bid_qty_builder})},
+      m_bids_builder{std::make_shared<arrow::ListBuilder>(
+          arrow::default_memory_pool(), m_bid_builder)},
+      m_ask_price_builder{std::make_shared<arrow::DoubleBuilder>()},
       m_ask_qty_builder{std::make_shared<arrow::DoubleBuilder>()},
-      m_asks_builder{arrow::default_memory_pool(), m_ask_px_builder,
-                     m_ask_qty_builder, true} {}
+      m_ask_builder{std::make_shared<arrow::StructBuilder>(
+          quote_struct(), arrow::default_memory_pool(),
+          std::vector<std::shared_ptr<arrow::ArrayBuilder>>{
+              m_ask_price_builder, m_ask_qty_builder})},
+      m_asks_builder{std::make_shared<arrow::ListBuilder>(
+          arrow::default_memory_pool(), m_ask_builder)},
+      m_crc32_builder{std::make_shared<arrow::UInt64Builder>()},
+      m_symbol_builder{std::make_shared<arrow::StringBuilder>()},
+      m_timestamp_builder{std::make_shared<arrow::Int64Builder>()} {}
 
 void book_sink_t::accept(const response::book_t &book) {
   reset_builders();
 
   PARQUET_THROW_NOT_OK(
-      m_recv_tm_builder.Append(book.header().recv_tm().micros()));
+      m_recv_tm_builder->Append(book.header().recv_tm().micros()));
+  PARQUET_THROW_NOT_OK(m_crc32_builder->Append(book.crc32()));
 
-  PARQUET_THROW_NOT_OK(m_asks_builder.Append());
-  for (const auto &ask : book.asks()) {
-    PARQUET_THROW_NOT_OK(m_ask_px_builder->Append(ask.first));
-    PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second));
+  for (const auto &bid : book.bids()) {
+    PARQUET_THROW_NOT_OK(m_bids_builder->Append());
+    auto &bids_builder =
+        static_cast<arrow::StructBuilder &>(*m_bids_builder->value_builder());
+    PARQUET_THROW_NOT_OK(
+        static_cast<arrow::DoubleBuilder *>(bids_builder.field_builder(0))
+            ->Append(bid.first));
+    PARQUET_THROW_NOT_OK(
+        static_cast<arrow::DoubleBuilder *>(bids_builder.field_builder(1))
+            ->Append(bid.second));
   }
 
-  PARQUET_THROW_NOT_OK(m_crc32_builder.Append(book.crc32()));
-  PARQUET_THROW_NOT_OK(m_symbol_builder.Append(book.symbol()));
-  PARQUET_THROW_NOT_OK(m_timestamp_builder.Append(book.timestamp().micros()));
+  for (const auto &ask : book.asks()) {
+    PARQUET_THROW_NOT_OK(m_asks_builder->Append());
+    auto &asks_builder =
+        static_cast<arrow::StructBuilder &>(*m_asks_builder->value_builder());
+    PARQUET_THROW_NOT_OK(
+        static_cast<arrow::DoubleBuilder *>(asks_builder.field_builder(0))
+            ->Append(ask.first));
+    PARQUET_THROW_NOT_OK(
+        static_cast<arrow::DoubleBuilder *>(asks_builder.field_builder(1))
+            ->Append(ask.second));
+  }
+
+  PARQUET_THROW_NOT_OK(m_symbol_builder->Append(book.symbol()));
+  PARQUET_THROW_NOT_OK(m_timestamp_builder->Append(book.timestamp().micros()));
 
   std::shared_ptr<arrow::Array> recv_tm_array;
-  std::shared_ptr<arrow::Array> ask_px_array;
+  std::shared_ptr<arrow::Array> bid_price_array;
+  std::shared_ptr<arrow::Array> bid_qty_array;
+  std::shared_ptr<arrow::Array> bid_array;
+  std::shared_ptr<arrow::Array> bids_array;
+  std::shared_ptr<arrow::Array> ask_price_array;
   std::shared_ptr<arrow::Array> ask_qty_array;
+  std::shared_ptr<arrow::Array> ask_array;
   std::shared_ptr<arrow::Array> asks_array;
   std::shared_ptr<arrow::Array> crc32_array;
   std::shared_ptr<arrow::Array> symbol_array;
   std::shared_ptr<arrow::Array> timestamp_array;
 
-  PARQUET_THROW_NOT_OK(m_recv_tm_builder.Finish(&recv_tm_array));
-  PARQUET_THROW_NOT_OK(m_ask_px_builder->Finish(&ask_px_array));
+  PARQUET_THROW_NOT_OK(m_recv_tm_builder->Finish(&recv_tm_array));
+  PARQUET_THROW_NOT_OK(m_bid_price_builder->Finish(&bid_price_array));
+  PARQUET_THROW_NOT_OK(m_bid_qty_builder->Finish(&bid_qty_array));
+  PARQUET_THROW_NOT_OK(m_bid_builder->Finish(&bid_array));
+  PARQUET_THROW_NOT_OK(m_bids_builder->Finish(&bids_array));
+  PARQUET_THROW_NOT_OK(m_ask_price_builder->Finish(&ask_price_array));
   PARQUET_THROW_NOT_OK(m_ask_qty_builder->Finish(&ask_qty_array));
-  PARQUET_THROW_NOT_OK(m_asks_builder.Finish(&asks_array));
-  PARQUET_THROW_NOT_OK(m_crc32_builder.Finish(&crc32_array));
-  PARQUET_THROW_NOT_OK(m_symbol_builder.Finish(&symbol_array));
-  PARQUET_THROW_NOT_OK(m_timestamp_builder.Finish(&timestamp_array));
+  PARQUET_THROW_NOT_OK(m_ask_builder->Finish(&ask_array));
+  PARQUET_THROW_NOT_OK(m_asks_builder->Finish(&asks_array));
+  PARQUET_THROW_NOT_OK(m_crc32_builder->Finish(&crc32_array));
+  PARQUET_THROW_NOT_OK(m_symbol_builder->Finish(&symbol_array));
+  PARQUET_THROW_NOT_OK(m_timestamp_builder->Finish(&timestamp_array));
 
   auto columns = std::vector<std::shared_ptr<arrow::Array>>{
-      recv_tm_array, asks_array, crc32_array, symbol_array, timestamp_array};
+      recv_tm_array, bids_array,   asks_array,
+      crc32_array,   symbol_array, timestamp_array};
 
   std::shared_ptr<arrow::RecordBatch> batch =
       arrow::RecordBatch::Make(m_schema, 1, columns);
@@ -105,13 +151,25 @@ void book_sink_t::accept(const response::book_t &book) {
 }
 
 void book_sink_t::reset_builders() {
-  m_recv_tm_builder.Reset();
-  m_ask_px_builder->Reset();
+  m_recv_tm_builder->Reset();
+  m_bid_price_builder->Reset();
+  m_bid_qty_builder->Reset();
+  m_bid_builder->Reset();
+  m_bids_builder->Reset();
+  m_ask_price_builder->Reset();
   m_ask_qty_builder->Reset();
-  m_asks_builder.Reset();
-  m_crc32_builder.Reset();
-  m_symbol_builder.Reset();
-  m_timestamp_builder.Reset();
+  m_ask_builder->Reset();
+  m_asks_builder->Reset();
+  m_crc32_builder->Reset();
+  m_symbol_builder->Reset();
+  m_timestamp_builder->Reset();
+}
+
+std::shared_ptr<arrow::DataType> book_sink_t::quote_struct() {
+  const auto field_vector =
+      arrow::FieldVector{arrow::field("price", arrow::float64(), false),
+                         arrow::field("qty", arrow::float64(), false)};
+  return arrow::struct_(field_vector);
 }
 
 std::shared_ptr<arrow::Schema> book_sink_t::schema() {
@@ -120,8 +178,8 @@ std::shared_ptr<arrow::Schema> book_sink_t::schema() {
   auto field_vector = arrow::FieldVector{
       arrow::field("recv_tm", arrow::int64(),
                    false), // TODO: replace with timestamp type
-      arrow::field("asks", arrow::map(arrow::float64(), arrow::float64(), true),
-                   false),
+      arrow::field("bids", arrow::list(quote_struct()), false),
+      arrow::field("asks", arrow::list(quote_struct()), false),
       arrow::field("crc32", arrow::uint64(), false),
       arrow::field("symbol", arrow::utf8(), false),
       arrow::field("timestamp", arrow::int64(),
@@ -213,5 +271,5 @@ std::shared_ptr<arrow::Schema> trades_sink_t::schema() {
   return arrow::schema(field_vector);
 }
 
-  } // namespace pq
+} // namespace pq
 } // namespace krakpot
