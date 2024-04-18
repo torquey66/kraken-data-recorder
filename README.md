@@ -39,7 +39,7 @@ reasonably up to date CMake. On MacOS Ventura, I am able to to this by running:
 
 conan install . --profile=default --build=missing --output-folder=build -sbuild_type=Debug
 cd ./build
-cmake -DCMAKE_PREFIX_PATH=<full path to build dir> -DCMAKE_BUILD_TYPE=Debug ..
+cmake -DLIBCXX_ENABLE_INCOMPLETE_FEATURES=ON --preset conan-debug ..
 make -j
 ```
 
