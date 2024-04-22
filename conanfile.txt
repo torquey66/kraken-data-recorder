@@ -6,6 +6,7 @@ doctest/2.4.11
 nlohmann_json/3.11.3
 openssl/3.2.0
 simdjson/3.6.1
+thrift/0.17.0
 
 [generators]
 CMakeToolchain
@@ -13,5 +14,6 @@ CMakeDeps
 
 [options]
 arrow/*:parquet=True
+arrow/*:with_boost=True
 arrow/*:with_snappy=True
 arrow/*:with_thrift=True
