@@ -88,54 +88,42 @@ void book_sink_t::accept(const response::book_t &book) {
       m_recv_tm_builder->Append(book.header().recv_tm().micros()));
   PARQUET_THROW_NOT_OK(m_crc32_builder->Append(book.crc32()));
 
+  PARQUET_THROW_NOT_OK(m_bid_price_builder->Reserve(book.bids().size()));
+  PARQUET_THROW_NOT_OK(m_bid_qty_builder->Reserve(book.bids().size()));
+  PARQUET_THROW_NOT_OK(m_bid_builder->Reserve(book.bids().size()));
+  PARQUET_THROW_NOT_OK(m_bids_builder->Reserve(1));
+
+  PARQUET_THROW_NOT_OK(m_bids_builder->Append(book.bids().size()));
   for (const auto &bid : book.bids()) {
-    PARQUET_THROW_NOT_OK(m_bids_builder->Append());
-    auto &bids_builder =
-        static_cast<arrow::StructBuilder &>(*m_bids_builder->value_builder());
-    PARQUET_THROW_NOT_OK(
-        static_cast<arrow::DoubleBuilder *>(bids_builder.field_builder(0))
-            ->Append(bid.first));
-    PARQUET_THROW_NOT_OK(
-        static_cast<arrow::DoubleBuilder *>(bids_builder.field_builder(1))
-            ->Append(bid.second));
+    PARQUET_THROW_NOT_OK(m_bid_builder->Append());
+    PARQUET_THROW_NOT_OK(m_bid_price_builder->Append(bid.first));
+    PARQUET_THROW_NOT_OK(m_bid_qty_builder->Append(bid.second));
   }
 
+  PARQUET_THROW_NOT_OK(m_ask_price_builder->Reserve(book.asks().size()));
+  PARQUET_THROW_NOT_OK(m_ask_qty_builder->Reserve(book.asks().size()));
+  PARQUET_THROW_NOT_OK(m_ask_builder->Reserve(book.asks().size()));
+  PARQUET_THROW_NOT_OK(m_asks_builder->Reserve(1));
+
+  PARQUET_THROW_NOT_OK(m_asks_builder->Append(book.asks().size()));
   for (const auto &ask : book.asks()) {
-    PARQUET_THROW_NOT_OK(m_asks_builder->Append());
-    auto &asks_builder =
-        static_cast<arrow::StructBuilder &>(*m_asks_builder->value_builder());
-    PARQUET_THROW_NOT_OK(
-        static_cast<arrow::DoubleBuilder *>(asks_builder.field_builder(0))
-            ->Append(ask.first));
-    PARQUET_THROW_NOT_OK(
-        static_cast<arrow::DoubleBuilder *>(asks_builder.field_builder(1))
-            ->Append(ask.second));
+    PARQUET_THROW_NOT_OK(m_ask_builder->Append());
+    PARQUET_THROW_NOT_OK(m_ask_price_builder->Append(ask.first));
+    PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second));
   }
 
   PARQUET_THROW_NOT_OK(m_symbol_builder->Append(book.symbol()));
   PARQUET_THROW_NOT_OK(m_timestamp_builder->Append(book.timestamp().micros()));
 
   std::shared_ptr<arrow::Array> recv_tm_array;
-  std::shared_ptr<arrow::Array> bid_price_array;
-  std::shared_ptr<arrow::Array> bid_qty_array;
-  std::shared_ptr<arrow::Array> bid_array;
   std::shared_ptr<arrow::Array> bids_array;
-  std::shared_ptr<arrow::Array> ask_price_array;
-  std::shared_ptr<arrow::Array> ask_qty_array;
-  std::shared_ptr<arrow::Array> ask_array;
   std::shared_ptr<arrow::Array> asks_array;
   std::shared_ptr<arrow::Array> crc32_array;
   std::shared_ptr<arrow::Array> symbol_array;
   std::shared_ptr<arrow::Array> timestamp_array;
 
   PARQUET_THROW_NOT_OK(m_recv_tm_builder->Finish(&recv_tm_array));
-  PARQUET_THROW_NOT_OK(m_bid_price_builder->Finish(&bid_price_array));
-  PARQUET_THROW_NOT_OK(m_bid_qty_builder->Finish(&bid_qty_array));
-  PARQUET_THROW_NOT_OK(m_bid_builder->Finish(&bid_array));
   PARQUET_THROW_NOT_OK(m_bids_builder->Finish(&bids_array));
-  PARQUET_THROW_NOT_OK(m_ask_price_builder->Finish(&ask_price_array));
-  PARQUET_THROW_NOT_OK(m_ask_qty_builder->Finish(&ask_qty_array));
-  PARQUET_THROW_NOT_OK(m_ask_builder->Finish(&ask_array));
   PARQUET_THROW_NOT_OK(m_asks_builder->Finish(&asks_array));
   PARQUET_THROW_NOT_OK(m_crc32_builder->Finish(&crc32_array));
   PARQUET_THROW_NOT_OK(m_symbol_builder->Finish(&symbol_array));
