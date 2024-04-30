@@ -23,7 +23,6 @@ find_package(simdjson)
 include_directories(${CMAKE_SOURCE_DIR})
 add_library(krakpot_base
   asset.cpp
-  cert.cpp
   engine.cpp
   pair.cpp
   parquet.cpp
