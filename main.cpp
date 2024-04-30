@@ -1,6 +1,5 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 
-#include "cert.hpp"
 #include "engine.hpp"
 #include "session.hpp"
 
@@ -21,7 +20,11 @@ void signal_handler(const boost::system::error_code &ec, int signal_number) {
 
 int main(int, char **) {
   boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv13_client};
-  krakpot::load_root_certificates(ctx);
+  ctx.set_options(boost::asio::ssl::context::default_workarounds |
+                  boost::asio::ssl::context::no_sslv2 |
+                  boost::asio::ssl::context::no_sslv3 |
+                  boost::asio::ssl::context::no_tlsv1 |
+                  boost::asio::ssl::context::no_tlsv1_1);
 
   try {
     boost::asio::io_context ioc;
