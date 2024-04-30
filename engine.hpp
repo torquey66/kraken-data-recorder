@@ -1,6 +1,7 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "level_book.hpp"
 #include "parquet.hpp"
 #include "session.hpp"
 
@@ -52,6 +53,7 @@ private:
   req_id_t m_inst_req_id = 0;
   req_id_t m_trade_req_id = 0;
 
+  model::level_book_t m_level_book;
   pq::book_sink_t m_book_sink;
   pq::trades_sink_t m_trades_sink;
 };

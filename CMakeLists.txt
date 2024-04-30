@@ -24,6 +24,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 add_library(krakpot_base
   asset.cpp
   engine.cpp
+  level_book.cpp
   pair.cpp
   parquet.cpp
   requests.cpp

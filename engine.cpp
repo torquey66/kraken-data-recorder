@@ -90,7 +90,7 @@ bool engine_t::handle_instrument_snapshot(doc_t &doc, yield_context_t yield) {
 
   // !@# TODO: make depth configurable in some fashion
   const request::subscribe_book_t subscribe_book{
-      ++m_book_req_id, request::subscribe_book_t::e_1000, true, symbols};
+    ++m_book_req_id, request::subscribe_book_t::depth_t{c_book_depth}, true, symbols};
   m_session.send(subscribe_book.str(), yield);
 
   const request::subscribe_trade_t subscribe_trade{++m_trade_req_id, true,
@@ -127,14 +127,15 @@ bool engine_t::handle_book_msg(doc_t &doc, yield_context_t yield) {
 
 bool engine_t::handle_book_snapshot(doc_t &doc, yield_context_t) {
   const auto response = response::book_t::from_json(doc);
-  // BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << response.str();
   m_book_sink.accept(response);
+  m_level_book.accept(response);
   return true;
 }
 
 bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
   const auto response = response::book_t::from_json(doc);
   m_book_sink.accept(response);
+  m_level_book.accept(response);
   return true;
 }
 
