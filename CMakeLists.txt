@@ -31,6 +31,7 @@ add_library(krakpot_base
   responses.cpp
   session.cpp
   types.cpp
+  decimal.hpp
   responses.hpp
   parquet.hpp
 )
@@ -51,6 +52,9 @@ target_link_libraries(Krakpot krakpot_base)
 
 add_executable(parse_instrument_snapshot test/parse_instrument_snapshot.cpp)
 target_link_libraries(parse_instrument_snapshot krakpot_base)
+
+add_executable(decimal_test test/unit/decimal_test.cpp)
+target_link_libraries(decimal_test krakpot_base)
 
 add_executable(parquet_test test/unit/parquet_test.cpp)
 target_link_libraries(parquet_test krakpot_base)
