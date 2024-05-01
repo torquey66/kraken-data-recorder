@@ -1,6 +1,8 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "decimal.hpp"
+
 #include <cstdint>
 #include <limits>
 #include <string>
