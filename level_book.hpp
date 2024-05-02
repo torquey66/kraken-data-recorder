@@ -35,6 +35,8 @@ struct level_book_t final {
   void accept(const response::book_t &);
 
 private:
+  uint64_t crc32(std::string symbol) const;
+
   using symbol_t = std::string;
   std::unordered_map<symbol_t, sides_t> m_sides;
 };
