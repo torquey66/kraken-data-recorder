@@ -75,16 +75,20 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
 
     // TODO: eliminate duplication
     for (simdjson::fallback::ondemand::object obj : data["asks"]) {
-      const auto token = std::string_view{obj["price"].raw_json_token()};
-      const auto price = price_t{obj["price"].get_double(), token};
-      const ask_t ask = std::make_pair(price, obj["qty"].get_double());
+      const auto price_token = std::string_view{obj["price"].raw_json_token()};
+      const auto price = price_t{obj["price"].get_double(), price_token};
+      const auto qty_token = std::string_view{obj["qty"].raw_json_token()};
+      const auto qty = qty_t{obj["qty"].get_double(), qty_token};
+      const ask_t ask = std::make_pair(price, qty);
       result.m_asks.push_back(ask);
     }
 
     for (simdjson::fallback::ondemand::object obj : data["bids"]) {
-      const auto token = std::string_view{obj["price"].raw_json_token()};
-      const auto price = price_t{obj["price"].get_double(), token};
-      const bid_t bid = std::make_pair(price, obj["qty"].get_double());
+      const auto price_token = std::string_view{obj["price"].raw_json_token()};
+      const auto price = price_t{obj["price"].get_double(), price_token};
+      const auto qty_token = std::string_view{obj["qty"].raw_json_token()};
+      const auto qty = qty_t{obj["qty"].get_double(), qty_token};
+      const bid_t bid = std::make_pair(price, qty);
       result.m_bids.push_back(bid);
     }
 
@@ -109,14 +113,14 @@ nlohmann::json book_t::to_json() const {
   auto asks = nlohmann::json::array();
   for (const auto &ask : m_asks) {
     const nlohmann::json ask_json = {{"price", ask.first.value()},
-                                     {"qty", ask.second}};
+                                     {"qty", ask.second.value()}};
     asks.push_back(ask_json);
   }
 
   auto bids = nlohmann::json::array();
   for (const auto &bid : m_bids) {
     const nlohmann::json bid_json = {{"price", bid.first.value()},
-                                     {"qty", bid.second}};
+                                     {"qty", bid.second.value()}};
     bids.push_back(bid_json);
   }
 
@@ -175,7 +179,8 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
     trade.ord_type = parse_ord_type(buffer);
     const auto price_token = std::string_view{obj["price"].raw_json_token()};
     trade.price = price_t{obj["price"].get_double(), price_token};
-    trade.qty = obj["qty"].get_double();
+    const auto qty_token = std::string_view{obj["qty"].raw_json_token()};
+    trade.qty = qty_t{obj["qty"].get_double(), qty_token};
     buffer = obj["side"].get_string();
     trade.side = parse_side(buffer);
     buffer = obj["symbol"].get_string();
@@ -196,7 +201,7 @@ nlohmann::json trades_t::to_json() const {
   for (const auto &trade : m_trades) {
     const nlohmann::json trade_json = {
         {"ord_type", trade.ord_type}, {"price", trade.price.value()},
-        {"qty", trade.qty},           {"side", trade.side},
+        {"qty", trade.qty.value()},   {"side", trade.side},
         {"symbol", trade.symbol},     {"timestamp", trade.timestamp.str()},
         {"trade_id", trade.trade_id},
     };

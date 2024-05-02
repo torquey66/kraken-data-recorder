@@ -46,7 +46,7 @@ void sides_t::apply_update(const Q& quotes, S& side) {
     const auto [price, qty] = quote;
     auto it = side.find(price);
     if (it != side.end()) {
-      if (qty == 0) {
+      if (qty.value() == 0) {
         side.erase(it);
       } else {
         it->second = qty;
