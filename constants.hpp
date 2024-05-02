@@ -9,6 +9,8 @@
  */
 namespace krakpot {
 
+static constexpr double c_NaN = std::numeric_limits<double>::signaling_NaN();
+
 static constexpr size_t c_ping_interval_secs = 30;
 
 static constexpr char c_kraken_host[] = "ws.kraken.com";

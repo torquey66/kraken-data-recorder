@@ -96,7 +96,7 @@ void book_sink_t::accept(const response::book_t &book) {
   PARQUET_THROW_NOT_OK(m_bids_builder->Append(book.bids().size()));
   for (const auto &bid : book.bids()) {
     PARQUET_THROW_NOT_OK(m_bid_builder->Append());
-    PARQUET_THROW_NOT_OK(m_bid_price_builder->Append(bid.first));
+    PARQUET_THROW_NOT_OK(m_bid_price_builder->Append(bid.first.value()));
     PARQUET_THROW_NOT_OK(m_bid_qty_builder->Append(bid.second));
   }
 
@@ -108,7 +108,7 @@ void book_sink_t::accept(const response::book_t &book) {
   PARQUET_THROW_NOT_OK(m_asks_builder->Append(book.asks().size()));
   for (const auto &ask : book.asks()) {
     PARQUET_THROW_NOT_OK(m_ask_builder->Append());
-    PARQUET_THROW_NOT_OK(m_ask_price_builder->Append(ask.first));
+    PARQUET_THROW_NOT_OK(m_ask_price_builder->Append(ask.first.value()));
     PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second));
   }
 
@@ -194,7 +194,7 @@ void trades_sink_t::accept(const response::trades_t &trades) {
         m_recv_tm_builder.Append(trades.header().recv_tm().micros()));
     PARQUET_THROW_NOT_OK(
         m_ord_type_builder.Append(std::string(1, trade.ord_type)));
-    PARQUET_THROW_NOT_OK(m_price_builder.Append(trade.price));
+    PARQUET_THROW_NOT_OK(m_price_builder.Append(trade.price.value()));
     PARQUET_THROW_NOT_OK(m_qty_builder.Append(trade.qty));
     PARQUET_THROW_NOT_OK(m_side_builder.Append(std::string(1, trade.side)));
     PARQUET_THROW_NOT_OK(m_symbol_builder.Append(trade.symbol));

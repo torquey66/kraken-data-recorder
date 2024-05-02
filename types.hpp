@@ -24,13 +24,11 @@ using integer_t = int64_t;
 using double_t = double;
 
 using req_id_t = int64_t;
-using price_t = double_t;
+using price_t = decimal_t;
 using qty_t = double_t;
 using quote_t = std::pair<price_t, qty_t>;
 using ask_t = quote_t;
 using bid_t = quote_t;
-
-static constexpr double_t c_NaN = std::numeric_limits<double>::signaling_NaN();
 
 /**
  * ord_type_t is based on the FIX 5.0 spec. See:
