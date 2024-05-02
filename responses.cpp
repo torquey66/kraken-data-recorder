@@ -4,6 +4,17 @@
 
 #include <chrono>
 
+namespace {
+
+template <typename O>
+krakpot::decimal_t extract_decimal(O &obj, std::string field) {
+  const auto token = std::string_view{obj[field].raw_json_token()};
+  const auto result = krakpot::decimal_t{obj[field].get_double(), token};
+  return result;
+}
+
+} // namespace
+
 namespace krakpot {
 namespace response {
 
@@ -75,19 +86,15 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
 
     // TODO: eliminate duplication
     for (simdjson::fallback::ondemand::object obj : data["asks"]) {
-      const auto price_token = std::string_view{obj["price"].raw_json_token()};
-      const auto price = price_t{obj["price"].get_double(), price_token};
-      const auto qty_token = std::string_view{obj["qty"].raw_json_token()};
-      const auto qty = qty_t{obj["qty"].get_double(), qty_token};
+      const auto price = extract_decimal(obj, "price");
+      const auto qty = extract_decimal(obj, "qty");
       const ask_t ask = std::make_pair(price, qty);
       result.m_asks.push_back(ask);
     }
 
     for (simdjson::fallback::ondemand::object obj : data["bids"]) {
-      const auto price_token = std::string_view{obj["price"].raw_json_token()};
-      const auto price = price_t{obj["price"].get_double(), price_token};
-      const auto qty_token = std::string_view{obj["qty"].raw_json_token()};
-      const auto qty = qty_t{obj["qty"].get_double(), qty_token};
+      const auto price = extract_decimal(obj, "price");
+      const auto qty = extract_decimal(obj, "qty");
       const bid_t bid = std::make_pair(price, qty);
       result.m_bids.push_back(bid);
     }
@@ -177,10 +184,8 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
     auto trade = trade_t{};
     buffer = obj["ord_type"].get_string();
     trade.ord_type = parse_ord_type(buffer);
-    const auto price_token = std::string_view{obj["price"].raw_json_token()};
-    trade.price = price_t{obj["price"].get_double(), price_token};
-    const auto qty_token = std::string_view{obj["qty"].raw_json_token()};
-    trade.qty = qty_t{obj["qty"].get_double(), qty_token};
+    trade.price = extract_decimal(obj, "price");
+    trade.qty = extract_decimal(obj, "qty");
     buffer = obj["side"].get_string();
     trade.side = parse_side(buffer);
     buffer = obj["symbol"].get_string();
