@@ -1,6 +1,8 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "constants.hpp"
+
 #include <algorithm>
 #include <array>
 #include <sstream>
@@ -8,6 +10,8 @@
 namespace krakpot {
 
 struct decimal_t final {
+  decimal_t() : m_value{c_NaN}, m_token{"NaN"} {}
+
   template <typename S>
   explicit decimal_t(double value, S token)
       : m_value{value}, m_token{token.begin(), token.end()} {}
