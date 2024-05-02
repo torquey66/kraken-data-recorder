@@ -25,7 +25,7 @@ using double_t = double;
 
 using req_id_t = int64_t;
 using price_t = decimal_t;
-using qty_t = double_t;
+using qty_t = decimal_t;
 using quote_t = std::pair<price_t, qty_t>;
 using ask_t = quote_t;
 using bid_t = quote_t;
