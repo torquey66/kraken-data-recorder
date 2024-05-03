@@ -3,18 +3,34 @@
 
 #include "constants.hpp"
 
-#include <algorithm>
-#include <array>
-#include <sstream>
+#include <string>
+#include <string_view>
 
 namespace krakpot {
 
-struct decimal_t final {
-  decimal_t() : m_value{c_NaN}, m_token{"NaN"} {}
+struct token_t final {
 
   template <typename S>
-  explicit decimal_t(double value, S token)
-      : m_value{value}, m_token{token.begin(), token.end()} {}
+  token_t(S chars) : m_chars{chars.begin(), chars.end()} {}
+
+  token_t(const char *str) : m_chars{str} {}
+
+  bool operator==(const token_t &rhs) const = default;
+
+  std::string trimmed() const;
+
+  std::string str() const { return m_chars; }
+
+private:
+  std::string m_chars;
+};
+
+struct decimal_t final {
+
+  decimal_t() : m_value{c_NaN}, m_token{c_NaN_str} {}
+
+  template <typename S>
+  explicit decimal_t(double value, S token) : m_value{value}, m_token{token} {}
 
   auto operator<=>(const decimal_t &rhs) const {
     return m_value <=> rhs.m_value;
@@ -24,11 +40,11 @@ struct decimal_t final {
   auto value() const { return m_value; }
   auto token() const { return m_token; }
 
-  auto str() const { return m_token; }
+  auto str() const { return m_token.str(); }
 
 private:
   double m_value;
-  std::string m_token;
+  token_t m_token;
 };
 
 } // namespace krakpot

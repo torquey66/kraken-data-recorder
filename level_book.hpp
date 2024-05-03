@@ -20,6 +20,8 @@ struct sides_t final {
   void accept_snapshot(const response::book_t &);
   void accept_update(const response::book_t &);
 
+  void verify_checksum(uint64_t) const;
+
 private:
   template <typename Q, typename S>
   void apply_update(const Q&, S&);
