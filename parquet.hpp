@@ -40,6 +40,7 @@ private:
   std::unique_ptr<parquet::arrow::FileWriter> m_os;
 
   std::shared_ptr<arrow::Int64Builder> m_recv_tm_builder;
+  std::shared_ptr<arrow::StringBuilder> m_type_builder;
 
   std::shared_ptr<arrow::DoubleBuilder> m_bid_price_builder;
   std::shared_ptr<arrow::DoubleBuilder> m_bid_qty_builder;

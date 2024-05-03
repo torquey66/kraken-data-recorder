@@ -61,6 +61,7 @@ book_sink_t::book_sink_t(std::string parquet_dir)
       m_book_file{open_sink_file(m_book_filename)},
       m_os{open_writer(m_book_file, m_schema)},
       m_recv_tm_builder{std::make_shared<arrow::Int64Builder>()},
+      m_type_builder{std::make_shared<arrow::StringBuilder>()},
       m_bid_price_builder{std::make_shared<arrow::DoubleBuilder>()},
       m_bid_qty_builder{std::make_shared<arrow::DoubleBuilder>()},
       m_bid_builder{std::make_shared<arrow::StructBuilder>(
@@ -86,6 +87,7 @@ void book_sink_t::accept(const response::book_t &book) {
 
   PARQUET_THROW_NOT_OK(
       m_recv_tm_builder->Append(book.header().recv_tm().micros()));
+  PARQUET_THROW_NOT_OK(m_type_builder->Append(book.header().type()));
   PARQUET_THROW_NOT_OK(m_crc32_builder->Append(book.crc32()));
 
   PARQUET_THROW_NOT_OK(m_bid_price_builder->Reserve(book.bids().size()));
@@ -116,6 +118,7 @@ void book_sink_t::accept(const response::book_t &book) {
   PARQUET_THROW_NOT_OK(m_timestamp_builder->Append(book.timestamp().micros()));
 
   std::shared_ptr<arrow::Array> recv_tm_array;
+  std::shared_ptr<arrow::Array> type_array;
   std::shared_ptr<arrow::Array> bids_array;
   std::shared_ptr<arrow::Array> asks_array;
   std::shared_ptr<arrow::Array> crc32_array;
@@ -123,6 +126,7 @@ void book_sink_t::accept(const response::book_t &book) {
   std::shared_ptr<arrow::Array> timestamp_array;
 
   PARQUET_THROW_NOT_OK(m_recv_tm_builder->Finish(&recv_tm_array));
+  PARQUET_THROW_NOT_OK(m_type_builder->Finish(&type_array));
   PARQUET_THROW_NOT_OK(m_bids_builder->Finish(&bids_array));
   PARQUET_THROW_NOT_OK(m_asks_builder->Finish(&asks_array));
   PARQUET_THROW_NOT_OK(m_crc32_builder->Finish(&crc32_array));
@@ -130,7 +134,7 @@ void book_sink_t::accept(const response::book_t &book) {
   PARQUET_THROW_NOT_OK(m_timestamp_builder->Finish(&timestamp_array));
 
   auto columns = std::vector<std::shared_ptr<arrow::Array>>{
-      recv_tm_array, bids_array,   asks_array,
+      recv_tm_array, type_array,   bids_array,     asks_array,
       crc32_array,   symbol_array, timestamp_array};
 
   std::shared_ptr<arrow::RecordBatch> batch =
@@ -140,6 +144,7 @@ void book_sink_t::accept(const response::book_t &book) {
 
 void book_sink_t::reset_builders() {
   m_recv_tm_builder->Reset();
+  m_type_builder->Reset();
   m_bid_price_builder->Reset();
   m_bid_qty_builder->Reset();
   m_bid_builder->Reset();
@@ -166,6 +171,7 @@ std::shared_ptr<arrow::Schema> book_sink_t::schema() {
   auto field_vector = arrow::FieldVector{
       arrow::field("recv_tm", arrow::int64(),
                    false), // TODO: replace with timestamp type
+      arrow::field("type", arrow::utf8(), false),
       arrow::field("bids", arrow::list(quote_struct()), false),
       arrow::field("asks", arrow::list(quote_struct()), false),
       arrow::field("crc32", arrow::uint64(), false),
