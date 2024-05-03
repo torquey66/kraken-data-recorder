@@ -4,6 +4,8 @@
 #include "constants.hpp"
 #include "responses.hpp"
 
+#include <boost/crc.hpp>
+
 #include <map>
 #include <unordered_map>
 
@@ -20,13 +22,16 @@ struct sides_t final {
   void accept_snapshot(const response::book_t &);
   void accept_update(const response::book_t &);
 
-  void verify_checksum(uint64_t) const;
-
 private:
   template <typename Q, typename S>
   void apply_update(const Q&, S&);
   
   void clear();
+
+  void verify_checksum(uint64_t) const;
+
+  template <typename S>
+  boost::crc_32_type update_checksum(const boost::crc_32_type, const S &) const;
 
   bid_side_t m_bids;
   ask_side_t m_asks;
@@ -37,12 +42,28 @@ struct level_book_t final {
   void accept(const response::book_t &);
 
 private:
-  uint64_t crc32(std::string symbol) const;
-
   using symbol_t = std::string;
   std::unordered_map<symbol_t, sides_t> m_sides;
 };
 
+template <typename S>
+boost::crc_32_type sides_t::update_checksum(const boost::crc_32_type crc32,
+                                            const S &side) const {
+  auto result = crc32;
+  auto depth = size_t{0};
+  for (const auto &kv : side) {
+    if (++depth > 10) {
+      break;
+    }
+    const auto &price = kv.first;
+    const auto &qty = kv.second;
+    const auto trimmed_price = price.token().trimmed();
+    const auto trimmed_qty = qty.token().trimmed();
+    result.process_bytes(trimmed_price.data(), trimmed_price.size());
+    result.process_bytes(trimmed_qty.data(), trimmed_qty.size());
+  }
+  return result;
+}
 
 template <typename Q, typename S>
 void sides_t::apply_update(const Q& quotes, S& side) {
