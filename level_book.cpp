@@ -12,14 +12,8 @@ namespace {
 boost::crc_32_type process(const krakpot::decimal_t &value,
                            boost::crc_32_type crc32) {
   auto result = crc32;
-  const auto &token = value.token();
-  const auto it =
-      std::find_if_not(token.begin(), token.end(),
-                       [](const char ch) { return ch == '0' || ch == '.'; });
-  const auto offset = std::distance(token.begin(), it);
-  const auto data = token.data() + offset;
-  const auto length = token.size() - offset;
-  result.process_bytes(data, length);
+  const auto token = value.token().trimmed();
+  result.process_bytes(token.data(), token.size());
   return result;
 }
 
@@ -32,11 +26,13 @@ void sides_t::accept_snapshot(const response::book_t &snapshot) {
   clear();
   m_bids.insert(snapshot.bids().begin(), snapshot.bids().end());
   m_asks.insert(snapshot.asks().begin(), snapshot.asks().end());
+  verify_checksum(snapshot.crc32());
 }
 
 void sides_t::accept_update(const response::book_t &update) {
   apply_update(update.bids(), m_bids);
   apply_update(update.asks(), m_asks);
+  verify_checksum(update.crc32());
 }
 
 void sides_t::clear() {
@@ -44,19 +40,46 @@ void sides_t::clear() {
   m_asks.clear();
 }
 
+void sides_t::verify_checksum(uint64_t expected_crc32) const {
+  boost::crc_32_type result;
+
+  auto depth = size_t{0};
+  for (const auto &kv : asks()) {
+    if (++depth > 10) {
+      break;
+    }
+    const auto &price = kv.first;
+    const auto &qty = kv.second;
+    result = process(price, result);
+    result = process(qty, result);
+  }
+
+  depth = 0;
+  for (const auto &kv : bids()) {
+    if (++depth > 10) {
+      break;
+    }
+    const auto &price = kv.first;
+    const auto &qty = kv.second;
+    result = process(price, result);
+    result = process(qty, result);
+  }
+
+  const auto actual_crc32 = result.checksum();
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " expected: " << expected_crc32
+                           << " actual: " << actual_crc32;
+  if (expected_crc32 != actual_crc32) {
+    throw std::runtime_error(
+        "bogus crc32 expected: " + std::to_string(expected_crc32) +
+        " actual: " + std::to_string(actual_crc32));
+  }
+}
+
 void level_book_t::accept(const response::book_t &response) {
   auto &sides = m_sides[response.symbol()];
   const auto type = response.header().type();
   if (type == c_book_type_snapshot) {
-    sides.accept_snapshot(response);
-    const auto expected_cksum = response.crc32();
-    const auto actual_cksum = crc32(response.symbol());
-    if (expected_cksum != actual_cksum) {
-      throw std::runtime_error(
-          "bogus cksum expected: " + std::to_string(expected_cksum) +
-          " actual: " + std::to_string(actual_cksum));
-    }
-    return;
+    return sides.accept_snapshot(response);
   }
   if (type == c_book_type_update) {
     return sides.accept_update(response);
