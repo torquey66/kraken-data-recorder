@@ -57,6 +57,9 @@ target_link_libraries(parse_instrument_snapshot krakpot_base)
 add_executable(decimal_test test/unit/decimal_test.cpp)
 target_link_libraries(decimal_test krakpot_base)
 
+add_executable(level_book_test test/unit/level_book_test.cpp)
+target_link_libraries(level_book_test krakpot_base)
+
 add_executable(parquet_test test/unit/parquet_test.cpp)
 target_link_libraries(parquet_test krakpot_base)
 
