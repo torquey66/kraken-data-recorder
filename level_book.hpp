@@ -22,6 +22,8 @@ struct sides_t final {
   void accept_snapshot(const response::book_t &);
   void accept_update(const response::book_t &);
 
+  uint64_t crc32() const;
+
 private:
   template <typename Q, typename S>
   void apply_update(const Q&, S&);
@@ -39,10 +41,12 @@ private:
 
 
 struct level_book_t final {
+  using symbol_t = std::string;
   void accept(const response::book_t &);
 
+  uint64_t crc32(symbol_t symbol) const;
+
 private:
-  using symbol_t = std::string;
   std::unordered_map<symbol_t, sides_t> m_sides;
 };
 

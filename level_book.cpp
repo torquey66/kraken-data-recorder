@@ -28,16 +28,19 @@ void sides_t::clear() {
 }
 
 void sides_t::verify_checksum(uint64_t expected_crc32) const {
-  boost::crc_32_type result;
-  result = update_checksum(result, asks());
-  result = update_checksum(result, bids());
-
-  const auto actual_crc32 = result.checksum();
+  const auto actual_crc32 = crc32();
   if (expected_crc32 != actual_crc32) {
     throw std::runtime_error(
         "bogus crc32 expected: " + std::to_string(expected_crc32) +
         " actual: " + std::to_string(actual_crc32));
   }
+}
+
+uint64_t sides_t::crc32() const {
+  boost::crc_32_type result;
+  result = update_checksum(result, asks());
+  result = update_checksum(result, bids());
+  return result.checksum();
 }
 
 void level_book_t::accept(const response::book_t &response) {
@@ -50,6 +53,15 @@ void level_book_t::accept(const response::book_t &response) {
     return sides.accept_update(response);
   }
   throw std::runtime_error("bogus book channel type: '" + type + "'");
+}
+
+uint64_t level_book_t::crc32(symbol_t symbol) const {
+  const auto it= m_sides.find(symbol);
+  if (it == m_sides.end()) {
+    throw std::runtime_error("bogus symbol: " + symbol);
+  }
+  const auto &sides = it->second;
+  return sides.crc32();
 }
 
 } // namespace model
