@@ -62,10 +62,12 @@ private:
  * https://docs.kraken.com/websockets-v2/#book
  */
 struct book_t final {
-  book_t() = default;
-
   using asks_t = std::vector<ask_t>;
   using bids_t = std::vector<bid_t>;
+
+  book_t() = default;
+  book_t(const header_t &, const asks_t &, const bids_t &, uint64_t,
+         std::string, timestamp_t);
 
   const header_t &header() const { return m_header; }
   const bids_t &bids() const { return m_bids; }
