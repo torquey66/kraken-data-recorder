@@ -64,6 +64,11 @@ nlohmann::json instrument_t::to_json() const {
   return result;
 }
 
+book_t::book_t(const header_t &header, const asks_t &asks, const bids_t &bids,
+               uint64_t crc32, std::string symbol, timestamp_t timestamp)
+    : m_header(header), m_asks(asks), m_bids(bids), m_crc32(crc32),
+      m_symbol(symbol), m_timestamp(timestamp) {}
+
 book_t book_t::from_json(simdjson::ondemand::document &response) {
   auto result = book_t{};
   auto buffer = std::string_view{};
