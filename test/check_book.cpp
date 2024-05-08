@@ -40,26 +40,20 @@ int main(int argc, char *argv[]) {
       std::cerr << "error: " << maybe_batch.status().ToString() << std::endl;
     }
     const auto &batch = *maybe_batch.ValueOrDie();
-    const auto recv_tm_col = batch.GetColumnByName("recv_tm");
-    const auto type_col = batch.GetColumnByName("type");
-    const auto crc32_col = batch.GetColumnByName("crc32");
-    const auto symbol_col = batch.GetColumnByName("symbol");
-    const auto timestamp_col = batch.GetColumnByName("timestamp");
+    const auto recv_tm_col = std::dynamic_pointer_cast<arrow::Int64Array>(
+        batch.GetColumnByName("recv_tm"));
+    const auto type_col = std::dynamic_pointer_cast<arrow::StringArray>(
+        batch.GetColumnByName("type"));
+    const auto crc32_col = std::dynamic_pointer_cast<arrow::UInt64Array>(
+        batch.GetColumnByName("crc32"));
+    const auto symbol_col = std::dynamic_pointer_cast<arrow::StringArray>(
+        batch.GetColumnByName("symbol"));
+    const auto timestamp_col = std::dynamic_pointer_cast<arrow::Int64Array>(
+        batch.GetColumnByName("timestamp"));
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
-      std::shared_ptr<::arrow::Scalar> recv_tm_val;
-      std::shared_ptr<::arrow::Scalar> type_val;
-      std::shared_ptr<::arrow::Scalar> crc32_val;
-      std::shared_ptr<::arrow::Scalar> symbol_val;
-      std::shared_ptr<::arrow::Scalar> timestamp_val;
-      PARQUET_ASSIGN_OR_THROW(recv_tm_val, recv_tm_col->GetScalar(idx));
-      PARQUET_ASSIGN_OR_THROW(type_val, type_col->GetScalar(idx));
-      PARQUET_ASSIGN_OR_THROW(crc32_val, crc32_col->GetScalar(idx));
-      PARQUET_ASSIGN_OR_THROW(symbol_val, symbol_col->GetScalar(idx));
-      PARQUET_ASSIGN_OR_THROW(timestamp_val, timestamp_col->GetScalar(idx));
-
-      std::cout << recv_tm_val->ToString() << " " << type_val->ToString()
-                << crc32_val->ToString() << " " << symbol_val->ToString() << " "
-                << timestamp_val->ToString() << std::endl;
+      std::cout << recv_tm_col->Value(idx) << " " << type_col->Value(idx) << " "
+                << crc32_col->Value(idx) << " " << symbol_col->Value(idx) << " "
+                << timestamp_col->Value(idx) << std::endl;
     }
   }
 }
