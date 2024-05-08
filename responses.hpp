@@ -32,6 +32,9 @@ struct header_t final {
   const std::string &channel() const { return m_channel; }
   const std::string &type() const { return m_type; }
 
+  nlohmann::json to_json() const;
+  std::string str() const { return to_json().dump(); }
+
 private:
   timestamp_t m_recv_tm;
   std::string m_channel;
