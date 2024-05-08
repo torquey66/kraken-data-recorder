@@ -54,6 +54,9 @@ target_link_libraries(Krakpot krakpot_base)
 add_executable(parse_instrument_snapshot test/parse_instrument_snapshot.cpp)
 target_link_libraries(parse_instrument_snapshot krakpot_base)
 
+add_executable(check_book test/check_book.cpp)
+target_link_libraries(check_book krakpot_base)
+
 add_executable(decimal_test test/unit/decimal_test.cpp)
 target_link_libraries(decimal_test krakpot_base)
 
