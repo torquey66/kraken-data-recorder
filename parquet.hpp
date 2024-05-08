@@ -42,13 +42,13 @@ private:
   std::shared_ptr<arrow::Int64Builder> m_recv_tm_builder;
   std::shared_ptr<arrow::StringBuilder> m_type_builder;
 
-  std::shared_ptr<arrow::DoubleBuilder> m_bid_price_builder;
-  std::shared_ptr<arrow::DoubleBuilder> m_bid_qty_builder;
+  std::shared_ptr<arrow::StringBuilder> m_bid_price_builder;
+  std::shared_ptr<arrow::StringBuilder> m_bid_qty_builder;
   std::shared_ptr<arrow::StructBuilder> m_bid_builder;
   std::shared_ptr<arrow::ListBuilder> m_bids_builder;
 
-  std::shared_ptr<arrow::DoubleBuilder> m_ask_price_builder;
-  std::shared_ptr<arrow::DoubleBuilder> m_ask_qty_builder;
+  std::shared_ptr<arrow::StringBuilder> m_ask_price_builder;
+  std::shared_ptr<arrow::StringBuilder> m_ask_qty_builder;
   std::shared_ptr<arrow::StructBuilder> m_ask_builder;
   std::shared_ptr<arrow::ListBuilder> m_asks_builder;
 
