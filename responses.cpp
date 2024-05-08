@@ -18,6 +18,12 @@ krakpot::decimal_t extract_decimal(O &obj, std::string field) {
 namespace krakpot {
 namespace response {
 
+nlohmann::json header_t::to_json() const {
+  const nlohmann::json result = {
+      {"recv_tm", recv_tm().str()}, {"channel", channel()}, {"type", type()}};
+  return result;
+}
+
 instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
   auto result = instrument_t{};
   auto buffer = std::string_view{};
