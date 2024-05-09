@@ -2,6 +2,7 @@
 #include "level_book.hpp"
 
 #include <boost/log/trivial.hpp>
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <string_view>
@@ -43,6 +44,23 @@ uint64_t sides_t::crc32() const {
   return result.checksum();
 }
 
+std::string sides_t::str() const {
+  auto bids_json = nlohmann::json{};
+  for (const auto &bid : bids()) {
+    const nlohmann::json quote{{bid.first.str(), bid.second.str()}};
+    bids_json.push_back(quote);
+  }
+
+  auto asks_json = nlohmann::json{};
+  for (const auto &ask : asks()) {
+    const nlohmann::json quote{{ask.first.str(), ask.second.str()}};
+    asks_json.push_back(quote);
+  }
+
+  const nlohmann::json result = {{"bids", bids_json}, {"asks", asks_json}};
+  return result;
+}
+
 void level_book_t::accept(const response::book_t &response) {
   auto &sides = m_sides[response.symbol()];
   const auto type = response.header().type();
@@ -62,6 +80,12 @@ uint64_t level_book_t::crc32(symbol_t symbol) const {
   }
   const auto &sides = it->second;
   return sides.crc32();
+}
+
+std::string level_book_t::str(std::string symbol) const {
+  const auto &side = m_sides.at(symbol);
+  const nlohmann::json result{{"symbol", symbol}, {"side", side.str()}};
+  return result.dump();
 }
 
 } // namespace model
