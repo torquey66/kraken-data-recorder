@@ -24,12 +24,13 @@ struct sides_t final {
 
   uint64_t crc32() const;
 
+  std::string str() const;
+
 private:
   template <typename Q, typename S>
   void apply_update(const Q&, S&);
-  
-  void clear();
 
+  void clear();
   void verify_checksum(uint64_t) const;
 
   template <typename S>
@@ -45,6 +46,8 @@ struct level_book_t final {
   void accept(const response::book_t &);
 
   uint64_t crc32(symbol_t symbol) const;
+
+  std::string str(std::string) const;
 
 private:
   std::unordered_map<symbol_t, sides_t> m_sides;
