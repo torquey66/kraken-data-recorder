@@ -5,6 +5,7 @@
 #include "responses.hpp"
 
 #include <boost/crc.hpp>
+#include <nlohmann/json.hpp>
 
 #include <map>
 #include <unordered_map>
@@ -24,11 +25,11 @@ struct sides_t final {
 
   uint64_t crc32() const;
 
-  std::string str() const;
+  nlohmann::json to_json() const;
+  std::string str() const { return to_json().dump(); }
 
 private:
-  template <typename Q, typename S>
-  void apply_update(const Q&, S&);
+  template <typename Q, typename S> void apply_update(const Q &, S &);
 
   void clear();
   void verify_checksum(uint64_t) const;
@@ -39,7 +40,6 @@ private:
   bid_side_t m_bids;
   ask_side_t m_asks;
 };
-
 
 struct level_book_t final {
   using symbol_t = std::string;
@@ -73,7 +73,7 @@ boost::crc_32_type sides_t::update_checksum(const boost::crc_32_type crc32,
 }
 
 template <typename Q, typename S>
-void sides_t::apply_update(const Q& quotes, S& side) {
+void sides_t::apply_update(const Q &quotes, S &side) {
   for (const auto &quote : quotes) {
     const auto [price, qty] = quote;
     auto it = side.find(price);

@@ -2,7 +2,6 @@
 #include "level_book.hpp"
 
 #include <boost/log/trivial.hpp>
-#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <string_view>
@@ -44,7 +43,7 @@ uint64_t sides_t::crc32() const {
   return result.checksum();
 }
 
-std::string sides_t::str() const {
+nlohmann::json sides_t::to_json() const {
   auto bids_json = nlohmann::json{};
   for (const auto &bid : bids()) {
     const nlohmann::json quote{{bid.first.str(), bid.second.str()}};
@@ -74,7 +73,7 @@ void level_book_t::accept(const response::book_t &response) {
 }
 
 uint64_t level_book_t::crc32(symbol_t symbol) const {
-  const auto it= m_sides.find(symbol);
+  const auto it = m_sides.find(symbol);
   if (it == m_sides.end()) {
     throw std::runtime_error("bogus symbol: " + symbol);
   }
@@ -85,7 +84,7 @@ uint64_t level_book_t::crc32(symbol_t symbol) const {
 std::string level_book_t::str(std::string symbol) const {
   const auto &side = m_sides.at(symbol);
   const nlohmann::json result{{"symbol", symbol}, {"side", side.str()}};
-  return result.dump();
+  return result.dump(3);
 }
 
 } // namespace model

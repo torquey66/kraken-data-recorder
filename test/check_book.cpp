@@ -100,20 +100,16 @@ int main(int argc, char *argv[]) {
       const auto timestamp = timestamp_array->Value(idx);
       const auto header = response::header_t{
           recv_tm, "book", std::string{type.begin(), type.end()}};
+      const auto symbol_str = std::string{symbol.begin(), symbol.end()};
       const auto response =
-          response::book_t{header,
-                           asks,
-                           bids,
-                           crc32,
-                           std::string{symbol.begin(), symbol.end()},
-                           timestamp};
+          response::book_t{header, asks, bids, crc32, symbol_str, timestamp};
       try {
-        prev_level_book = level_book;
+        //        prev_level_book = level_book;
         level_book.accept(response);
       } catch (const std::exception &ex) {
-        const auto symbol_str = std::string{symbol.begin(), symbol.end()};
         std::cerr << ex.what() << std::endl;
-        std::cerr << "before: " << prev_level_book.str(symbol_str) << std::endl;
+        //        std::cerr << "before: " << prev_level_book.str(symbol_str)
+        //        << std::endl;
         std::cerr << response.str() << std::endl;
         std::cerr << " after: " << level_book.str(symbol_str) << std::endl;
         return -1;
