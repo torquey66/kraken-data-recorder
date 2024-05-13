@@ -66,7 +66,6 @@ int main(int argc, char *argv[]) {
   std::shared_ptr<::arrow::RecordBatchReader> rb_reader;
   PARQUET_THROW_NOT_OK(arrow_reader->GetRecordBatchReader(&rb_reader));
 
-  auto prev_level_book = model::level_book_t{};
   auto level_book = model::level_book_t{};
 
   for (arrow::Result<std::shared_ptr<arrow::RecordBatch>> maybe_batch :
@@ -90,6 +89,7 @@ int main(int argc, char *argv[]) {
     const auto timestamp_array = std::dynamic_pointer_cast<arrow::Int64Array>(
         batch.GetColumnByName("timestamp"));
 
+    // auto num_processed = 0;
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
       const auto recv_tm = recv_tm_array->Value(idx);
       const auto type = type_array->Value(idx);
@@ -104,16 +104,16 @@ int main(int argc, char *argv[]) {
       const auto response =
           response::book_t{header, asks, bids, crc32, symbol_str, timestamp};
       try {
-        //        prev_level_book = level_book;
         level_book.accept(response);
+        // ++num_processed;
       } catch (const std::exception &ex) {
         std::cerr << ex.what() << std::endl;
-        //        std::cerr << "before: " << prev_level_book.str(symbol_str)
-        //        << std::endl;
         std::cerr << response.str() << std::endl;
         std::cerr << " after: " << level_book.str(symbol_str) << std::endl;
+        // std::cerr << "num_processed: " << num_processed << std::endl;
         return -1;
       }
     }
+    // std::cout << "num_processed: " << num_processed << std::endl;
   }
 }
