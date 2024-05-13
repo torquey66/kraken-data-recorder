@@ -30,18 +30,3 @@ TEST_CASE("sanity check - comparison") {
   const auto d3 = krakpot::decimal_t{19.82, std::string{"19.82"}};
   CHECK(d2 == d3);
 }
-
-TEST_CASE("sanity check - token trimming") {
-  const auto samples = std::map<std::string, std::string>{
-      {"0.10000000", "10000000"},  {"0.10000000", "10000000"},
-      {"1.54582015", "154582015"}, {"0.07990000", "7990000"},
-      {"45283.4", "452834"},       {"45281.0", "452810"},
-      {"45280.3", "452803"},       {"45280.3 ", "452803"},
-      {" 45280.3 ", "452803"},     {" 45280.3 \n", "452803"},
-  };
-  for (const auto &sample : samples) {
-    const auto &[raw, trimmed] = sample;
-    const auto token = krakpot::token_t{raw};
-    CHECK(token.trimmed() == trimmed);
-  }
-}

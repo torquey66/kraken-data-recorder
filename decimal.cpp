@@ -4,18 +4,18 @@
 
 namespace krakpot {
 
-std::string token_t::trimmed() const {
-  // !@# TODO upgrade compiler and use ranges
-  // !@# TODO verify that this is not a bottleneck
-  auto buffer = m_chars;
-  auto eit = std::remove(buffer.begin(), buffer.end(), '.');
-  buffer.erase(eit, buffer.end());
-  eit = std::remove_if(buffer.begin(), buffer.end(),
-                       [](const char ch) { return std::iswspace(ch); });
-  buffer.erase(eit, buffer.end());
-  const auto begin = buffer.find_first_not_of('0');
-  buffer = buffer.substr(begin);
-  return buffer;
+void token_t::process(boost::crc_32_type &crc32) const {
+  auto in_leading_zeros = true;
+  for (const auto ch : m_chars) {
+    if (ch != '.') {
+      if (!in_leading_zeros) {
+        crc32.process_byte(ch);
+      } else if (ch != '0') {
+        in_leading_zeros = false;
+        crc32.process_byte(ch);
+      }
+    }
+  }
 }
 
 } // namespace krakpot

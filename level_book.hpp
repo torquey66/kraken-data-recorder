@@ -54,9 +54,9 @@ private:
 };
 
 template <typename S>
-boost::crc_32_type sides_t::update_checksum(const boost::crc_32_type crc32,
+boost::crc_32_type sides_t::update_checksum(boost::crc_32_type crc32,
                                             const S &side) const {
-  auto result = crc32;
+  auto& result = crc32;
   auto depth = size_t{0};
   for (const auto &kv : side) {
     if (++depth > 10) {
@@ -64,10 +64,8 @@ boost::crc_32_type sides_t::update_checksum(const boost::crc_32_type crc32,
     }
     const auto &price = kv.first;
     const auto &qty = kv.second;
-    const auto trimmed_price = price.token().trimmed();
-    const auto trimmed_qty = qty.token().trimmed();
-    result.process_bytes(trimmed_price.data(), trimmed_price.size());
-    result.process_bytes(trimmed_qty.data(), trimmed_qty.size());
+    price.process(crc32);
+    qty.process(crc32);
   }
   return result;
 }

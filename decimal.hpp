@@ -3,6 +3,7 @@
 
 #include "constants.hpp"
 
+#include <boost/crc.hpp>
 #include <string>
 #include <string_view>
 
@@ -17,9 +18,9 @@ struct token_t final {
 
   bool operator==(const token_t &rhs) const = default;
 
-  std::string trimmed() const;
-
   std::string str() const { return m_chars; }
+
+  void process(boost::crc_32_type&) const;
 
 private:
   std::string m_chars;
@@ -41,6 +42,8 @@ struct decimal_t final {
   auto &token() const { return m_token; }
 
   auto str() const { return m_token.str(); }
+
+  void process(boost::crc_32_type& crc32) const { return m_token.process(crc32); }
 
 private:
   double m_value;
