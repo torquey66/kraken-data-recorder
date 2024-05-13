@@ -30,9 +30,11 @@ void sides_t::clear() {
 void sides_t::verify_checksum(uint64_t expected_crc32) const {
   const auto actual_crc32 = crc32();
   if (expected_crc32 != actual_crc32) {
-    throw std::runtime_error(
+    const auto message =
         "bogus crc32 expected: " + std::to_string(expected_crc32) +
-        " actual: " + std::to_string(actual_crc32));
+        " actual: " + std::to_string(actual_crc32);
+    BOOST_LOG_TRIVIAL(error) << message;
+    throw std::runtime_error(message);
   }
 }
 

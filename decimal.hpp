@@ -38,7 +38,7 @@ struct decimal_t final {
   bool operator==(const decimal_t &rhs) const = default;
 
   auto value() const { return m_value; }
-  auto token() const { return m_token; }
+  auto &token() const { return m_token; }
 
   auto str() const { return m_token.str(); }
 

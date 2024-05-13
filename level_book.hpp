@@ -17,8 +17,8 @@ using bid_side_t = std::map<price_t, qty_t, std::greater<price_t>>;
 using ask_side_t = std::map<price_t, qty_t, std::less<price_t>>;
 
 struct sides_t final {
-  auto bids() const { return m_bids; }
-  auto asks() const { return m_asks; }
+  const bid_side_t &bids() const { return m_bids; }
+  const ask_side_t &asks() const { return m_asks; }
 
   void accept_snapshot(const response::book_t &);
   void accept_update(const response::book_t &);
@@ -75,7 +75,7 @@ boost::crc_32_type sides_t::update_checksum(const boost::crc_32_type crc32,
 template <typename Q, typename S>
 void sides_t::apply_update(const Q &quotes, S &side) {
   for (const auto &quote : quotes) {
-    const auto [price, qty] = quote;
+    const auto &[price, qty] = quote;
     auto it = side.find(price);
     if (it != side.end()) {
       if (qty.value() == 0) {
