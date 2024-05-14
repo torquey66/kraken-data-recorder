@@ -35,7 +35,7 @@ int main(int, char **) {
     auto engine = krakpot::engine_t(session);
 
     const auto handle_recv =
-        [&engine](krakpot::session_t::msg_t msg,
+        [&engine](krakpot::msg_t msg,
                   krakpot::session_t::yield_context_t yield) {
           try {
             return engine.handle_msg(msg, yield);

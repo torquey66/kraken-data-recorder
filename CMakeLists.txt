@@ -26,6 +26,7 @@ add_library(krakpot_base
   decimal.cpp
   engine.cpp
   level_book.cpp
+  metrics.cpp
   pair.cpp
   parquet.cpp
   requests.cpp

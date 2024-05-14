@@ -33,7 +33,6 @@ struct session_t final {
       boost::beast::ssl_stream<boost::beast::tcp_stream>>;
   using yield_context_t = boost::asio::yield_context;
 
-  using msg_t = std::string_view;
   using recv_cb_t = std::function<bool(msg_t, yield_context_t)>;
 
   session_t(ioc_t &, ssl_context_t &);
