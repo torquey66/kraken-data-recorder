@@ -33,7 +33,6 @@ void sides_t::verify_checksum(uint64_t expected_crc32) const {
     const auto message =
         "bogus crc32 expected: " + std::to_string(expected_crc32) +
         " actual: " + std::to_string(actual_crc32);
-    BOOST_LOG_TRIVIAL(error) << message;
     throw std::runtime_error(message);
   }
 }
@@ -60,6 +59,15 @@ nlohmann::json sides_t::to_json() const {
 
   const nlohmann::json result = {{"bids", bids_json}, {"asks", asks_json}};
   return result;
+}
+
+const sides_t &level_book_t::sides(symbol_t symbol) const {
+  const auto it = m_sides.find(symbol);
+  if (it == m_sides.end()) {
+    const auto message = "unknown symbol: " + symbol;
+    throw std::runtime_error(message);
+  }
+  return it->second;
 }
 
 void level_book_t::accept(const response::book_t &response) {
