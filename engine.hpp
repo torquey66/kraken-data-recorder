@@ -2,6 +2,7 @@
 #pragma once
 
 #include "level_book.hpp"
+#include "metrics.hpp"
 #include "parquet.hpp"
 #include "session.hpp"
 
@@ -19,7 +20,6 @@ namespace krakpot {
 
 struct engine_t final {
 
-  using msg_t = session_t::msg_t;
   using yield_context_t = session_t::yield_context_t;
 
   engine_t(session_t &);
@@ -56,6 +56,8 @@ private:
   model::level_book_t m_level_book;
   pq::book_sink_t m_book_sink;
   pq::trades_sink_t m_trades_sink;
+
+  metrics_t m_metrics;
 };
 
 } // namespace krakpot

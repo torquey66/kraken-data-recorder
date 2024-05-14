@@ -20,6 +20,8 @@
  */
 namespace krakpot {
 
+using msg_t = std::string_view;
+
 using integer_t = int64_t;
 using double_t = double;
 

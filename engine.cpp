@@ -20,6 +20,8 @@ engine_t::engine_t(session_t &session)
 
 bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
 
+  m_metrics.accept(msg);
+
   try {
     simdjson::padded_string padded_msg{msg};
     simdjson::ondemand::document doc = m_parser.iterate(padded_msg);
@@ -151,15 +153,14 @@ bool engine_t::handle_heartbeat_msg(doc_t &, yield_context_t) {
   return true;
 }
 
-bool engine_t::handle_pong_msg(doc_t &doc, yield_context_t yield) {
+bool engine_t::handle_pong_msg(doc_t & /*doc*/, yield_context_t yield) {
   // !@# TODO: track ping/pong latency
   if (!m_subscribed) {
     const request::subscribe_instrument_t subscribe_inst{++m_inst_req_id};
     m_session.send(subscribe_inst.str(), yield);
     m_subscribed = true;
   }
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << "  "
-                           << simdjson::to_json_string(doc);
+  BOOST_LOG_TRIVIAL(info) << m_metrics.str();
   return true;
 }
 
