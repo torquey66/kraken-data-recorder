@@ -6,8 +6,10 @@
 #include <arrow/io/api.h>
 #include <arrow/record_batch.h>
 #include <arrow/scalar.h>
+#include <nlohmann/json.hpp>
 #include <parquet/arrow/reader.h>
 
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -36,6 +38,23 @@ std::vector<quote_t> extract(const arrow::ListArray &quotes_array,
     result.push_back(quote);
   }
   return result;
+}
+
+void dump_sides(const model::sides_t &sides, const size_t max_depth = 10) {
+  const auto &bids = sides.bids();
+  const auto &asks = sides.asks();
+  auto bid_it = bids.begin();
+  auto ask_it = asks.begin();
+  for (size_t depth = 0; depth < max_depth; ++depth) {
+    const auto bid_px = bid_it != bids.end() ? bid_it->first.value() : c_NaN;
+    const auto bid_qty = bid_it != bids.end() ? bid_it->second.value() : c_NaN;
+    const auto ask_px = ask_it != asks.end() ? ask_it->first.value() : c_NaN;
+    const auto ask_qty = ask_it != asks.end() ? ask_it->second.value() : c_NaN;
+    std::cerr << std::setprecision(8) << bid_qty << " @ " << bid_px << "     "
+              << ask_qty << " @ " << ask_px << std::endl;
+    ++bid_it;
+    ++ask_it;
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -89,7 +108,6 @@ int main(int argc, char *argv[]) {
     const auto timestamp_array = std::dynamic_pointer_cast<arrow::Int64Array>(
         batch.GetColumnByName("timestamp"));
 
-    // auto num_processed = 0;
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
       const auto recv_tm = recv_tm_array->Value(idx);
       const auto type = type_array->Value(idx);
@@ -105,15 +123,12 @@ int main(int argc, char *argv[]) {
           response::book_t{header, asks, bids, crc32, symbol_str, timestamp};
       try {
         level_book.accept(response);
-        // ++num_processed;
       } catch (const std::exception &ex) {
         std::cerr << ex.what() << std::endl;
         std::cerr << response.str() << std::endl;
-        std::cerr << " after: " << level_book.str(symbol_str) << std::endl;
-        // std::cerr << "num_processed: " << num_processed << std::endl;
+        dump_sides(level_book.sides(symbol_str));
         return -1;
       }
     }
-    // std::cout << "num_processed: " << num_processed << std::endl;
   }
 }

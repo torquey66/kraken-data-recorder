@@ -43,11 +43,15 @@ private:
 
 struct level_book_t final {
   using symbol_t = std::string;
+
+  const sides_t& sides(symbol_t) const;    
+
   void accept(const response::book_t &);
 
   uint64_t crc32(symbol_t symbol) const;
 
   std::string str(std::string) const;
+
 
 private:
   std::unordered_map<symbol_t, sides_t> m_sides;
