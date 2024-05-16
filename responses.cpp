@@ -160,10 +160,10 @@ nlohmann::json book_t::to_json() const {
 }
 
 ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
-  if (ord_type == c_trades_market) {
+  if (ord_type == c_trade_market) {
     return e_market;
   }
-  if (ord_type == c_trades_limit) {
+  if (ord_type == c_trade_limit) {
     return e_limit;
   }
   throw std::runtime_error{"unsupported ord_type: " +
@@ -171,10 +171,10 @@ ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
 }
 
 side_t trades_t::parse_side(std::string_view side) {
-  if (side == c_trades_buy) {
+  if (side == c_trade_buy) {
     return e_buy;
   }
-  if (side == c_trades_sell) {
+  if (side == c_trade_sell) {
     return e_sell;
   }
   throw std::runtime_error{"unsupported side: " +
@@ -193,18 +193,18 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
 
   for (auto obj : response[c_response_data]) {
     auto trade = trade_t{};
-    buffer = obj[c_trades_ord_type].get_string();
+    buffer = obj[c_trade_ord_type].get_string();
     trade.ord_type = parse_ord_type(buffer);
-    trade.price = extract_decimal(obj, c_book_price);
-    trade.qty = extract_decimal(obj, c_book_qty);
-    buffer = obj[c_trades_side].get_string();
+    trade.price = extract_decimal(obj, c_trade_price);
+    trade.qty = extract_decimal(obj, c_trade_qty);
+    buffer = obj[c_trade_side].get_string();
     trade.side = parse_side(buffer);
-    buffer = obj[c_book_symbol].get_string();
+    buffer = obj[c_trade_symbol].get_string();
     trade.symbol = std::string(buffer.begin(), buffer.end());
-    buffer = obj[c_book_timestamp].get_string();
+    buffer = obj[c_trade_timestamp].get_string();
     trade.timestamp =
         timestamp_t::from_iso_8601(std::string{buffer.data(), buffer.size()});
-    trade.trade_id = obj[c_trades_trade_id].get_uint64();
+    trade.trade_id = obj[c_trade_trade_id].get_uint64();
     result.m_trades.push_back(trade);
   }
 
@@ -216,10 +216,10 @@ nlohmann::json trades_t::to_json() const {
   auto trades = nlohmann::json::array();
   for (const auto &trade : m_trades) {
     const nlohmann::json trade_json = {
-        {c_trades_ord_type, trade.ord_type}, {c_book_price, trade.price.value()},
-        {c_book_qty, trade.qty.value()},   {c_trades_side, trade.side},
-        {c_book_symbol, trade.symbol},     {c_book_timestamp, trade.timestamp.str()},
-        {c_trades_trade_id, trade.trade_id},
+        {c_trade_ord_type, trade.ord_type}, {c_trade_price, trade.price.value()},
+        {c_trade_qty, trade.qty.value()},   {c_trade_side, trade.side},
+        {c_trade_symbol, trade.symbol},     {c_trade_timestamp, trade.timestamp.str()},
+        {c_trade_trade_id, trade.trade_id},
     };
     trades.push_back(trade_json);
   }
