@@ -169,15 +169,15 @@ std::shared_ptr<arrow::Schema> book_sink_t::schema() {
   // TODO: add KeyValueMetadata for enum fields
 
   auto field_vector = arrow::FieldVector{
-      arrow::field("recv_tm", arrow::int64(),
-                   false), // TODO: replace with timestamp type
-      arrow::field("type", arrow::utf8(), false),
-      arrow::field("bids", arrow::list(quote_struct()), false),
-      arrow::field("asks", arrow::list(quote_struct()), false),
-      arrow::field("crc32", arrow::uint64(), false),
-      arrow::field("symbol", arrow::utf8(), false),
-      arrow::field("timestamp", arrow::int64(),
-                   false), // TODO: replace with timestamp type
+      arrow::field(c_header_recv_tm, arrow::int64(),
+                   false), // TODO: replace with timestamp type?
+      arrow::field(c_header_type, arrow::utf8(), false),
+      arrow::field(c_book_bids, arrow::list(quote_struct()), false),
+      arrow::field(c_book_asks, arrow::list(quote_struct()), false),
+      arrow::field(c_book_checksum, arrow::uint64(), false),
+      arrow::field(c_book_symbol, arrow::utf8(), false),
+      arrow::field(c_book_timestamp, arrow::int64(),
+                   false), // TODO: replace with timestamp type?
   };
   return arrow::schema(field_vector);
 }
@@ -251,16 +251,16 @@ std::shared_ptr<arrow::Schema> trades_sink_t::schema() {
   // TODO: add KeyValueMetadata for enum fields
 
   auto field_vector = arrow::FieldVector{
-      arrow::field("recv_tm", arrow::int64(),
+      arrow::field(c_header_recv_tm, arrow::int64(),
                    false), // TODO: replace with timestamp type
-      arrow::field("ord_type", arrow::utf8(), false),
-      arrow::field("price", arrow::float64(), false),
-      arrow::field("qty", arrow::float64(), false),
-      arrow::field("side", arrow::utf8(), false),
-      arrow::field("symbol", arrow::utf8(), false),
-      arrow::field("timestamp", arrow::int64(),
+      arrow::field(c_trade_ord_type, arrow::utf8(), false),
+      arrow::field(c_trade_price, arrow::float64(), false),
+      arrow::field(c_trade_qty, arrow::float64(), false),
+      arrow::field(c_trade_side, arrow::utf8(), false),
+      arrow::field(c_trade_symbol, arrow::utf8(), false),
+      arrow::field(c_trade_timestamp, arrow::int64(),
                    false), // TODO: replace with timestamp type
-      arrow::field("trade_id", arrow::uint64(), false),
+      arrow::field(c_trade_trade_id, arrow::uint64(), false),
   };
   return arrow::schema(field_vector);
 }

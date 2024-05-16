@@ -103,13 +103,17 @@ static constexpr char c_book_side[] = "side";
 static constexpr char c_book_symbol[] = "symbol";
 static constexpr char c_book_timestamp[] = "timestamp";
 
-static constexpr char c_trades_buy[] = "buy";
-static constexpr char c_trades_limit[] = "limit";
-static constexpr char c_trades_market[] = "market";
-static constexpr char c_trades_ord_type[] = "ord_type";
-static constexpr char c_trades_sell[] = "sell";
-static constexpr char c_trades_side[] = "side";
-static constexpr char c_trades_trade_id[] = "trade_id";
+static constexpr char c_trade_buy[] = "buy";
+static constexpr char c_trade_limit[] = "limit";
+static constexpr char c_trade_market[] = "market";
+static constexpr char c_trade_ord_type[] = "ord_type";
+static constexpr char c_trade_price[] = "price";
+static constexpr char c_trade_qty[] = "qty";
+static constexpr char c_trade_sell[] = "sell";
+static constexpr char c_trade_side[] = "side";
+static constexpr char c_trade_symbol[] = "symbol";
+static constexpr char c_trade_timestamp[] = "timestamp";
+static constexpr char c_trade_trade_id[] = "trade_id";
 
 static constexpr char c_metrics_num_bytes[] = "num_bytes";
 static constexpr char c_metrics_num_msgs[] = "num_msgs";
