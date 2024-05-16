@@ -20,7 +20,7 @@ namespace response {
 
 nlohmann::json header_t::to_json() const {
   const nlohmann::json result = {
-      {"recv_tm", recv_tm().str()}, {"channel", channel()}, {"type", type()}};
+      {c_header_recv_tm, recv_tm().str()}, {c_header_channel, channel()}, {c_header_type, type()}};
   return result;
 }
 
@@ -28,18 +28,18 @@ instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
   auto result = instrument_t{};
   auto buffer = std::string_view{};
 
-  buffer = response["channel"].get_string();
+  buffer = response[c_header_channel].get_string();
   const auto channel = std::string{buffer.begin(), buffer.end()};
-  buffer = response["type"].get_string();
+  buffer = response[c_header_type].get_string();
   const auto type = std::string{buffer.begin(), buffer.end()};
   result.m_header = header_t{timestamp_t::now(), channel, type};
 
-  for (simdjson::fallback::ondemand::object obj : response["data"]["assets"]) {
+  for (simdjson::fallback::ondemand::object obj : response[c_response_data][c_instrument_assets]) {
     const auto asset = asset_t::from_json(obj);
     result.m_assets.push_back(asset);
   }
 
-  for (simdjson::fallback::ondemand::object obj : response["data"]["pairs"]) {
+  for (simdjson::fallback::ondemand::object obj : response[c_response_data][c_instrument_pairs]) {
     const auto pair = pair_t::from_json(obj);
     result.m_pairs.push_back(pair);
   }
@@ -60,12 +60,12 @@ nlohmann::json instrument_t::to_json() const {
   }
 
   auto data = nlohmann::json{};
-  data["pairs"] = pairs;
-  data["assets"] = assets;
+  data[c_instrument_pairs] = pairs;
+  data[c_instrument_assets] = assets;
 
-  const nlohmann::json result = {{"channel", m_header.channel()},
-                                 {"data", data},
-                                 {"type", m_header.type()}};
+  const nlohmann::json result = {{c_header_channel, m_header.channel()},
+                                 {c_response_data, data},
+                                 {c_header_type, m_header.type()}};
 
   return result;
 }
@@ -79,16 +79,16 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
   auto result = book_t{};
   auto buffer = std::string_view{};
 
-  buffer = response["channel"].get_string();
+  buffer = response[c_header_channel].get_string();
   const auto channel = std::string{buffer.begin(), buffer.end()};
-  buffer = response["type"].get_string();
+  buffer = response[c_header_type].get_string();
   const auto type = std::string{buffer.begin(), buffer.end()};
   result.m_header = header_t{timestamp_t::now(), channel, type};
 
   // TODO: it is entirely unclear to me why `data` is an array since
   // it only ever seems to contain a single entry.
   bool processed = false;
-  for (auto data : response["data"]) {
+  for (auto data : response[c_response_data]) {
     if (processed) {
       throw std::runtime_error(
           "TODO: fix problem with multiple data[] entries");
@@ -96,28 +96,28 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
     processed = true;
 
     // TODO: eliminate duplication
-    for (simdjson::fallback::ondemand::object obj : data["asks"]) {
-      const auto price = extract_decimal(obj, "price");
-      const auto qty = extract_decimal(obj, "qty");
+    for (simdjson::fallback::ondemand::object obj : data[c_book_asks]) {
+      const auto price = extract_decimal(obj, c_book_price);
+      const auto qty = extract_decimal(obj, c_book_qty);
       const ask_t ask = std::make_pair(price, qty);
       result.m_asks.push_back(ask);
     }
 
-    for (simdjson::fallback::ondemand::object obj : data["bids"]) {
-      const auto price = extract_decimal(obj, "price");
-      const auto qty = extract_decimal(obj, "qty");
+    for (simdjson::fallback::ondemand::object obj : data[c_book_bids]) {
+      const auto price = extract_decimal(obj, c_book_price);
+      const auto qty = extract_decimal(obj, c_book_qty);
       const bid_t bid = std::make_pair(price, qty);
       result.m_bids.push_back(bid);
     }
 
-    result.m_crc32 = data["checksum"].get_uint64();
+    result.m_crc32 = data[c_book_checksum].get_uint64();
 
-    buffer = data["symbol"].get_string();
+    buffer = data[c_book_symbol].get_string();
     const auto symbol = std::string{buffer.begin(), buffer.end()};
     result.m_symbol = symbol;
 
-    if (type == "update") {
-      buffer = data["timestamp"].get_string();
+    if (type == c_book_type_update) {
+      buffer = data[c_book_timestamp].get_string();
       result.m_timestamp =
           timestamp_t::from_iso_8601(std::string{buffer.data(), buffer.size()});
     }
@@ -130,40 +130,40 @@ nlohmann::json book_t::to_json() const {
 
   auto asks = nlohmann::json::array();
   for (const auto &ask : m_asks) {
-    const nlohmann::json ask_json = {{"price", ask.first.value()},
-                                     {"qty", ask.second.value()}};
+    const nlohmann::json ask_json = {{c_book_price, ask.first.value()},
+                                     {c_book_qty, ask.second.value()}};
     asks.push_back(ask_json);
   }
 
   auto bids = nlohmann::json::array();
   for (const auto &bid : m_bids) {
-    const nlohmann::json bid_json = {{"price", bid.first.value()},
-                                     {"qty", bid.second.value()}};
+    const nlohmann::json bid_json = {{c_book_price, bid.first.value()},
+                                     {c_book_qty, bid.second.value()}};
     bids.push_back(bid_json);
   }
 
   auto content = nlohmann::json{};
-  content["asks"] = asks;
-  content["bids"] = bids;
-  content["checksum"] = m_crc32;
-  content["symbol"] = m_symbol;
-  content["timestamp"] = m_timestamp.str();
+  content[c_book_asks] = asks;
+  content[c_book_bids] = bids;
+  content[c_book_checksum] = m_crc32;
+  content[c_book_symbol] = m_symbol;
+  content[c_book_timestamp] = m_timestamp.str();
 
   auto data = nlohmann::json::array();
   data.push_back(content);
 
-  const nlohmann::json result = {{"channel", m_header.channel()},
-                                 {"data", data},
-                                 {"type", m_header.type()}};
+  const nlohmann::json result = {{c_header_channel, m_header.channel()},
+                                 {c_response_data, data},
+                                 {c_header_type, m_header.type()}};
 
   return result;
 }
 
 ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
-  if (ord_type == "market") {
+  if (ord_type == c_trades_market) {
     return e_market;
   }
-  if (ord_type == "limit") {
+  if (ord_type == c_trades_limit) {
     return e_limit;
   }
   throw std::runtime_error{"unsupported ord_type: " +
@@ -171,10 +171,10 @@ ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
 }
 
 side_t trades_t::parse_side(std::string_view side) {
-  if (side == "buy") {
+  if (side == c_trades_buy) {
     return e_buy;
   }
-  if (side == "sell") {
+  if (side == c_trades_sell) {
     return e_sell;
   }
   throw std::runtime_error{"unsupported side: " +
@@ -185,26 +185,26 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   auto result = trades_t{};
   auto buffer = std::string_view{};
 
-  buffer = response["channel"].get_string();
+  buffer = response[c_header_channel].get_string();
   const auto channel = std::string{buffer.begin(), buffer.end()};
-  buffer = response["type"].get_string();
+  buffer = response[c_header_type].get_string();
   const auto type = std::string{buffer.begin(), buffer.end()};
   result.m_header = header_t{timestamp_t::now(), channel, type};
 
-  for (auto obj : response["data"]) {
+  for (auto obj : response[c_response_data]) {
     auto trade = trade_t{};
-    buffer = obj["ord_type"].get_string();
+    buffer = obj[c_trades_ord_type].get_string();
     trade.ord_type = parse_ord_type(buffer);
-    trade.price = extract_decimal(obj, "price");
-    trade.qty = extract_decimal(obj, "qty");
-    buffer = obj["side"].get_string();
+    trade.price = extract_decimal(obj, c_book_price);
+    trade.qty = extract_decimal(obj, c_book_qty);
+    buffer = obj[c_trades_side].get_string();
     trade.side = parse_side(buffer);
-    buffer = obj["symbol"].get_string();
+    buffer = obj[c_book_symbol].get_string();
     trade.symbol = std::string(buffer.begin(), buffer.end());
-    buffer = obj["timestamp"].get_string();
+    buffer = obj[c_book_timestamp].get_string();
     trade.timestamp =
         timestamp_t::from_iso_8601(std::string{buffer.data(), buffer.size()});
-    trade.trade_id = obj["trade_id"].get_uint64();
+    trade.trade_id = obj[c_trades_trade_id].get_uint64();
     result.m_trades.push_back(trade);
   }
 
@@ -216,17 +216,17 @@ nlohmann::json trades_t::to_json() const {
   auto trades = nlohmann::json::array();
   for (const auto &trade : m_trades) {
     const nlohmann::json trade_json = {
-        {"ord_type", trade.ord_type}, {"price", trade.price.value()},
-        {"qty", trade.qty.value()},   {"side", trade.side},
-        {"symbol", trade.symbol},     {"timestamp", trade.timestamp.str()},
-        {"trade_id", trade.trade_id},
+        {c_trades_ord_type, trade.ord_type}, {c_book_price, trade.price.value()},
+        {c_book_qty, trade.qty.value()},   {c_trades_side, trade.side},
+        {c_book_symbol, trade.symbol},     {c_book_timestamp, trade.timestamp.str()},
+        {c_trades_trade_id, trade.trade_id},
     };
     trades.push_back(trade_json);
   }
 
-  const nlohmann::json result = {{"channel", m_header.channel()},
-                                 {"data", trades},
-                                 {"type", m_header.type()}};
+  const nlohmann::json result = {{c_header_channel, m_header.channel()},
+                                 {c_response_data, trades},
+                                 {c_header_type, m_header.type()}};
   return result;
 }
 
