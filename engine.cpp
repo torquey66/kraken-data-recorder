@@ -27,21 +27,21 @@ bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
     simdjson::ondemand::document doc = m_parser.iterate(padded_msg);
 
     auto buffer = std::string_view{};
-    if (doc["channel"].get(buffer) == simdjson::SUCCESS) {
-      if (buffer == "instrument") {
+    if (doc[c_response_channel].get(buffer) == simdjson::SUCCESS) {
+      if (buffer == c_channel_instrument) {
         return handle_instrument_msg(doc, yield);
       }
-      if (buffer == "book") {
+      if (buffer == c_channel_book) {
         return handle_book_msg(doc, yield);
       }
-      if (buffer == "trade") {
+      if (buffer == c_channel_trade) {
         return handle_trade_msg(doc, yield);
       }
-      if (buffer == "heartbeat") {
+      if (buffer == c_channel_heartbeat) {
         return handle_heartbeat_msg(doc, yield);
       }
-    } else if (doc["method"].get(buffer) == simdjson::SUCCESS) {
-      if (buffer == "pong") {
+    } else if (doc[c_response_method].get(buffer) == simdjson::SUCCESS) {
+      if (buffer == c_method_pong) {
         return handle_pong_msg(doc, yield);
       }
       // !@# TODO: ultimately we will want to crack open 'subscribe'
@@ -65,15 +65,15 @@ bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
 bool engine_t::handle_instrument_msg(doc_t &doc, yield_context_t yield) {
 
   auto buffer = std::string_view{};
-  if (doc["type"].get(buffer) != simdjson::SUCCESS) {
+  if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__ << ": missing 'type' " << simdjson::to_json_string(doc);
     return false;
   }
 
-  if (buffer == "snapshot") {
+  if (buffer == c_instrument_snapshot) {
     return handle_instrument_snapshot(doc, yield);
-  } else if (buffer == "update") {
+  } else if (buffer == c_instrument_update) {
     return handle_instrument_update(doc, yield);
   }
 
@@ -111,15 +111,15 @@ bool engine_t::handle_instrument_update(doc_t &doc, yield_context_t) {
 
 bool engine_t::handle_book_msg(doc_t &doc, yield_context_t yield) {
   auto buffer = std::string_view{};
-  if (doc["type"].get(buffer) != simdjson::SUCCESS) {
+  if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__ << ": missing 'type' " << simdjson::to_json_string(doc);
     return false;
   }
 
-  if (buffer == "snapshot") {
+  if (buffer == c_book_type_snapshot) {
     return handle_book_snapshot(doc, yield);
-  } else if (buffer == "update") {
+  } else if (buffer == c_book_type_update) {
     return handle_book_update(doc, yield);
   }
 

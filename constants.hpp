@@ -31,8 +31,20 @@ static constexpr char c_header_type[] = "type";
 
 static constexpr char c_response_data[] = "data";
 
+static constexpr char c_response_channel[] = "channel";
+static constexpr char c_response_method[] = "method";
+
+static constexpr char c_channel_instrument[] = "instrument";
+static constexpr char c_channel_book[] = "book";
+static constexpr char c_channel_trade[] = "trade";
+static constexpr char c_channel_heartbeat[] = "heartbeat";
+
+static constexpr char c_method_pong[] = "pong";
+
 static constexpr char c_instrument_assets[] = "assets";
 static constexpr char c_instrument_pairs[] = "pairs";
+static constexpr char c_instrument_snapshot[] = "snapshot";
+static constexpr char c_instrument_update[] = "update";
 
 static constexpr char c_asset_borrowable[] = "borrowable";
 static constexpr char c_asset_collateral_value[] = "collateral_value";
