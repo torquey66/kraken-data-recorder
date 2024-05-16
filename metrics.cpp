@@ -2,6 +2,8 @@
 
 #include "metrics.hpp"
 
+#include "constants.hpp"
+
 namespace krakpot {
 
 void metrics_t::accept(msg_t msg) {
@@ -11,8 +13,8 @@ void metrics_t::accept(msg_t msg) {
 
 nlohmann::json metrics_t::to_json() const {
   const nlohmann::json result = {
-      {"num_msgs", m_num_msgs},
-      {"num_bytes", m_num_bytes},
+      {c_metrics_num_msgs, m_num_msgs},
+      {c_metrics_num_bytes, m_num_bytes},
   };
   return result;
 }

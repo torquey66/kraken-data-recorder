@@ -71,6 +71,7 @@ static constexpr char c_book_bids[] = "bids";
 static constexpr char c_book_checksum[] = "checksum";
 static constexpr char c_book_price[] = "price";
 static constexpr char c_book_qty[] = "qty";
+static constexpr char c_book_side[] = "side";
 static constexpr char c_book_symbol[] = "symbol";
 static constexpr char c_book_timestamp[] = "timestamp";
 
@@ -81,5 +82,8 @@ static constexpr char c_trades_ord_type[] = "ord_type";
 static constexpr char c_trades_sell[] = "sell";
 static constexpr char c_trades_side[] = "side";
 static constexpr char c_trades_trade_id[] = "trade_id";
+
+static constexpr char c_metrics_num_bytes[] = "num_bytes";
+static constexpr char c_metrics_num_msgs[] = "num_msgs";
 
 } // namespace krakpot
