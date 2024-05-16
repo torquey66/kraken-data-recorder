@@ -144,7 +144,6 @@ bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
 bool engine_t::handle_trade_msg(doc_t &doc, yield_context_t) {
   const auto response = response::trades_t::from_json(doc);
   m_trades_sink.accept(response);
-  //  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " " << response.str();
   return true;
 }
 
