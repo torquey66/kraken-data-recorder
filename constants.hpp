@@ -63,6 +63,34 @@ static constexpr char c_asset_status_invalid[] = "invalid";
 static constexpr char c_asset_status_withdrawalonly[] = "withdrawalonly";
 static constexpr char c_asset_status_workinprogress[] = "workinprogress";
 
+static constexpr char c_pair_base[] = "base";
+static constexpr char c_pair_cost_min[] = "cost_min";
+static constexpr char c_pair_cost_precision[] = "cost_precision";
+static constexpr char c_pair_has_index[] = "has_index";
+static constexpr char c_pair_margin_initial[] = "margin_initial";
+static constexpr char c_pair_marginable[] = "marginable";
+static constexpr char c_pair_pair_marginable[] = "pair_marginable";
+static constexpr char c_pair_position_limit_long[] = "position_limit_long";
+static constexpr char c_pair_position_limit_short[] = "position_limit_short";
+static constexpr char c_pair_price_increment[] = "price_increment";
+static constexpr char c_pair_price_precision[] = "price_precision";
+static constexpr char c_pair_qty_increment[] = "qty_increment";
+static constexpr char c_pair_qty_min[] = "qty_min";
+static constexpr char c_pair_qty_precision[] = "qty_precision";
+static constexpr char c_pair_quote[] = "quote";
+static constexpr char c_pair_status[] = "status";
+static constexpr char c_pair_symbol[] = "symbol";
+
+static constexpr char c_pair_status_cancel_only[] = "cancel_only";
+static constexpr char c_pair_status_delisted[] = "delisted";
+static constexpr char c_pair_status_invalid[] = "invalid";
+static constexpr char c_pair_status_limit_only[] = "limit_only";
+static constexpr char c_pair_status_maintenance[] = "maintenance";
+static constexpr char c_pair_status_online[] = "online";
+static constexpr char c_pair_status_post_only[] = "post_only";
+static constexpr char c_pair_status_reduce_only[] = "reduce_only";
+static constexpr char c_pair_status_work_in_progress[] = "work_in_progress";
+
 static constexpr char c_book_type_snapshot[] = "snapshot";
 static constexpr char c_book_type_update[] = "update";
 

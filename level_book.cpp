@@ -57,7 +57,7 @@ nlohmann::json sides_t::to_json() const {
     asks_json.push_back(quote);
   }
 
-  const nlohmann::json result = {{"bids", bids_json}, {"asks", asks_json}};
+  const nlohmann::json result = {{c_book_bids, bids_json}, {c_book_asks, asks_json}};
   return result;
 }
 
@@ -93,7 +93,7 @@ uint64_t level_book_t::crc32(symbol_t symbol) const {
 
 std::string level_book_t::str(std::string symbol) const {
   const auto &side = m_sides.at(symbol);
-  const nlohmann::json result{{"symbol", symbol}, {"side", side.str()}};
+  const nlohmann::json result{{c_book_symbol, symbol}, {c_book_side, side.str()}};
   return result.dump(3);
 }
 
