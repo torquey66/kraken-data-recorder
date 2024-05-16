@@ -23,6 +23,7 @@ find_package(simdjson)
 include_directories(${CMAKE_SOURCE_DIR})
 add_library(krakpot_base
   asset.cpp
+  config.cpp
   decimal.cpp
   engine.cpp
   level_book.cpp
