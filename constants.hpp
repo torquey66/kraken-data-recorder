@@ -34,6 +34,23 @@ static constexpr char c_response_data[] = "data";
 static constexpr char c_instrument_assets[] = "assets";
 static constexpr char c_instrument_pairs[] = "pairs";
 
+static constexpr char c_asset_borrowable[] = "borrowable";
+static constexpr char c_asset_collateral_value[] = "collateral_value";
+static constexpr char c_asset_id[] = "id";
+static constexpr char c_asset_margin_rate[] = "margin_rate";
+static constexpr char c_asset_precision[] = "precision";
+static constexpr char c_asset_precision_display[] = "precision_display";
+static constexpr char c_asset_status[] = "status";
+
+static constexpr char c_asset_status_depositonly[] = "depositonly";
+static constexpr char c_asset_status_disabled[] = "disabled";
+static constexpr char c_asset_status_enabled[] = "enabled";
+static constexpr char c_asset_status_fundingtemporarilydisabled[] =
+    "fundingtemporarilydisabled";
+static constexpr char c_asset_status_invalid[] = "invalid";
+static constexpr char c_asset_status_withdrawalonly[] = "withdrawalonly";
+static constexpr char c_asset_status_workinprogress[] = "workinprogress";
+
 static constexpr char c_book_type_snapshot[] = "snapshot";
 static constexpr char c_book_type_update[] = "update";
 
