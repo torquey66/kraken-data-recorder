@@ -1,3 +1,4 @@
+#include "constants.hpp"
 #include "level_book.hpp"
 #include "responses.hpp"
 #include "types.hpp"
@@ -23,9 +24,9 @@ std::vector<quote_t> extract(const arrow::ListArray &quotes_array,
   const auto slice = std::dynamic_pointer_cast<arrow::StructArray>(
       quotes_array.value_slice(idx));
   const auto price_array = std::dynamic_pointer_cast<arrow::StringArray>(
-      slice->GetFieldByName("price"));
+      slice->GetFieldByName(c_book_price));
   const auto qty_array = std::dynamic_pointer_cast<arrow::StringArray>(
-      slice->GetFieldByName("qty"));
+      slice->GetFieldByName(c_book_qty));
   for (auto sidx = 0; sidx < slice->length(); ++sidx) {
     const auto price_view = price_array->Value(sidx);
     const auto qty_view = qty_array->Value(sidx);
@@ -94,19 +95,19 @@ int main(int argc, char *argv[]) {
     }
     const auto &batch = *maybe_batch.ValueOrDie();
     const auto recv_tm_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-        batch.GetColumnByName("recv_tm"));
+        batch.GetColumnByName(c_header_recv_tm));
     const auto type_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName("type"));
+        batch.GetColumnByName(c_header_type));
     const auto bids_array = std::dynamic_pointer_cast<arrow::ListArray>(
-        batch.GetColumnByName("bids"));
+        batch.GetColumnByName(c_book_bids));
     const auto asks_array = std::dynamic_pointer_cast<arrow::ListArray>(
-        batch.GetColumnByName("asks"));
+        batch.GetColumnByName(c_book_asks));
     const auto crc32_array = std::dynamic_pointer_cast<arrow::UInt64Array>(
-        batch.GetColumnByName("crc32"));
+        batch.GetColumnByName(c_book_checksum));
     const auto symbol_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName("symbol"));
+        batch.GetColumnByName(c_book_symbol));
     const auto timestamp_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-        batch.GetColumnByName("timestamp"));
+        batch.GetColumnByName(c_book_timestamp));
 
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
       const auto recv_tm = recv_tm_array->Value(idx);
