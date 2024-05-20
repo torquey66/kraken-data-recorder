@@ -142,7 +142,7 @@ TEST_CASE("book_t doc example snapshot") {
   const auto snap = krakpot::response::book_t::from_json(snap_doc);
   CHECK(snap.crc32() == 3310070434);
 
-  auto book = krakpot::model::level_book_t{};
+  auto book = krakpot::model::level_book_t{krakpot::e_100};
   book.accept(snap);
   CHECK(book.crc32("BTC/USD") == snap.crc32());
 }

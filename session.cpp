@@ -36,12 +36,13 @@ void fail(bst::error_code ec, char const *what) {
 
 namespace krakpot {
 
-session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context)
-    : m_ioc{ioc}, m_ws{ioc, ssl_context} {
+session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context,
+                     const config_t &config)
+    : m_ioc{ioc}, m_ws{ioc, ssl_context}, m_config{config} {
   asio::spawn(
       m_ioc,
       [this](yield_context_t yield) {
-        handshake(c_kraken_host, c_kraken_port, yield);
+        handshake(m_config.kraken_host(), m_config.kraken_port(), yield);
         ping(yield);
       },
       [](std::exception_ptr ex) {
@@ -161,7 +162,8 @@ void session_t::ping(yield_context_t yield) {
     try {
       const auto ping = request::ping_t{++m_req_id};
       send(ping.str(), yield);
-      timer.expires_from_now(boost::posix_time::seconds(c_ping_interval_secs));
+      timer.expires_from_now(
+          boost::posix_time::seconds(m_config.ping_interval_secs()));
       timer.async_wait(yield);
     } catch (const std::exception &ex) {
       BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ex.what();

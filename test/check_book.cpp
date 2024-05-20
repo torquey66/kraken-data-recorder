@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
   std::shared_ptr<::arrow::RecordBatchReader> rb_reader;
   PARQUET_THROW_NOT_OK(arrow_reader->GetRecordBatchReader(&rb_reader));
 
-  auto level_book = model::level_book_t{};
+  auto level_book = model::level_book_t{e_1000};
 
   for (arrow::Result<std::shared_ptr<arrow::RecordBatch>> maybe_batch :
        *rb_reader) {

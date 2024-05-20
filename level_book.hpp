@@ -3,6 +3,7 @@
 
 #include "constants.hpp"
 #include "responses.hpp"
+#include "types.hpp"
 
 #include <boost/crc.hpp>
 #include <nlohmann/json.hpp>
@@ -17,6 +18,9 @@ using bid_side_t = std::map<price_t, qty_t, std::greater<price_t>>;
 using ask_side_t = std::map<price_t, qty_t, std::less<price_t>>;
 
 struct sides_t final {
+
+  sides_t(depth_t book_depth) : m_book_depth{book_depth} {};
+
   const bid_side_t &bids() const { return m_bids; }
   const ask_side_t &asks() const { return m_asks; }
 
@@ -37,6 +41,8 @@ private:
   template <typename S>
   boost::crc_32_type update_checksum(const boost::crc_32_type, const S &) const;
 
+  depth_t m_book_depth;
+
   bid_side_t m_bids;
   ask_side_t m_asks;
 };
@@ -44,7 +50,9 @@ private:
 struct level_book_t final {
   using symbol_t = std::string;
 
-  const sides_t& sides(symbol_t) const;    
+  const sides_t &sides(symbol_t) const;
+
+  level_book_t(depth_t book_depth) : m_book_depth{book_depth} {};
 
   void accept(const response::book_t &);
 
@@ -52,18 +60,18 @@ struct level_book_t final {
 
   std::string str(std::string) const;
 
-
 private:
+  depth_t m_book_depth;
   std::unordered_map<symbol_t, sides_t> m_sides;
 };
 
 template <typename S>
 boost::crc_32_type sides_t::update_checksum(boost::crc_32_type crc32,
                                             const S &side) const {
-  auto& result = crc32;
+  auto &result = crc32;
   auto depth = size_t{0};
   for (const auto &kv : side) {
-    if (++depth > 10) {
+    if (++depth > c_book_crc32_depth) {
       break;
     }
     const auto &price = kv.first;
@@ -89,9 +97,9 @@ void sides_t::apply_update(const Q &quotes, S &side) {
       side.insert(quote);
     }
   }
-  if (side.size() > c_book_depth) {
+  if (side.size() > static_cast<size_t>(m_book_depth)) {
     auto it = side.begin();
-    std::advance(it, c_book_depth);
+    std::advance(it, m_book_depth);
     side.erase(it, side.end());
   }
 }
