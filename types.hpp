@@ -78,6 +78,18 @@ enum side_t : char {
 };
 
 /**
+ * Allowed values for book subscriptions.
+ */
+enum depth_t : int64_t {
+  e_invalid = -1,
+  e_10 = 10,
+  e_25 = 25,
+  e_100 = 100,
+  e_500 = 500,
+  e_1000 = 1000,
+};
+
+/**
  * AFAIK, Kraken timetamps are always ISO 8601 strings in GMT.
  *
  * TODO: consider using chrono timepoints in some fashion instead of

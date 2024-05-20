@@ -1,6 +1,7 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "config.hpp"
 #include "types.hpp"
 
 #include <boost/asio.hpp>
@@ -35,7 +36,7 @@ struct session_t final {
 
   using recv_cb_t = std::function<bool(msg_t, yield_context_t)>;
 
-  session_t(ioc_t &, ssl_context_t &);
+  session_t(ioc_t &, ssl_context_t &, const config_t&);
 
   void start_processing(const recv_cb_t &);
   void stop_processing() { m_keep_processing = false; }
@@ -51,6 +52,7 @@ private:
 
   ioc_t &m_ioc;
   websocket_t m_ws;
+  config_t m_config;
 
   bool m_keep_processing = false;
   req_id_t m_req_id = 0;

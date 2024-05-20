@@ -34,7 +34,8 @@ config_t config_t::from_json(simdjson::ondemand::document &doc) {
   }
 
   if (doc[c_book_depth].get(optional_val) == simdjson::SUCCESS) {
-    result.m_book_depth = optional_val.get_int64();
+    const int64_t val = optional_val.get_int64();
+    result.m_book_depth = depth_t{val};
   }
 
   return result;

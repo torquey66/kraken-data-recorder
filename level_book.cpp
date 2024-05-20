@@ -71,7 +71,11 @@ const sides_t &level_book_t::sides(symbol_t symbol) const {
 }
 
 void level_book_t::accept(const response::book_t &response) {
-  auto &sides = m_sides[response.symbol()];
+  auto it = m_sides.find(response.symbol());
+  if (it == m_sides.end()) {
+    it = m_sides.insert(std::make_pair(response.symbol(), sides_t{m_book_depth})).first;
+  }
+  auto &sides = it->second;
   const auto type = response.header().type();
   if (type == c_book_type_snapshot) {
     return sides.accept_snapshot(response);

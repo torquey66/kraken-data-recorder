@@ -2,6 +2,7 @@
 
 #include "engine.hpp"
 
+#include "config.hpp"
 #include "constants.hpp"
 #include "requests.hpp"
 #include "responses.hpp"
@@ -14,9 +15,9 @@
 
 namespace krakpot {
 
-engine_t::engine_t(session_t &session)
-    : m_session{session}, m_book_sink{c_parquet_dir},
-      m_trades_sink{c_parquet_dir} {}
+engine_t::engine_t(session_t &session, const config_t &config)
+    : m_session{session}, m_config{config}, m_level_book{config.book_depth()},
+      m_book_sink{config.parquet_dir()}, m_trades_sink{config.parquet_dir()} {}
 
 bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
 
@@ -90,9 +91,8 @@ bool engine_t::handle_instrument_snapshot(doc_t &doc, yield_context_t yield) {
   std::transform(pairs.begin(), pairs.end(), std::back_inserter(symbols),
                  [](const auto &pair) { return pair.symbol(); });
 
-  // !@# TODO: make depth configurable in some fashion
   const request::subscribe_book_t subscribe_book{
-    ++m_book_req_id, request::subscribe_book_t::depth_t{c_book_depth}, true, symbols};
+      ++m_book_req_id, m_config.book_depth(), true, symbols};
   m_session.send(subscribe_book.str(), yield);
 
   const request::subscribe_trade_t subscribe_trade{++m_trade_req_id, true,

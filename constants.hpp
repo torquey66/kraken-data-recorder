@@ -15,15 +15,7 @@ namespace krakpot {
 static constexpr double c_NaN = std::numeric_limits<double>::signaling_NaN();
 static constexpr char c_NaN_str[] = "NaN";
 
-static constexpr size_t c_ping_interval_secs = 30;
-
-static constexpr char c_kraken_host[] = "ws.kraken.com";
-static constexpr char c_kraken_port[] = "443";
-
-// TODO: make this a configurable option
-static constexpr char c_parquet_dir[] = "/tmp/krakpot_parquet";
-
-static constexpr int64_t c_book_depth = 1000;
+static constexpr size_t c_book_crc32_depth = 10;
 
 /** Websocket protocol strings */
 static constexpr char c_header_recv_tm[] = "recv_tm";

@@ -1,6 +1,7 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "config.hpp"
 #include "level_book.hpp"
 #include "metrics.hpp"
 #include "parquet.hpp"
@@ -22,7 +23,7 @@ struct engine_t final {
 
   using yield_context_t = session_t::yield_context_t;
 
-  engine_t(session_t &);
+  engine_t(session_t &, const config_t &);
 
   /** Return false to cease processing and shut down. */
   bool handle_msg(msg_t, yield_context_t);
@@ -44,6 +45,7 @@ private:
   bool handle_pong_msg(doc_t &, yield_context_t);
 
   session_t &m_session;
+  config_t m_config;
 
   simdjson::ondemand::parser m_parser;
 
