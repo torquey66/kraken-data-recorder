@@ -1,4 +1,4 @@
-#include "../responses.hpp" // !@# TODO: fix CMake include to eliminate relative path
+#include "responses.hpp"
 
 #include <iostream>
 #include <simdjson.h>
