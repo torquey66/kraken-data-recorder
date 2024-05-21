@@ -20,23 +20,23 @@ find_package(OpenSSL)
 find_package(simdjson)                                                                                                                       
 
 # TODO: split these into 'src' and 'include' directories or the like
-include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/base)
 add_library(krakpot_base
-  asset.cpp
-  config.cpp
-  decimal.cpp
-  engine.cpp
-  level_book.cpp
-  metrics.cpp
-  pair.cpp
-  parquet.cpp
-  requests.cpp
-  responses.cpp
-  session.cpp
-  types.cpp
-  decimal.hpp
-  responses.hpp
-  parquet.hpp
+  base/asset.cpp
+  base/config.cpp
+  base/decimal.cpp
+  base/engine.cpp
+  base/level_book.cpp
+  base/metrics.cpp
+  base/pair.cpp
+  base/parquet.cpp
+  base/requests.cpp
+  base/responses.cpp
+  base/session.cpp
+  base/types.cpp
+  base/decimal.hpp
+  base/responses.hpp
+  base/parquet.hpp
 )
 
 target_link_libraries(krakpot_base
