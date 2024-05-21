@@ -2,7 +2,10 @@
 
 #include "config.hpp"
 #include "engine.hpp"
+#include "level_book.hpp"
+#include "parquet.hpp"
 #include "session.hpp"
+#include "sink.hpp"
 #include "types.hpp"
 
 #include <boost/beast/core.hpp>
@@ -14,6 +17,49 @@
 #include <string>
 
 namespace po = boost::program_options;
+
+/**
+ * Maintain parquet sinks for books and trades.
+ */
+struct parquet_sink_t final : public krakpot::sink_t {
+
+  parquet_sink_t(std::string parquet_dir) :
+    m_book_sink{parquet_dir},
+    m_trades_sink{parquet_dir} {}
+  
+  void accept(const krakpot::response::book_t &response) override {
+    m_book_sink.accept(response);
+  }
+
+  void accept(const krakpot::response::trades_t &response) override {
+    m_trades_sink.accept(response);
+  }
+
+private:
+  krakpot::pq::book_sink_t m_book_sink;
+  krakpot::pq::trades_sink_t m_trades_sink;
+};
+
+/**
+ * Maintain sink for in-memory level book.
+ */
+struct level_book_sink_t final : public krakpot::sink_t {
+
+  level_book_sink_t(krakpot::depth_t depth)
+    : m_level_book{depth} {}
+  
+  void accept(const krakpot::response::book_t &response) override {
+    m_level_book.accept(response);
+  }
+
+  void accept(const krakpot::response::trades_t &) override {
+    // N/A for level books
+  }
+
+private:
+  krakpot::model::level_book_t m_level_book;
+};
+
 
 bool shutting_down = false;
 
@@ -67,6 +113,12 @@ int main(int argc, char *argv[]) {
     boost::asio::io_context ioc;
     boost::asio::signal_set signals(ioc, SIGINT);
     signals.async_wait(signal_handler);
+
+    // !@# TODO: clean up this initialization mess
+    krakpot::multisink_t::sink_vector_t sinks;
+    sinks.emplace_back(std::make_unique<parquet_sink_t>(config.parquet_dir()));
+    sinks.emplace_back(std::make_unique<level_book_sink_t>(config.book_depth()));
+    krakpot::multisink_t multisink{sinks};
 
     auto session = krakpot::session_t(ioc, ctx, config);
     auto engine = krakpot::engine_t(session, config);

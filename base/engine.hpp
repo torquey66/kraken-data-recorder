@@ -5,6 +5,7 @@
 #include "level_book.hpp"
 #include "metrics.hpp"
 #include "parquet.hpp"
+#include "sink.hpp"
 #include "session.hpp"
 
 #include <simdjson.h>

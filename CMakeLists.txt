@@ -37,6 +37,7 @@ add_library(krakpot_base
   base/decimal.hpp
   base/responses.hpp
   base/parquet.hpp
+  base/sink.hpp
 )
 
 target_link_libraries(krakpot_base
