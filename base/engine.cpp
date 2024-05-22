@@ -2,7 +2,6 @@
 
 #include "engine.hpp"
 
-#include "config.hpp"
 #include "constants.hpp"
 #include "requests.hpp"
 #include "responses.hpp"
@@ -15,9 +14,9 @@
 
 namespace krakpot {
 
-engine_t::engine_t(session_t &session, const config_t &config)
-    : m_session{session}, m_config{config}, m_level_book{config.book_depth()},
-      m_book_sink{config.parquet_dir()}, m_trades_sink{config.parquet_dir()} {}
+engine_t::engine_t(session_t &session, const config_t &config,
+                   const sink_t &sink)
+    : m_session{session}, m_config{config}, m_sink(sink) {}
 
 bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
 
@@ -109,7 +108,7 @@ bool engine_t::handle_instrument_update(doc_t &doc, yield_context_t) {
   return true;
 }
 
-bool engine_t::handle_book_msg(doc_t &doc, yield_context_t yield) {
+bool engine_t::handle_book_msg(doc_t &doc, yield_context_t) {
   auto buffer = std::string_view{};
   if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
@@ -117,33 +116,19 @@ bool engine_t::handle_book_msg(doc_t &doc, yield_context_t yield) {
     return false;
   }
 
-  if (buffer == c_book_type_snapshot) {
-    return handle_book_snapshot(doc, yield);
-  } else if (buffer == c_book_type_update) {
-    return handle_book_update(doc, yield);
+  if (buffer != c_book_type_snapshot && buffer != c_book_type_update) {
+    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": unknown 'type' " << buffer;
+    return false;
   }
 
-  BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": unknown 'type' " << buffer;
-  return false;
-}
-
-bool engine_t::handle_book_snapshot(doc_t &doc, yield_context_t) {
   const auto response = response::book_t::from_json(doc);
-  m_book_sink.accept(response);
-  m_level_book.accept(response);
-  return true;
-}
-
-bool engine_t::handle_book_update(doc_t &doc, yield_context_t) {
-  const auto response = response::book_t::from_json(doc);
-  m_book_sink.accept(response);
-  m_level_book.accept(response);
+  m_sink.accept(response);
   return true;
 }
 
 bool engine_t::handle_trade_msg(doc_t &doc, yield_context_t) {
   const auto response = response::trades_t::from_json(doc);
-  m_trades_sink.accept(response);
+  m_sink.accept(response);
   return true;
 }
 

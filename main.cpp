@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     const krakpot::sink_t sink{accept_book, accept_trades};
 
     auto session = krakpot::session_t(ioc, ctx, config);
-    auto engine = krakpot::engine_t(session, config);
+    auto engine = krakpot::engine_t(session, config, sink);
 
     const auto handle_recv =
         [&engine](krakpot::msg_t msg,
