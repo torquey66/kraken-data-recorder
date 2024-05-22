@@ -29,15 +29,20 @@ add_library(krakpot_base
   base/level_book.cpp
   base/metrics.cpp
   base/pair.cpp
-  base/parquet.cpp
   base/requests.cpp
   base/responses.cpp
   base/session.cpp
   base/types.cpp
   base/decimal.hpp
   base/responses.hpp
-  base/parquet.hpp
   base/sink.hpp
+)
+
+# TODO: split these into 'src' and 'include' directories or the like
+include_directories(${CMAKE_SOURCE_DIR}/parquet)
+add_library(krakpot_parquet
+  parquet/parquet.cpp
+  parquet/parquet.hpp
 )
 
 target_link_libraries(krakpot_base
@@ -51,8 +56,14 @@ target_link_libraries(krakpot_base
   simdjson::simdjson
 )
 
-add_executable(Krakpot main.cpp)
-target_link_libraries(Krakpot krakpot_base)
+target_link_libraries(krakpot_parquet
+  PUBLIC
+  arrow::arrow
+  krakpot_base
+)
+
+add_executable(kp_record kp_record/kp_record.cpp)
+target_link_libraries(kp_record krakpot_base krakpot_parquet)
 
 add_executable(parse_instrument_snapshot test/parse_instrument_snapshot.cpp)
 target_link_libraries(parse_instrument_snapshot krakpot_base)
@@ -67,7 +78,7 @@ add_executable(level_book_test test/unit/level_book_test.cpp)
 target_link_libraries(level_book_test krakpot_base)
 
 add_executable(parquet_test test/unit/parquet_test.cpp)
-target_link_libraries(parquet_test krakpot_base)
+target_link_libraries(parquet_test krakpot_base krakpot_parquet)
 
 add_executable(response_test test/unit/response_test.cpp)
 target_link_libraries(response_test krakpot_base)
