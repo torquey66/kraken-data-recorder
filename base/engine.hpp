@@ -2,9 +2,7 @@
 #pragma once
 
 #include "config.hpp"
-#include "level_book.hpp"
 #include "metrics.hpp"
-#include "parquet.hpp"
 #include "sink.hpp"
 #include "session.hpp"
 
@@ -24,7 +22,7 @@ struct engine_t final {
 
   using yield_context_t = session_t::yield_context_t;
 
-  engine_t(session_t &, const config_t &);
+  engine_t(session_t &, const config_t &, const sink_t&);
 
   /** Return false to cease processing and shut down. */
   bool handle_msg(msg_t, yield_context_t);
@@ -37,9 +35,6 @@ private:
   bool handle_instrument_update(doc_t &, yield_context_t);
 
   bool handle_book_msg(doc_t &, yield_context_t);
-  bool handle_book_snapshot(doc_t &, yield_context_t);
-  bool handle_book_update(doc_t &, yield_context_t);
-
   bool handle_trade_msg(doc_t &, yield_context_t);
 
   bool handle_heartbeat_msg(doc_t &, yield_context_t);
@@ -56,9 +51,7 @@ private:
   req_id_t m_inst_req_id = 0;
   req_id_t m_trade_req_id = 0;
 
-  model::level_book_t m_level_book;
-  pq::book_sink_t m_book_sink;
-  pq::trades_sink_t m_trades_sink;
+  sink_t m_sink;
 
   metrics_t m_metrics;
 };
