@@ -2,43 +2,28 @@
 
 #include "responses.hpp"
 
-#include <memory>
-#include <vector>
+#include <functional>
 
 namespace krakpot {
 
-struct sink_t {
-  virtual ~sink_t() {}
+struct sink_t final {
+  using accept_book_t = std::function<void(const response::book_t &)>;
+  using accept_trades_t = std::function<void(const response::trades_t &)>;
 
-  virtual void accept(const response::book_t &) = 0;
-  virtual void accept(const response::trades_t &) = 0;
-};
+  sink_t(const accept_book_t &accept_book, const accept_trades_t &accept_trades)
+      : m_accept_book(accept_book), m_accept_trades(accept_trades) {}
 
-struct multisink_t : public sink_t {
-
-  using sink_ptr_t = std::unique_ptr<sink_t>;
-  using sink_vector_t = std::vector<sink_ptr_t>;
-
-  multisink_t(sink_vector_t &sinks) {
-    for (auto &sink : sinks) {
-      m_sinks.emplace_back(std::move(sink));
-    }
+  void accept(const response::book_t &response) const {
+    m_accept_book(response);
   }
 
-  void accept(const response::book_t &response) override {
-    for (auto &sink : m_sinks) {
-      sink->accept(response);
-    }
-  }
-
-  void accept(const response::trades_t &response) override {
-    for (auto &sink : m_sinks) {
-      sink->accept(response);
-    }
+  void accept(const response::trades_t &response) const {
+    m_accept_trades(response);
   }
 
 private:
-  sink_vector_t m_sinks;
+  accept_book_t m_accept_book;
+  accept_trades_t m_accept_trades;
 };
 
 } // namespace krakpot
