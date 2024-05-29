@@ -89,10 +89,9 @@ int main(int argc, char *argv[]) {
     auto engine = krakpot::engine_t(session, config, sink);
 
     const auto handle_recv =
-        [&engine](krakpot::msg_t msg,
-                  krakpot::session_t::yield_context_t yield) {
+        [&engine](krakpot::msg_t msg) {
           try {
-            return engine.handle_msg(msg, yield);
+            return engine.handle_msg(msg);
           } catch (const std::exception &ex) {
             BOOST_LOG_TRIVIAL(error) << ex.what();
             return false;

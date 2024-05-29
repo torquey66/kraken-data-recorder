@@ -18,7 +18,7 @@ engine_t::engine_t(session_t &session, const config_t &config,
                    const sink_t &sink)
     : m_session{session}, m_config{config}, m_sink(sink) {}
 
-bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
+bool engine_t::handle_msg(msg_t msg) {
 
   m_metrics.accept(msg);
 
@@ -29,20 +29,20 @@ bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
     auto buffer = std::string_view{};
     if (doc[c_response_channel].get(buffer) == simdjson::SUCCESS) {
       if (buffer == c_channel_instrument) {
-        return handle_instrument_msg(doc, yield);
+        return handle_instrument_msg(doc);
       }
       if (buffer == c_channel_book) {
-        return handle_book_msg(doc, yield);
+        return handle_book_msg(doc);
       }
       if (buffer == c_channel_trade) {
-        return handle_trade_msg(doc, yield);
+        return handle_trade_msg(doc);
       }
       if (buffer == c_channel_heartbeat) {
-        return handle_heartbeat_msg(doc, yield);
+        return handle_heartbeat_msg(doc);
       }
     } else if (doc[c_response_method].get(buffer) == simdjson::SUCCESS) {
       if (buffer == c_method_pong) {
-        return handle_pong_msg(doc, yield);
+        return handle_pong_msg(doc);
       }
       // !@# TODO: ultimately we will want to crack open 'subscribe'
       // !responses and handle those which report failures.
@@ -62,7 +62,7 @@ bool engine_t::handle_msg(msg_t msg, yield_context_t yield) {
   return true;
 }
 
-bool engine_t::handle_instrument_msg(doc_t &doc, yield_context_t yield) {
+bool engine_t::handle_instrument_msg(doc_t &doc) {
 
   auto buffer = std::string_view{};
   if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
@@ -72,16 +72,16 @@ bool engine_t::handle_instrument_msg(doc_t &doc, yield_context_t yield) {
   }
 
   if (buffer == c_instrument_snapshot) {
-    return handle_instrument_snapshot(doc, yield);
+    return handle_instrument_snapshot(doc);
   } else if (buffer == c_instrument_update) {
-    return handle_instrument_update(doc, yield);
+    return handle_instrument_update(doc);
   }
 
   BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": unknown 'type' " << buffer;
   return false;
 }
 
-bool engine_t::handle_instrument_snapshot(doc_t &doc, yield_context_t yield) {
+bool engine_t::handle_instrument_snapshot(doc_t &doc) {
 
   const auto response = response::instrument_t::from_json(doc);
 
@@ -92,23 +92,23 @@ bool engine_t::handle_instrument_snapshot(doc_t &doc, yield_context_t yield) {
 
   const request::subscribe_book_t subscribe_book{
       ++m_book_req_id, m_config.book_depth(), true, symbols};
-  m_session.send(subscribe_book.str(), yield);
+  m_session.send(subscribe_book.str());
 
   const request::subscribe_trade_t subscribe_trade{++m_trade_req_id, true,
                                                    symbols};
-  m_session.send(subscribe_trade.str(), yield);
+  m_session.send(subscribe_trade.str());
 
   return true;
 }
 
-bool engine_t::handle_instrument_update(doc_t &doc, yield_context_t) {
+bool engine_t::handle_instrument_update(doc_t &doc) {
 
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " TODO: handle updates -- doc: "
                            << simdjson::to_json_string(doc);
   return true;
 }
 
-bool engine_t::handle_book_msg(doc_t &doc, yield_context_t) {
+bool engine_t::handle_book_msg(doc_t &doc) {
   auto buffer = std::string_view{};
   if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
@@ -126,22 +126,22 @@ bool engine_t::handle_book_msg(doc_t &doc, yield_context_t) {
   return true;
 }
 
-bool engine_t::handle_trade_msg(doc_t &doc, yield_context_t) {
+bool engine_t::handle_trade_msg(doc_t &doc) {
   const auto response = response::trades_t::from_json(doc);
   m_sink.accept(response);
   return true;
 }
 
-bool engine_t::handle_heartbeat_msg(doc_t &, yield_context_t) {
+bool engine_t::handle_heartbeat_msg(doc_t &) {
   // !@# TODO: track a stat on time between heartbeats?
   return true;
 }
 
-bool engine_t::handle_pong_msg(doc_t & /*doc*/, yield_context_t yield) {
+bool engine_t::handle_pong_msg(doc_t & /*doc*/) {
   // !@# TODO: track ping/pong latency
   if (!m_subscribed) {
     const request::subscribe_instrument_t subscribe_inst{++m_inst_req_id};
-    m_session.send(subscribe_inst.str(), yield);
+    m_session.send(subscribe_inst.str());
     m_subscribed = true;
   }
   BOOST_LOG_TRIVIAL(info) << m_metrics.str();

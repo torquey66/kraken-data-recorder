@@ -5,7 +5,6 @@
 #include "types.hpp"
 
 #include <boost/asio.hpp>
-#include <boost/asio/spawn.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/websocket.hpp>
@@ -32,30 +31,44 @@ struct session_t final {
   using ssl_context_t = boost::asio::ssl::context;
   using websocket_t = boost::beast::websocket::stream<
       boost::beast::ssl_stream<boost::beast::tcp_stream>>;
-  using yield_context_t = boost::asio::yield_context;
 
-  using recv_cb_t = std::function<bool(msg_t, yield_context_t)>;
+  using recv_cb_t = std::function<bool(msg_t)>;
 
-  session_t(ioc_t &, ssl_context_t &, const config_t&);
+  session_t(ioc_t &, ssl_context_t &, const config_t &);
 
   void start_processing(const recv_cb_t &);
-  void stop_processing() { m_keep_processing = false; }
-  void send(msg_t, yield_context_t);
-  void send(const std::string &msg, yield_context_t yield) {
-    send(std::string_view(msg.data(), msg.size()), yield);
+  void stop_processing() {
+    m_keep_processing = false;
+    m_ping_timer.cancel();
+  }
+  void send(msg_t);
+  void send(const std::string &msg) {
+    send(std::string_view(msg.data(), msg.size()));
   }
 
 private:
-  void handshake(std::string host, std::string port, yield_context_t);
-  void ping(yield_context_t);
-  void process(const recv_cb_t &, yield_context_t);
+  using error_code = boost::beast::error_code;
+  using resolver = boost::asio::ip::tcp::resolver;
+
+  void on_resolve(error_code, resolver::results_type);
+  void on_connect(error_code, resolver::results_type::endpoint_type);
+  void on_ssl_handshake(error_code);
+  void on_handshake(error_code);
+  void on_ping_timer(error_code);
+  void on_write(error_code, size_t);
+  void on_read(error_code, size_t, const recv_cb_t &);
+  void on_close(error_code);
 
   ioc_t &m_ioc;
+  resolver m_resolver;
   websocket_t m_ws;
+  boost::asio::deadline_timer m_ping_timer;
   config_t m_config;
 
   bool m_keep_processing = false;
   req_id_t m_req_id = 0;
+  boost::beast::flat_buffer m_buffer;
+  std::string m_msg_str;
 };
 
 } // namespace krakpot

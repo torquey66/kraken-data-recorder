@@ -20,25 +20,23 @@ namespace krakpot {
 
 struct engine_t final {
 
-  using yield_context_t = session_t::yield_context_t;
-
   engine_t(session_t &, const config_t &, const sink_t&);
 
   /** Return false to cease processing and shut down. */
-  bool handle_msg(msg_t, yield_context_t);
+  bool handle_msg(msg_t);
 
 private:
   using doc_t = simdjson::ondemand::document;
 
-  bool handle_instrument_msg(doc_t &, yield_context_t);
-  bool handle_instrument_snapshot(doc_t &, yield_context_t);
-  bool handle_instrument_update(doc_t &, yield_context_t);
+  bool handle_instrument_msg(doc_t &);
+  bool handle_instrument_snapshot(doc_t &);
+  bool handle_instrument_update(doc_t &);
 
-  bool handle_book_msg(doc_t &, yield_context_t);
-  bool handle_trade_msg(doc_t &, yield_context_t);
+  bool handle_book_msg(doc_t &);
+  bool handle_trade_msg(doc_t &);
 
-  bool handle_heartbeat_msg(doc_t &, yield_context_t);
-  bool handle_pong_msg(doc_t &, yield_context_t);
+  bool handle_heartbeat_msg(doc_t &);
+  bool handle_pong_msg(doc_t &);
 
   session_t &m_session;
   config_t m_config;
