@@ -57,18 +57,21 @@ void session_t::start_processing(const recv_cb_t &handle_recv) {
     m_ioc.run_one();
   }
 
-  m_buffer.clear();
-  m_ws.async_read(m_buffer, [this, &handle_recv](error_code ec, size_t size) {
-    this->on_read(ec, size, handle_recv);
-  });
+  m_read_buffer.clear();
+  m_ws.async_read(m_read_buffer,
+                  [this, &handle_recv](error_code ec, size_t size) {
+                    this->on_read(ec, size, handle_recv);
+                  });
 }
 
 void session_t::send(msg_t msg) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
-  m_ws.async_write(
-      asio::buffer(std::string(msg.data(), msg.size())),
-      [this](error_code ec, size_t size) { this->on_write(ec, size); });
+  // m_ws.async_write(
+  //     asio::buffer(std::string(msg.data(), msg.size())),
+  //     [this](error_code ec, size_t size) { this->on_write(ec, size); });
+  m_ws.write(asio::buffer(std::string(msg.data(), msg.size())));
+
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " returning";
 }
 
@@ -161,9 +164,11 @@ void session_t::on_ping_timer(error_code ec) {
 
   try {
     const auto ping = request::ping_t{++m_req_id};
-    m_ws.async_write(
-        asio::buffer(ping.str()),
-        [this](error_code ec, size_t size) { this->on_write(ec, size); });
+    // m_ws.async_write(
+    //     asio::buffer(ping.str()),
+    //     [this](error_code ec, size_t size) { this->on_write(ec, size); });
+    m_ws.write(asio::buffer(ping.str()));
+    ++m_req_id;
 
     m_ping_timer.expires_from_now(
         boost::posix_time::seconds(m_config.ping_interval_secs()));
@@ -195,8 +200,9 @@ void session_t::on_read(error_code ec, size_t size,
   try {
     // !@# TODO - see whether we can eliminate this copy by connecting
     // simdjson's iterator directly to buffer sequence
-    m_msg_str = boost::beast::buffers_to_string(m_buffer.data());
-    if (!handle_recv(std::string_view(m_msg_str))) {
+    m_read_msg_str = boost::beast::buffers_to_string(m_read_buffer.data());
+    m_read_buffer.consume(size);
+    if (!handle_recv(std::string_view(m_read_msg_str))) {
       BOOST_LOG_TRIVIAL(error)
           << __FUNCTION__ << "handle_recv() returned false -- stop processing";
       m_keep_processing = false;
@@ -207,11 +213,12 @@ void session_t::on_read(error_code ec, size_t size,
   }
 
   if (m_keep_processing) {
-    m_buffer.clear();
-    m_msg_str.clear();
-    m_ws.async_read(m_buffer, [this, &handle_recv](error_code ec, size_t size) {
-      this->on_read(ec, size, handle_recv);
-    });
+    //    m_read_buffer.clear();
+    m_read_msg_str.clear();
+    m_ws.async_read(m_read_buffer,
+                    [this, &handle_recv](error_code ec, size_t size) {
+                      this->on_read(ec, size, handle_recv);
+                    });
   }
 
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded size: " << size;

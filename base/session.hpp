@@ -67,8 +67,9 @@ private:
 
   bool m_keep_processing = false;
   req_id_t m_req_id = 0;
-  boost::beast::flat_buffer m_buffer;
-  std::string m_msg_str;
+
+  boost::beast::flat_buffer m_read_buffer;
+  std::string m_read_msg_str;
 };
 
 } // namespace krakpot
