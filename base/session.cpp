@@ -52,7 +52,7 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context,
 void session_t::start_processing(const recv_cb_t &handle_recv) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
 
-  // TODO: clean this up
+  // TODO: clean this up - perhaps by adding a timeout to the interface
   while (!m_keep_processing) {
     m_ioc.run_one();
   }
@@ -67,10 +67,14 @@ void session_t::start_processing(const recv_cb_t &handle_recv) {
 void session_t::send(msg_t msg) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
-  // m_ws.async_write(
-  //     asio::buffer(std::string(msg.data(), msg.size())),
-  //     [this](error_code ec, size_t size) { this->on_write(ec, size); });
-  m_ws.write(asio::buffer(std::string(msg.data(), msg.size())));
+  const auto num_bytes_written =
+      m_ws.write(asio::buffer(std::string(msg.data(), msg.size())));
+  if (num_bytes_written != msg.size()) {
+    const std::string message = std::string(__FUNCTION__) + " short write: " +
+                                "expected: " + std::to_string(msg.size()) +
+                                " actual: " + std::to_string(num_bytes_written);
+    throw std::runtime_error(message);
+  }
 
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " returning";
 }
@@ -164,10 +168,8 @@ void session_t::on_ping_timer(error_code ec) {
 
   try {
     const auto ping = request::ping_t{++m_req_id};
-    // m_ws.async_write(
-    //     asio::buffer(ping.str()),
-    //     [this](error_code ec, size_t size) { this->on_write(ec, size); });
-    m_ws.write(asio::buffer(ping.str()));
+    const auto msg = ping.str();
+    send(msg);
     ++m_req_id;
 
     m_ping_timer.expires_from_now(
