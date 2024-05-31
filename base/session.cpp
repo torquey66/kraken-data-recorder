@@ -194,7 +194,6 @@ void session_t::on_write(error_code ec, size_t size) {
 
 void session_t::on_read(error_code ec, size_t size,
                         const recv_cb_t &handle_recv) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   if (ec) {
     fail(ec, __FUNCTION__);
   }
@@ -221,8 +220,6 @@ void session_t::on_read(error_code ec, size_t size,
                       this->on_read(ec, size, handle_recv);
                     });
   }
-
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded size: " << size;
 }
 
 void session_t::on_close(error_code ec) {
