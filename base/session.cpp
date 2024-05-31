@@ -215,7 +215,6 @@ void session_t::on_read(error_code ec, size_t size,
   }
 
   if (m_keep_processing) {
-    //    m_read_buffer.clear();
     m_read_msg_str.clear();
     m_ws.async_read(m_read_buffer,
                     [this, &handle_recv](error_code ec, size_t size) {
