@@ -37,6 +37,9 @@ jobs:
       run: conan profile detect
 
     - name: Conan build
+      run: conan graph info conanfile.txt
+
+    - name: Conan build
       run: conan install . --profile=default --build=missing --output-folder=build -sbuild_type=Debug
 
     # - name: Configure CMake
