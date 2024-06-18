@@ -35,7 +35,7 @@ jobs:
         echo "${{ steps.conan.outputs.version }}"
         conan profile detect
         conan cache clean
-        conan install . --profile=default --build="*" --output-folder=build -sbuild_type=Debug
+        conan install conanfile.py --profile=default --build=missing --output-folder=build -sbuild_type=Debug
 
     # - name: Configure CMake
     #   # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
