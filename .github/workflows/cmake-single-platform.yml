@@ -8,6 +8,7 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
+    branches: [ "dev/ci-pipeline" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
