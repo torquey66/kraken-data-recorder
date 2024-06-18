@@ -1,52 +1,9 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #include "parquet.hpp"
+#include "writer.hpp"
 
 #include <arrow/scalar.h>
 #include <boost/log/trivial.hpp>
-
-using arrow::Compression;
-using parquet::ParquetDataPageVersion;
-using parquet::ParquetVersion;
-using parquet::WriterProperties;
-
-namespace {
-
-std::shared_ptr<arrow::io::FileOutputStream>
-open_sink_file(std::string sink_filename) {
-  auto result = arrow::io::FileOutputStream::Open(sink_filename);
-  if (result.ok()) {
-    return result.ValueOrDie();
-  }
-  const auto msg = "failed to open: " + sink_filename +
-                   " error: " + result.status().ToString();
-  BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << msg;
-  throw std::runtime_error(msg);
-}
-
-std::unique_ptr<parquet::arrow::FileWriter>
-open_writer(std::shared_ptr<arrow::io::FileOutputStream> sink_file,
-            std::shared_ptr<arrow::Schema> schema) {
-
-  std::shared_ptr<WriterProperties> props =
-      WriterProperties::Builder()
-          .max_row_group_length(64 * 1024)
-          ->created_by("Krakpot")
-          ->version(ParquetVersion::PARQUET_2_6)
-          ->data_page_version(ParquetDataPageVersion::V2)
-          ->compression(Compression::SNAPPY)
-          ->build();
-
-  std::shared_ptr<parquet::ArrowWriterProperties> arrow_props =
-      parquet::ArrowWriterProperties::Builder().store_schema()->build();
-
-  arrow::Result<std::unique_ptr<parquet::arrow::FileWriter>> result =
-      parquet::arrow::FileWriter::Open(*schema, arrow::default_memory_pool(),
-                                       sink_file, props, arrow_props);
-
-  return std::move(result.ValueOrDie()); // TODO this is all really hinky
-}
-
-} // namespace
 
 namespace krakpot {
 namespace pq {

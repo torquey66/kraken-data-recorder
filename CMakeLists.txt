@@ -33,6 +33,7 @@ add_library(krakpot_base
   base/responses.cpp
   base/session.cpp
   base/types.cpp
+  base/constants.hpp
   base/decimal.hpp
   base/responses.hpp
   base/sink.hpp
@@ -62,7 +63,7 @@ target_link_libraries(krakpot_parquet
 )
 
 add_executable(kp_record kp_record/kp_record.cpp)
-target_link_libraries(kp_record krakpot_base krakpot_parquet)
+target_link_libraries(kp_record krakpot_parquet)
 
 add_executable(parse_instrument_snapshot test/parse_instrument_snapshot.cpp)
 target_link_libraries(parse_instrument_snapshot krakpot_base)

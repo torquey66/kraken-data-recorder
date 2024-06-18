@@ -22,7 +22,7 @@ namespace pq {
  */
 
 struct book_sink_t final {
-  book_sink_t(std::string parquet_dir);
+  book_sink_t(std::string parquet_dir); // TODO: filesystem::path?
 
   void accept(const response::book_t &);
 
@@ -58,7 +58,7 @@ private:
 };
 
 struct trades_sink_t final {
-  trades_sink_t(std::string parquet_dir);
+  trades_sink_t(std::string parquet_dir); // TODO: filesystem::path?
 
   void accept(const response::trades_t &);
 
