@@ -33,6 +33,9 @@ jobs:
     - name: Conan version
       run: echo "${{ steps.conan.outputs.version }}"
 
+    - name: Conan profile
+      run: conan profile detect
+
     - name: Conan build
       run: conan install . --profile=default --build=missing --output-folder=build -sbuild_type=Debug
 
