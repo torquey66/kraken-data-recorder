@@ -35,7 +35,6 @@ jobs:
         echo "${{ steps.conan.outputs.version }}"
         conan profile detect
         conan cache clean
-        conan graph info conanfile.txt
         conan install . --profile=default --build="*" --output-folder=build -sbuild_type=Debug
 
     # - name: Configure CMake
