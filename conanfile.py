@@ -5,7 +5,8 @@ class KrakpotRecipe(ConanFile):
     generators = "CMakeToolchain", "CMakeDeps"
 
     def requirements(self):
-        self.requires("arrow/16.1.0", override=True)
+        self.requires("arrow/16.1.0")
+        self.requires("boost/1.85.0", force=True)
         self.requires("date/3.0.1")
         self.requires("doctest/2.4.11")
         self.requires("nlohmann_json/3.11.3")
