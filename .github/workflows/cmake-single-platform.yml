@@ -31,16 +31,12 @@ jobs:
         version: 2.4.1
 
     - name: Conan version
-      run: echo "${{ steps.conan.outputs.version }}"
-
-    - name: Conan profile
-      run: conan profile detect
-
-    - name: Conan build
-      run: conan graph info conanfile.txt
-
-    - name: Conan build
-      run: conan install . --profile=default --build=missing --output-folder=build -sbuild_type=Debug
+      run: |
+        echo "${{ steps.conan.outputs.version }}"
+        conan profile detect
+        conan cache clean
+        conan graph info conanfile.txt
+        conan install . --profile=default --build=missing --output-folder=build -sbuild_type=Debug
 
     # - name: Configure CMake
     #   # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
