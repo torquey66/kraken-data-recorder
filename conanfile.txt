@@ -1,5 +1,5 @@
 [requires]
-arrow/15.0.0
+arrow/16.1.0
 boost/1.85.0
 date/3.0.1
 doctest/2.4.11
