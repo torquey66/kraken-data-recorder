@@ -2,9 +2,9 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
-#include <parquet.hpp>
 #include <responses.hpp>
 
+#include <arrow/api.h>
 #include <arrow/io/api.h>
 #include <arrow/io/memory.h>
 #include <parquet/arrow/reader.h>
