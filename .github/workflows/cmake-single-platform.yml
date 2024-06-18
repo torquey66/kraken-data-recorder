@@ -34,10 +34,9 @@ jobs:
       run: |
         echo "${{ steps.conan.outputs.version }}"
         conan profile detect
-        conan cache clean
         conan install conanfile.py --profile=default --build=missing --output-folder=build -sbuild_type=Debug
         cd build
-        cmake ..
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
         make -j
 
     # - name: Configure CMake
