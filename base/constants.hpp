@@ -12,6 +12,8 @@
  */
 namespace krakpot {
 
+static constexpr char c_app_name[] = "krakpot";
+
 static constexpr double c_NaN = std::numeric_limits<double>::signaling_NaN();
 static constexpr char c_NaN_str[] = "NaN";
 
