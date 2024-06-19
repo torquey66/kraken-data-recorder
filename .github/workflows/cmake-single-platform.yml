@@ -33,6 +33,7 @@ jobs:
     - name: Conan build
       run: |
         echo "${{ steps.conan.outputs.version }}"
+        mkdir -p /home/runner/.conan2/profiles
         cp ci.conan.txt /home/runner/.conan2/profiles/default
         conan install conanfile.py --build=missing --output-folder=build -sbuild_type=Debug
         cd build
