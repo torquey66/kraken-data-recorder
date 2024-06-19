@@ -14,7 +14,7 @@ on:
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  BUILD_TYPE: RelWithDebInfo
 
 jobs:
   Build:
@@ -35,9 +35,9 @@ jobs:
         echo "${{ steps.conan.outputs.version }}"
         mkdir -p /home/runner/.conan2/profiles
         cp ci.conan.txt /home/runner/.conan2/profiles/default
-        conan install conanfile.py --build=missing --output-folder=build -sbuild_type=Release
+        conan install conanfile.py --build=missing --output-folder=build -sbuild_type=RelWithDebInfo
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
         make -j
 
     - name: Release
