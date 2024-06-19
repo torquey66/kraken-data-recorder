@@ -62,6 +62,10 @@ void session_t::start_processing(const recv_cb_t &handle_recv) {
                   [this, &handle_recv](error_code ec, size_t size) {
                     this->on_read(ec, size, handle_recv);
                   });
+
+  m_ping_timer.expires_from_now(
+      boost::posix_time::seconds(m_config.ping_interval_secs()));
+  m_ping_timer.async_wait([this](error_code ec) { this->on_ping_timer(ec); });
 }
 
 void session_t::send(msg_t msg) {
@@ -151,8 +155,6 @@ void session_t::on_handshake(error_code ec) {
   }
 
   m_keep_processing = true;
-  on_ping_timer(ec);
-
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded";
 }
 
