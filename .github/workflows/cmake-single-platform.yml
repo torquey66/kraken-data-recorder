@@ -48,7 +48,8 @@ jobs:
         prerelease: false
 #        release_name: ${{ steps.version.outputs.version }}
         release_name: test-release
-        tag_name: ${{ github.ref }}
+#        tag_name: ${{ github.ref }}
+        tag_name: test-tag
         body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ github.token }}
