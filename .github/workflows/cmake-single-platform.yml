@@ -60,7 +60,7 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./bin/kp_record
+        asset_path: ./build/kp_record
         asset_name: kp_record
         asset_content_type: application/binary
 
