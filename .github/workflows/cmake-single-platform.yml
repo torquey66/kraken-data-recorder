@@ -30,12 +30,12 @@ jobs:
     - name: Conan build
       run: |
         echo "${{ steps.conan.outputs.version }}"
-        mkdir -p /home/runner/.conan2/profiles
-        cp ci.conan.txt /home/runner/.conan2/profiles/default
-        conan install conanfile.py --build=missing --output-folder=build -sbuild_type=Debug
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug ..
-        make -j
+        # mkdir -p /home/runner/.conan2/profiles
+        # cp ci.conan.txt /home/runner/.conan2/profiles/default
+        # conan install conanfile.py --build=missing --output-folder=build -sbuild_type=Debug
+        # cd build
+        # cmake -DCMAKE_BUILD_TYPE=Debug ..
+        # make -j
 
     - name: release
       uses: actions/create-release@v1
@@ -43,21 +43,22 @@ jobs:
       with:
         draft: false
         prerelease: false
-        release_name: ${{ steps.version.outputs.version }}
+#        release_name: ${{ steps.version.outputs.version }}
+        release_name: test-release
         tag_name: ${{ github.ref }}
         body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
-    - name: upload linux artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./bin/kp_record
-        asset_name: kp_record
-        asset_content_type: application/binary
+    # - name: upload linux artifact
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ github.token }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: ./bin/kp_record
+    #     asset_name: kp_record
+    #     asset_content_type: application/binary
 
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
