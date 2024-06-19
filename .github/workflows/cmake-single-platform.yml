@@ -30,31 +30,31 @@ jobs:
       with:
         version: 2.4.1
 
-    - name: Conan build
+    - name: Build
       run: |
         echo "${{ steps.conan.outputs.version }}"
         mkdir -p /home/runner/.conan2/profiles
         cp ci.conan.txt /home/runner/.conan2/profiles/default
-        conan install conanfile.py --build=missing --output-folder=build -sbuild_type=Debug
+        conan install conanfile.py --build=missing --output-folder=build -sbuild_type=Release
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        cmake -DCMAKE_BUILD_TYPE=Release ..
         make -j
 
-    - name: release
+    - name: Release
       uses: actions/create-release@v1
       id: create_release
       with:
         draft: false
         prerelease: false
 #        release_name: ${{ steps.version.outputs.version }}
-        release_name: test-release
+        release_name: test-release-1
 #        tag_name: ${{ github.ref }}
-        tag_name: test-tag
+        tag_name: test-tag-1
         body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
-    - name: upload linux artifact
+    - name: Upload GNU/Linux artifact
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ github.token }}
