@@ -33,7 +33,7 @@ jobs:
     - name: Conan build
       run: |
         echo "${{ steps.conan.outputs.version }}"
-        conan install conanfile.py --profile=ci.conan.txt --build=missing --output-folder=build -sbuild_type=Debug
+        conan install conanfile.py --profile:build=ci.conan.txt --build=missing --output-folder=build -sbuild_type=Debug
         cd build
         cmake -DCMAKE_BUILD_TYPE=Debug ..
         make -j
