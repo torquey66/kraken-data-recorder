@@ -30,7 +30,7 @@ namespace ws = bst::websocket;
 namespace {
 void fail(bst::error_code ec, char const *what) {
   BOOST_LOG_TRIVIAL(error) << what << ": " << ec.message();
-  throw std::runtime_error(what);
+  //  throw std::runtime_error(what);
 }
 } // namespace
 
@@ -42,30 +42,16 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context,
       m_ping_timer{m_ioc}, m_config{config} {
 
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
-
-  m_resolver.async_resolve(config.kraken_host(), config.kraken_port(),
-                           [this](error_code ec, resolver::results_type rt) {
-                             this->on_resolve(ec, rt);
-                           });
 }
 
 void session_t::start_processing(const recv_cb_t &handle_recv) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
 
-  // TODO: clean this up - perhaps by adding a timeout to the interface
-  while (!m_keep_processing) {
-    m_ioc.run_one();
-  }
-
-  m_read_buffer.clear();
-  m_ws.async_read(m_read_buffer,
-                  [this, &handle_recv](error_code ec, size_t size) {
-                    this->on_read(ec, size, handle_recv);
-                  });
-
-  m_ping_timer.expires_from_now(
-      boost::posix_time::seconds(m_config.ping_interval_secs()));
-  m_ping_timer.async_wait([this](error_code ec) { this->on_ping_timer(ec); });
+  m_handle_recv = handle_recv;
+  m_resolver.async_resolve(m_config.kraken_host(), m_config.kraken_port(),
+                           [this](error_code ec, resolver::results_type rt) {
+                             this->on_resolve(ec, rt);
+                           });
 }
 
 void session_t::send(msg_t msg) {
@@ -154,8 +140,16 @@ void session_t::on_handshake(error_code ec) {
     fail(ec, __FUNCTION__);
   }
 
-  m_keep_processing = true;
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded";
+  m_keep_processing = true;
+  m_read_buffer.clear();
+  m_ws.async_read(m_read_buffer, [this](error_code ec, size_t size) {
+    this->on_read(ec, size);
+  });
+
+  m_ping_timer.expires_from_now(
+      boost::posix_time::seconds(m_config.ping_interval_secs()));
+  m_ping_timer.async_wait([this](error_code ec) { this->on_ping_timer(ec); });
 }
 
 void session_t::on_ping_timer(error_code ec) {
@@ -172,7 +166,6 @@ void session_t::on_ping_timer(error_code ec) {
     const auto ping = request::ping_t{++m_req_id};
     const auto msg = ping.str();
     send(msg);
-    ++m_req_id;
 
     m_ping_timer.expires_from_now(
         boost::posix_time::seconds(m_config.ping_interval_secs()));
@@ -194,8 +187,7 @@ void session_t::on_write(error_code ec, size_t size) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded size: " << size;
 }
 
-void session_t::on_read(error_code ec, size_t size,
-                        const recv_cb_t &handle_recv) {
+void session_t::on_read(error_code ec, size_t size) {
   if (ec) {
     fail(ec, __FUNCTION__);
   }
@@ -205,10 +197,10 @@ void session_t::on_read(error_code ec, size_t size,
     // simdjson's iterator directly to buffer sequence
     m_read_msg_str = boost::beast::buffers_to_string(m_read_buffer.data());
     m_read_buffer.consume(size);
-    if (!handle_recv(std::string_view(m_read_msg_str))) {
+    if (!m_handle_recv(std::string_view(m_read_msg_str))) {
       BOOST_LOG_TRIVIAL(error)
           << __FUNCTION__ << "handle_recv() returned false -- stop processing";
-      m_keep_processing = false;
+      //      m_keep_processing = false;
     }
   } catch (const std::exception &ex) {
     BOOST_LOG_TRIVIAL(error) << ex.what();
@@ -217,10 +209,9 @@ void session_t::on_read(error_code ec, size_t size,
 
   if (m_keep_processing) {
     m_read_msg_str.clear();
-    m_ws.async_read(m_read_buffer,
-                    [this, &handle_recv](error_code ec, size_t size) {
-                      this->on_read(ec, size, handle_recv);
-                    });
+    m_ws.async_read(m_read_buffer, [this](error_code ec, size_t size) {
+      this->on_read(ec, size);
+    });
   }
 }
 
