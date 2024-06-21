@@ -55,7 +55,8 @@ bool engine_t::handle_msg(msg_t msg) {
     }
 
   } catch (const std::exception &ex) {
-    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": " << ex.what();
+    BOOST_LOG_TRIVIAL(error)
+        << __FUNCTION__ << ": " << ex.what() << " msg: " << msg;
     return false;
   }
 
@@ -84,7 +85,6 @@ bool engine_t::handle_instrument_msg(doc_t &doc) {
 bool engine_t::handle_instrument_snapshot(doc_t &doc) {
 
   const auto response = response::instrument_t::from_json(doc);
-
   const auto &pairs = response.pairs();
   auto symbols = std::vector<std::string>{};
   std::transform(pairs.begin(), pairs.end(), std::back_inserter(symbols),
