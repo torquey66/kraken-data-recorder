@@ -90,13 +90,17 @@ bool engine_t::handle_instrument_snapshot(doc_t &doc) {
   std::transform(pairs.begin(), pairs.end(), std::back_inserter(symbols),
                  [](const auto &pair) { return pair.symbol(); });
 
-  const request::subscribe_book_t subscribe_book{
-      ++m_book_req_id, m_config.book_depth(), true, symbols};
-  m_session.send(subscribe_book.str());
+  if (m_config.capture_book()) {
+    const request::subscribe_book_t subscribe_book{
+        ++m_book_req_id, m_config.book_depth(), true, symbols};
+    m_session.send(subscribe_book.str());
+  }
 
-  const request::subscribe_trade_t subscribe_trade{++m_trade_req_id, true,
-                                                   symbols};
-  m_session.send(subscribe_trade.str());
+  if (m_config.capture_trades()) {
+    const request::subscribe_trade_t subscribe_trade{++m_trade_req_id, true,
+                                                     symbols};
+    m_session.send(subscribe_trade.str());
+  }
 
   return true;
 }
