@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
       (config_t::c_kraken_port, po::value<std::string>()->default_value("443"), "Kraken websocket port")
       (config_t::c_parquet_dir, po::value<std::string>()->default_value("/tmp"), "directory in which to write parquet output")
       (config_t::c_book_depth, po::value<int64_t>()->default_value(1000), "one of {10, 25, 100, 500, 1000}")
+      (config_t::c_capture_book, po::value<bool>()->default_value(true), "subscribe to and record level book")
+      (config_t::c_capture_trades, po::value<bool>()->default_value(true), "subscribe to and record trades")
     ;
     // clang-format on
 
@@ -59,7 +61,9 @@ int main(int argc, char *argv[]) {
                  vm[config_t::c_kraken_host].as<std::string>(),
                  vm[config_t::c_kraken_port].as<std::string>(),
                  vm[config_t::c_parquet_dir].as<std::string>(),
-                 krakpot::depth_t{vm[config_t::c_book_depth].as<int64_t>()}};
+                 krakpot::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
+                 vm[config_t::c_capture_book].as<bool>(),
+                 vm[config_t::c_capture_trades].as<bool>()};
 
     boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv13_client};
     ctx.set_options(boost::asio::ssl::context::default_workarounds |
@@ -75,29 +79,38 @@ int main(int argc, char *argv[]) {
     krakpot::pq::book_sink_t book_sink{config.parquet_dir()};
     krakpot::pq::trades_sink_t trades_sink{config.parquet_dir()};
     krakpot::model::level_book_t level_book{config.book_depth()};
+
+    const auto noop_accept_book = [](const krakpot::response::book_t &) {};
     const auto accept_book =
         [&book_sink, &level_book](const krakpot::response::book_t &response) {
           level_book.accept(response);
           book_sink.accept(response);
         };
+
+    const auto noop_accept_trades = [](const krakpot::response::trades_t &) {};
     const auto accept_trades =
         [&trades_sink](const krakpot::response::trades_t &response) {
           trades_sink.accept(response);
         };
-    const krakpot::sink_t sink{accept_book, accept_trades};
+    const krakpot::sink_t sink{
+        config.capture_book()
+            ? krakpot::sink_t::accept_book_t{accept_book}
+            : krakpot::sink_t::accept_book_t{noop_accept_book},
+        config.capture_trades()
+            ? krakpot::sink_t::accept_trades_t{accept_trades}
+            : krakpot::sink_t::accept_trades_t{noop_accept_trades}};
 
     auto session = krakpot::session_t(ioc, ctx, config);
     auto engine = krakpot::engine_t(session, config, sink);
 
-    const auto handle_recv =
-        [&engine](krakpot::msg_t msg) {
-          try {
-            return engine.handle_msg(msg);
-          } catch (const std::exception &ex) {
-            BOOST_LOG_TRIVIAL(error) << ex.what();
-            return false;
-          }
-        };
+    const auto handle_recv = [&engine](krakpot::msg_t msg) {
+      try {
+        return engine.handle_msg(msg);
+      } catch (const std::exception &ex) {
+        BOOST_LOG_TRIVIAL(error) << ex.what();
+        return false;
+      }
+    };
     session.start_processing(handle_recv);
 
     while (!shutting_down) {
