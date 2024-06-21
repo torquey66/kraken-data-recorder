@@ -10,29 +10,9 @@
 #include <chrono>
 #include <format>
 
-/**
- * Note that this code was initially derived from the boost::beast
- * websocket examples, with a little advice from ChatGPT on the
- * side. I intended it as a foray in to coroutine-flavored asio
- * programming and in my view the jury's still out on whether the
- * result is easier to read than the vanilla callback approach.
- *
- * Furthermore, the coordination between the ping() and process()
- * operations is clumsy at best. I thought coroutines were supposed to
- * make things of this nature easier...
- *
- * TODO: figure out a better way
- */
 namespace asio = boost::asio;
 namespace bst = boost::beast;
 namespace ws = bst::websocket;
-
-namespace {
-void fail(bst::error_code ec, char const *what) {
-  BOOST_LOG_TRIVIAL(error) << what << ": " << ec.message();
-  //  throw std::runtime_error(what);
-}
-} // namespace
 
 namespace krakpot {
 
@@ -42,6 +22,11 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context,
       m_ping_timer{m_ioc}, m_config{config} {
 
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
+}
+
+void session_t::fail(bst::error_code ec, char const *what) {
+  BOOST_LOG_TRIVIAL(error) << what << ": " << ec.message();
+  m_keep_processing = false;
 }
 
 void session_t::start_processing(const recv_cb_t &handle_recv) {
@@ -200,11 +185,12 @@ void session_t::on_read(error_code ec, size_t size) {
     if (!m_handle_recv(std::string_view(m_read_msg_str))) {
       BOOST_LOG_TRIVIAL(error)
           << __FUNCTION__ << "handle_recv() returned false -- stop processing";
-      //      m_keep_processing = false;
+      m_keep_processing = false;
     }
   } catch (const std::exception &ex) {
     BOOST_LOG_TRIVIAL(error) << ex.what();
-    m_keep_processing = false;
+    BOOST_LOG_TRIVIAL(error) << "msg: " << m_read_msg_str;
+    stop_processing();
   }
 
   if (m_keep_processing) {

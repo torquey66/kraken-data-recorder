@@ -50,6 +50,8 @@ private:
   using error_code = boost::beast::error_code;
   using resolver = boost::asio::ip::tcp::resolver;
 
+  void fail(boost::beast::error_code, char const *);
+
   void on_resolve(error_code, resolver::results_type);
   void on_connect(error_code, resolver::results_type::endpoint_type);
   void on_ssl_handshake(error_code);
