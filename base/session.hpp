@@ -50,13 +50,15 @@ private:
   using error_code = boost::beast::error_code;
   using resolver = boost::asio::ip::tcp::resolver;
 
+  void fail(boost::beast::error_code, char const *);
+
   void on_resolve(error_code, resolver::results_type);
   void on_connect(error_code, resolver::results_type::endpoint_type);
   void on_ssl_handshake(error_code);
   void on_handshake(error_code);
   void on_ping_timer(error_code);
   void on_write(error_code, size_t);
-  void on_read(error_code, size_t, const recv_cb_t &);
+  void on_read(error_code, size_t);
   void on_close(error_code);
 
   ioc_t &m_ioc;
@@ -66,6 +68,7 @@ private:
   config_t m_config;
 
   bool m_keep_processing = false;
+  recv_cb_t m_handle_recv = [](msg_t) { return true; };
   req_id_t m_req_id = 0;
 
   boost::beast::flat_buffer m_read_buffer;
