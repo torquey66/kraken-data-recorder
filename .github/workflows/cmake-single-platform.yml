@@ -4,16 +4,13 @@ name: CMake on a single platform
 
 on:
   push:
-    branches: [ "main", "dev/ci-pipeline" ]
+    branches: [ "main" ]
     tags:
       - '*'
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:
-    branches: [ "dev/ci-pipeline" ]
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: RelWithDebInfo
 
 jobs:
@@ -47,9 +44,8 @@ jobs:
         draft: false
         prerelease: false
 #        release_name: ${{ steps.version.outputs.version }}
-        release_name: test-release-1
-#        tag_name: ${{ github.ref }}
-        tag_name: test-tag-1
+        release_name: test-${{ github.ref }}
+        tag_name: ${{ github.ref }}
         body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ github.token }}
@@ -63,10 +59,3 @@ jobs:
         asset_path: ./build/kp_record
         asset_name: kp_record
         asset_content_type: application/binary
-
-    # - name: Test
-    #   working-directory: ${{github.workspace}}/build
-    #   # Execute tests defined by the CMake configuration.
-    #   # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-    #   run: ctest -C ${{env.BUILD_TYPE}}
-
