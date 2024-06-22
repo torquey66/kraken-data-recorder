@@ -76,8 +76,10 @@ int main(int argc, char *argv[]) {
     boost::asio::signal_set signals(ioc, SIGINT);
     signals.async_wait(signal_handler);
 
-    krakpot::pq::book_sink_t book_sink{config.parquet_dir()};
-    krakpot::pq::trades_sink_t trades_sink{config.parquet_dir()};
+    const auto now = krakpot::timestamp_t::now().micros();
+
+    krakpot::pq::book_sink_t book_sink{config.parquet_dir(), now};
+    krakpot::pq::trades_sink_t trades_sink{config.parquet_dir(), now};
     krakpot::model::level_book_t level_book{config.book_depth()};
 
     const auto noop_accept_book = [](const krakpot::response::book_t &) {};
