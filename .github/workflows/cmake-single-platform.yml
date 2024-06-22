@@ -11,7 +11,7 @@ on:
     branches: [ "main" ]
 
 env:
-  BUILD_TYPE: RelWithDebInfo
+  BUILD_TYPE: Release
 
 jobs:
   Build:
@@ -32,9 +32,9 @@ jobs:
         echo "${{ steps.conan.outputs.version }}"
         mkdir -p /home/runner/.conan2/profiles
         cp ci.conan.txt /home/runner/.conan2/profiles/default
-        conan install conanfile.py --build=missing --output-folder=build -sbuild_type=RelWithDebInfo
+        conan install conanfile.py --build=missing --output-folder=build -sbuild_type=Release
         cd build
-        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+        cmake -DCMAKE_BUILD_TYPE=Release ..
         make -j
 
     - name: Release
