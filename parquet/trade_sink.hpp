@@ -2,13 +2,9 @@
 #pragma once
 
 #include "responses.hpp"
+#include "writer.hpp"
 
 #include <arrow/api.h>
-#include <arrow/io/file.h>
-#include <arrow/util/type_fwd.h>
-#include <parquet/api/writer.h>
-#include <parquet/arrow/writer.h>
-#include <parquet/stream_writer.h>
 
 #include <memory>
 #include <string>
@@ -17,7 +13,9 @@ namespace krakpot {
 namespace pq {
 
 struct trades_sink_t final {
-  trades_sink_t(std::string parquet_dir); // TODO: filesystem::path?
+  static constexpr char c_sink_name[] = "trades";
+
+  trades_sink_t(std::string parquet_dir, sink_id_t);
 
   void accept(const response::trades_t &);
 
