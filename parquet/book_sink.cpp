@@ -1,6 +1,5 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #include "book_sink.hpp"
-#include "writer.hpp"
 
 #include <arrow/scalar.h>
 #include <boost/log/trivial.hpp>
@@ -8,9 +7,9 @@
 namespace krakpot {
 namespace pq {
 
-book_sink_t::book_sink_t(std::string parquet_dir)
+book_sink_t::book_sink_t(std::string parquet_dir, sink_id_t id)
     : m_schema{schema()}, m_parquet_dir{parquet_dir},
-      m_book_filename{m_parquet_dir + "/book.pq"},
+      m_book_filename{sink_filename(parquet_dir, c_sink_name, id)},
       m_book_file{open_sink_file(m_book_filename)},
       m_os{open_writer(m_book_file, m_schema)},
       m_recv_tm_builder{std::make_shared<arrow::Int64Builder>()},

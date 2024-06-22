@@ -2,13 +2,22 @@
 
 #include <constants.hpp>
 
+#include <arrow/io/file.h>
 #include <parquet/api/writer.h>
 #include <parquet/arrow/writer.h>
 
 #include <memory>
+#include <string>
 
 namespace krakpot {
 namespace pq {
+
+using sink_id_t = int64_t;
+
+inline std::string sink_filename(std::string parquet_dir, std::string sink_name,
+                                 sink_id_t id) {
+  return parquet_dir + "/" + std::to_string(id) + "." + sink_name + ".pq";
+}
 
 inline std::shared_ptr<arrow::io::FileOutputStream>
 open_sink_file(std::string sink_filename) {
