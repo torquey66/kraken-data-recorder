@@ -45,6 +45,8 @@ add_library(krakpot_base
 # TODO: split these into 'src' and 'include' directories or the like
 include_directories(${CMAKE_SOURCE_DIR}/parquet)
 add_library(krakpot_parquet
+  parquet/assets_sink.hpp
+  parquet/assets_sink.cpp
   parquet/book_sink.hpp
   parquet/book_sink.cpp
   parquet/trade_sink.hpp
