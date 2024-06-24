@@ -82,13 +82,14 @@ bool engine_t::handle_instrument_msg(doc_t &doc) {
   return false;
 }
 
-bool engine_t::handle_instrument_snapshot(doc_t &doc) {
-
+bool engine_t::handle_instrument_snapshot(doc_t& doc) {
   const auto response = response::instrument_t::from_json(doc);
-  const auto &pairs = response.pairs();
+  m_sink.accept(response);
+
+  const auto& pairs = response.pairs();
   auto symbols = std::vector<std::string>{};
   std::transform(pairs.begin(), pairs.end(), std::back_inserter(symbols),
-                 [](const auto &pair) { return pair.symbol(); });
+                 [](const auto& pair) { return pair.symbol(); });
 
   if (m_config.capture_book()) {
     const request::subscribe_book_t subscribe_book{
@@ -105,10 +106,9 @@ bool engine_t::handle_instrument_snapshot(doc_t &doc) {
   return true;
 }
 
-bool engine_t::handle_instrument_update(doc_t &doc) {
-
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " TODO: handle updates -- doc: "
-                           << simdjson::to_json_string(doc);
+bool engine_t::handle_instrument_update(doc_t& doc) {
+  const auto response = response::instrument_t::from_json(doc);
+  m_sink.accept(response);
   return true;
 }
 
