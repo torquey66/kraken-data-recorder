@@ -49,6 +49,8 @@ add_library(krakpot_parquet
   parquet/assets_sink.cpp
   parquet/book_sink.hpp
   parquet/book_sink.cpp
+  parquet/pairs_sink.hpp
+  parquet/pairs_sink.cpp
   parquet/trade_sink.hpp
   parquet/trade_sink.cpp
 )
