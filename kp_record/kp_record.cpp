@@ -1,9 +1,11 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 
+#include "assets_sink.hpp"
 #include "book_sink.hpp"
 #include "config.hpp"
 #include "engine.hpp"
 #include "level_book.hpp"
+#include "pairs_sink.hpp"
 #include "session.hpp"
 #include "sink.hpp"
 #include "trade_sink.hpp"
@@ -21,14 +23,13 @@ namespace po = boost::program_options;
 
 bool shutting_down = false;
 
-void signal_handler(const boost::system::error_code &ec, int signal_number) {
+void signal_handler(const boost::system::error_code& ec, int signal_number) {
   BOOST_LOG_TRIVIAL(error) << "received signal_number: " << signal_number
                            << " error: " << ec.message() << " -- shutting down";
   shutting_down = true;
 }
 
-int main(int argc, char *argv[]) {
-
+int main(int argc, char* argv[]) {
   try {
     po::options_description desc(
         "Subscribe to Kraken and serialize book/trade data");
@@ -78,23 +79,37 @@ int main(int argc, char *argv[]) {
 
     const auto now = krakpot::timestamp_t::now().micros();
 
+    krakpot::pq::assets_sink_t assets_sink{config.parquet_dir(), now};
+    krakpot::pq::pairs_sink_t pairs_sink{config.parquet_dir(), now};
     krakpot::pq::book_sink_t book_sink{config.parquet_dir(), now};
     krakpot::pq::trades_sink_t trades_sink{config.parquet_dir(), now};
     krakpot::model::level_book_t level_book{config.book_depth()};
 
-    const auto noop_accept_book = [](const krakpot::response::book_t &) {};
+    // const auto noop_accept_instrument =
+    //     [](const krakpot::response::instrument_t&) {};
+    const auto accept_instrument =
+        [&assets_sink,
+         &pairs_sink](const krakpot::response::instrument_t& response) {
+          assets_sink.accept(response.header(), response.assets());
+          pairs_sink.accept(response.header(), response.pairs());
+        };
+
+    const auto noop_accept_book = [](const krakpot::response::book_t&) {};
     const auto accept_book =
-        [&book_sink, &level_book](const krakpot::response::book_t &response) {
+        [&book_sink, &level_book](const krakpot::response::book_t& response) {
           level_book.accept(response);
           book_sink.accept(response);
         };
 
-    const auto noop_accept_trades = [](const krakpot::response::trades_t &) {};
+    const auto noop_accept_trades = [](const krakpot::response::trades_t&) {};
     const auto accept_trades =
-        [&trades_sink](const krakpot::response::trades_t &response) {
+        [&trades_sink](const krakpot::response::trades_t& response) {
           trades_sink.accept(response);
         };
     const krakpot::sink_t sink{
+        //        krakpot::sink_t{noop_accept_instrument},
+        //        krakpot::sink_t{accept_instrument},
+        accept_instrument,
         config.capture_book()
             ? krakpot::sink_t::accept_book_t{accept_book}
             : krakpot::sink_t::accept_book_t{noop_accept_book},
@@ -108,7 +123,7 @@ int main(int argc, char *argv[]) {
     const auto handle_recv = [&engine](krakpot::msg_t msg) {
       try {
         return engine.handle_msg(msg);
-      } catch (const std::exception &ex) {
+      } catch (const std::exception& ex) {
         BOOST_LOG_TRIVIAL(error) << ex.what();
         return false;
       }
@@ -121,7 +136,7 @@ int main(int argc, char *argv[]) {
     BOOST_LOG_TRIVIAL(error) << "session.stop_processing()";
     session.stop_processing();
     ioc.run();
-  } catch (const std::exception &ex) {
+  } catch (const std::exception& ex) {
     BOOST_LOG_TRIVIAL(error) << ex.what();
     return EXIT_FAILURE;
   }

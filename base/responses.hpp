@@ -47,15 +47,16 @@ private:
 struct instrument_t final {
   instrument_t() = default;
 
-  static instrument_t from_json(simdjson::ondemand::document &);
+  static instrument_t from_json(simdjson::ondemand::document&);
+
+  const header_t& header() const { return m_header; }
+  const std::vector<asset_t>& assets() const { return m_assets; }
+  const std::vector<pair_t>& pairs() const { return m_pairs; }
 
   nlohmann::json to_json() const;
   std::string str() const { return to_json().dump(); }
 
-  const std::vector<asset_t> &assets() const { return m_assets; }
-  const std::vector<pair_t> &pairs() const { return m_pairs; }
-
-private:
+ private:
   header_t m_header;
   std::vector<asset_t> m_assets;
   std::vector<pair_t> m_pairs;

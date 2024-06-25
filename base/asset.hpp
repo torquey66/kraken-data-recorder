@@ -34,6 +34,14 @@ struct asset_t final {
 
   static asset_t from_json(simdjson::ondemand::object &);
 
+  bool borrowable() const { return m_borrowable; }
+  double_t collateral_value() const { return m_collateral_value; }
+  std::string id() const { return m_id; }
+  std::optional<double_t> margin_rate() const { return m_margin_rate; }
+  integer_t precision() const { return m_precision; }
+  integer_t precision_display() const { return m_precision_display; }
+  status_t status() const { return m_status; }
+
   nlohmann::json to_json() const;
   std::string str() const { return to_json().dump(); }
 
