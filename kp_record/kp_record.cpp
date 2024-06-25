@@ -5,6 +5,7 @@
 #include "config.hpp"
 #include "engine.hpp"
 #include "level_book.hpp"
+#include "pairs_sink.hpp"
 #include "session.hpp"
 #include "sink.hpp"
 #include "trade_sink.hpp"
@@ -79,6 +80,7 @@ int main(int argc, char* argv[]) {
     const auto now = krakpot::timestamp_t::now().micros();
 
     krakpot::pq::assets_sink_t assets_sink{config.parquet_dir(), now};
+    krakpot::pq::pairs_sink_t pairs_sink{config.parquet_dir(), now};
     krakpot::pq::book_sink_t book_sink{config.parquet_dir(), now};
     krakpot::pq::trades_sink_t trades_sink{config.parquet_dir(), now};
     krakpot::model::level_book_t level_book{config.book_depth()};
@@ -86,8 +88,10 @@ int main(int argc, char* argv[]) {
     // const auto noop_accept_instrument =
     //     [](const krakpot::response::instrument_t&) {};
     const auto accept_instrument =
-        [&assets_sink](const krakpot::response::instrument_t& response) {
+        [&assets_sink,
+         &pairs_sink](const krakpot::response::instrument_t& response) {
           assets_sink.accept(response.header(), response.assets());
+          pairs_sink.accept(response.header(), response.pairs());
         };
 
     const auto noop_accept_book = [](const krakpot::response::book_t&) {};
