@@ -31,6 +31,7 @@ struct pairs_sink_t final {
   std::shared_ptr<arrow::io::FileOutputStream> m_pairs_file;
   std::unique_ptr<parquet::arrow::FileWriter> m_os;
 
+  arrow::Int64Builder m_recv_tm_builder;
   arrow::StringBuilder m_base_builder;
   arrow::DoubleBuilder m_cost_min_builder;
   arrow::Int64Builder m_cost_precision_builder;
@@ -45,7 +46,7 @@ struct pairs_sink_t final {
   arrow::DoubleBuilder m_qty_min_builder;
   arrow::Int64Builder m_qty_precision_builder;
   arrow::StringBuilder m_quote_builder;
-  arrow::Int8Builder m_status_builder_builder;
+  arrow::Int8Builder m_status_builder;
   arrow::StringBuilder m_symbol_builder;
 };
 
