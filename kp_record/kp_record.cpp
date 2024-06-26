@@ -30,6 +30,7 @@ void signal_handler(const boost::system::error_code& ec, int signal_number) {
 }
 
 int main(int argc, char* argv[]) {
+  boost::asio::io_context ioc;
   try {
     po::options_description desc(
         "Subscribe to Kraken and serialize book/trade data");
@@ -73,7 +74,6 @@ int main(int argc, char* argv[]) {
                     boost::asio::ssl::context::no_tlsv1 |
                     boost::asio::ssl::context::no_tlsv1_1);
 
-    boost::asio::io_context ioc;
     boost::asio::signal_set signals(ioc, SIGINT);
     signals.async_wait(signal_handler);
 
@@ -88,8 +88,13 @@ int main(int argc, char* argv[]) {
     // const auto noop_accept_instrument =
     //     [](const krakpot::response::instrument_t&) {};
     const auto accept_instrument =
-        [&assets_sink,
+        [&level_book, &assets_sink,
          &pairs_sink](const krakpot::response::instrument_t& response) {
+          for (const auto& pair : response.pairs()) {
+            level_book.accept(pair);
+            BOOST_LOG_TRIVIAL(debug)
+                << "created/updated book for symbol: " << pair.symbol();
+          }
           assets_sink.accept(response.header(), response.assets());
           pairs_sink.accept(response.header(), response.pairs());
         };
@@ -134,9 +139,11 @@ int main(int argc, char* argv[]) {
       ioc.run_one();
     }
     BOOST_LOG_TRIVIAL(error) << "session.stop_processing()";
-    session.stop_processing();
+    //    session.stop_processing();
+    boost::asio::post(ioc, [&session]() { session.stop_processing(); });
     ioc.run();
   } catch (const std::exception& ex) {
+    ioc.stop();
     BOOST_LOG_TRIVIAL(error) << ex.what();
     return EXIT_FAILURE;
   }
