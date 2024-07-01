@@ -34,7 +34,25 @@ struct pair_t final {
   };
   // clang-format on
 
-  static pair_t from_json(simdjson::ondemand::object &);
+  pair_t() {}
+  pair_t(std::string base,
+         double_t cost_min,
+         integer_t cost_precision,
+         bool has_index,
+         std::optional<double_t> margin_initial,
+         bool marginable,
+         std::optional<integer_t> position_limit_long,
+         std::optional<integer_t> position_limit_short,
+         double_t price_increment,
+         integer_t price_precision,
+         double_t qty_increment,
+         double_t qty_min,
+         integer_t qty_precision,
+         std::string quote,
+         status_t status,
+         std::string symbol);
+
+  static pair_t from_json(simdjson::ondemand::object&);
 
   nlohmann::json to_json() const;
   std::string str() const { return to_json().dump(); }
