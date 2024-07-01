@@ -185,12 +185,12 @@ void session_t::on_read(error_code ec, size_t size) {
     if (!m_handle_recv(std::string_view(m_read_msg_str))) {
       BOOST_LOG_TRIVIAL(error)
           << __FUNCTION__ << "handle_recv() returned false -- stop processing";
-      m_keep_processing = false;
+      boost::asio::post(m_ioc, [this]() { stop_processing(); });
     }
-  } catch (const std::exception &ex) {
+  } catch (const std::exception& ex) {
     BOOST_LOG_TRIVIAL(error) << ex.what();
     BOOST_LOG_TRIVIAL(error) << "msg: " << m_read_msg_str;
-    stop_processing();
+    boost::asio::post(m_ioc, [this]() { stop_processing(); });
   }
 
   if (m_keep_processing) {

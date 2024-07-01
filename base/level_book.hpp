@@ -80,17 +80,17 @@ private:
 
 template <typename S>
 boost::crc_32_type sides_t::update_checksum(boost::crc_32_type crc32,
-                                            const S &side) const {
-  auto &result = crc32;
+                                            const S& side) const {
+  auto& result = crc32;
   auto depth = size_t{0};
-  for (const auto &kv : side) {
+  for (const auto& kv : side) {
     if (++depth > c_book_crc32_depth) {
       break;
     }
-    const auto &price = kv.first;
-    const auto &qty = kv.second;
-    price.process(crc32);
-    qty.process(crc32);
+    const auto& price = kv.first;
+    const auto& qty = kv.second;
+    price.process(crc32, price_precision());
+    qty.process(crc32, qty_precision());
   }
   return result;
 }

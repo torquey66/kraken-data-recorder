@@ -20,9 +20,9 @@ struct token_t final {
 
   std::string str() const { return m_chars; }
 
-  void process(boost::crc_32_type&) const;
+  void process(boost::crc_32_type&, int64_t) const;
 
-private:
+ private:
   std::string m_chars;
 };
 
@@ -43,7 +43,9 @@ struct decimal_t final {
 
   auto str() const { return m_token.str(); }
 
-  void process(boost::crc_32_type& crc32) const { return m_token.process(crc32); }
+  void process(boost::crc_32_type& crc32, int64_t precision) const {
+    return m_token.process(crc32, precision);
+  }
 
 private:
   double m_value;

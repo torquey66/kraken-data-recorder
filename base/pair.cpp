@@ -30,7 +30,40 @@ const std::unordered_map<pair_t::status_t, std::string>
         {e_work_in_progress, c_pair_status_work_in_progress},
 };
 
-pair_t pair_t::from_json(simdjson::ondemand::object &pair_obj) {
+pair_t::pair_t(std::string base,
+               double_t cost_min,
+               integer_t cost_precision,
+               bool has_index,
+               std::optional<double_t> margin_initial,
+               bool marginable,
+               std::optional<integer_t> position_limit_long,
+               std::optional<integer_t> position_limit_short,
+               double_t price_increment,
+               integer_t price_precision,
+               double_t qty_increment,
+               double_t qty_min,
+               integer_t qty_precision,
+               std::string quote,
+               status_t status,
+               std::string symbol)
+    : m_base{base},
+      m_cost_min{cost_min},
+      m_cost_precision{cost_precision},
+      m_has_index{has_index},
+      m_margin_initial{margin_initial},
+      m_marginable{marginable},
+      m_position_limit_long{position_limit_long},
+      m_position_limit_short{position_limit_short},
+      m_price_increment{price_increment},
+      m_price_precision{price_precision},
+      m_qty_increment{qty_increment},
+      m_qty_min{qty_min},
+      m_qty_precision{qty_precision},
+      m_quote{quote},
+      m_status{status},
+      m_symbol{symbol} {}
+
+pair_t pair_t::from_json(simdjson::ondemand::object& pair_obj) {
   auto result = pair_t{};
   auto buffer = std::string_view{};
   simdjson::ondemand::value optional_val{};
@@ -48,10 +81,12 @@ pair_t pair_t::from_json(simdjson::ondemand::object &pair_obj) {
 
   result.m_marginable = pair_obj[c_pair_marginable].get_bool();
 
-  if (pair_obj[c_pair_position_limit_long].get(optional_val) == simdjson::SUCCESS) {
+  if (pair_obj[c_pair_position_limit_long].get(optional_val) ==
+      simdjson::SUCCESS) {
     result.m_position_limit_long = optional_val.get_int64();
   }
-  if (pair_obj[c_pair_position_limit_short].get(optional_val) == simdjson::SUCCESS) {
+  if (pair_obj[c_pair_position_limit_short].get(optional_val) ==
+      simdjson::SUCCESS) {
     result.m_position_limit_short = optional_val.get_int64();
   }
 
