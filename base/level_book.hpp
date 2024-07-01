@@ -18,11 +18,18 @@ using bid_side_t = std::map<price_t, qty_t, std::greater<price_t>>;
 using ask_side_t = std::map<price_t, qty_t, std::less<price_t>>;
 
 struct sides_t final {
+  sides_t(depth_t,
+          integer_t price_precision,
+          integer_t qty_precision,
+          const bid_side_t&,
+          const ask_side_t&);
 
-  sides_t(depth_t book_depth) : m_book_depth{book_depth} {};
+  depth_t book_depth() const { return m_book_depth; }
+  integer_t price_precision() const { return m_price_precision; }
+  integer_t qty_precision() const { return m_qty_precision; }
 
-  const bid_side_t &bids() const { return m_bids; }
-  const ask_side_t &asks() const { return m_asks; }
+  const bid_side_t& bids() const { return m_bids; }
+  const ask_side_t& asks() const { return m_asks; }
 
   void accept_snapshot(const response::book_t &);
   void accept_update(const response::book_t &);
@@ -42,9 +49,14 @@ private:
   boost::crc_32_type update_checksum(const boost::crc_32_type, const S &) const;
 
   depth_t m_book_depth;
+  integer_t m_price_precision = 0;
+  integer_t m_qty_precision = 0;
 
   bid_side_t m_bids;
   ask_side_t m_asks;
+
+  std::string m_price_fmt;
+  std::string m_side_fmt;
 };
 
 struct level_book_t final {
@@ -54,6 +66,7 @@ struct level_book_t final {
 
   level_book_t(depth_t book_depth) : m_book_depth{book_depth} {};
 
+  void accept(const response::pair_t&);
   void accept(const response::book_t &);
 
   uint64_t crc32(symbol_t symbol) const;
@@ -67,17 +80,17 @@ private:
 
 template <typename S>
 boost::crc_32_type sides_t::update_checksum(boost::crc_32_type crc32,
-                                            const S &side) const {
-  auto &result = crc32;
+                                            const S& side) const {
+  auto& result = crc32;
   auto depth = size_t{0};
-  for (const auto &kv : side) {
+  for (const auto& kv : side) {
     if (++depth > c_book_crc32_depth) {
       break;
     }
-    const auto &price = kv.first;
-    const auto &qty = kv.second;
-    price.process(crc32);
-    qty.process(crc32);
+    const auto& price = kv.first;
+    const auto& qty = kv.second;
+    price.process(crc32, price_precision());
+    qty.process(crc32, qty_precision());
   }
   return result;
 }
