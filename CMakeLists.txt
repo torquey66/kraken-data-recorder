@@ -49,12 +49,11 @@ add_library(krakpot_parquet
   parquet/assets_sink.hpp
   parquet/book_sink.cpp
   parquet/book_sink.hpp
+  parquet/io.hpp
   parquet/pairs_sink.cpp
   parquet/pairs_sink.hpp
-  parquet/reader.hpp
   parquet/trade_sink.cpp
   parquet/trade_sink.hpp
-  parquet/writer.hpp
 )
 
 target_link_libraries(krakpot_base

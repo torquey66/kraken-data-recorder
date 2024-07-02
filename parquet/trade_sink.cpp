@@ -8,10 +8,9 @@ namespace krakpot {
 namespace pq {
 
 trades_sink_t::trades_sink_t(std::string parquet_dir, sink_id_t id)
-    : m_schema{schema()}, m_parquet_dir{parquet_dir},
-      m_trades_filename{sink_filename(parquet_dir, c_sink_name, id)},
-      m_trades_file{open_sink_file(m_trades_filename)},
-      m_os{open_writer(m_trades_file, m_schema)} {}
+    : m_schema{schema()},
+      m_sink_filename{parquet_filename(parquet_dir, c_sink_name, id)},
+      m_writer{m_sink_filename, m_schema} {}
 
 void trades_sink_t::accept(const response::trades_t &trades) {
   reset_builders();
@@ -54,7 +53,7 @@ void trades_sink_t::accept(const response::trades_t &trades) {
 
   std::shared_ptr<arrow::RecordBatch> batch =
       arrow::RecordBatch::Make(m_schema, trades.size(), columns);
-  PARQUET_THROW_NOT_OK(m_os->WriteRecordBatch(*batch));
+  PARQUET_THROW_NOT_OK(m_writer.arrow_file_writer().WriteRecordBatch(*batch));
 }
 
 void trades_sink_t::reset_builders() {
