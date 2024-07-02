@@ -1,5 +1,6 @@
 #include "constants.hpp"
 #include "level_book.hpp"
+#include "reader.hpp"
 #include "responses.hpp"
 #include "types.hpp"
 
@@ -58,25 +59,10 @@ void dump_sides(const model::sides_t& sides, const size_t max_depth = 10) {
 
 void process_pairs(std::string pairs_filename,
                    model::level_book_t& level_book) {
-  auto* pool = arrow::default_memory_pool();
-  auto reader_properties = parquet::ReaderProperties(pool);
-  reader_properties.set_buffer_size(4096 * 4);
-  reader_properties.enable_buffered_stream();
+  pq::reader_t reader{pairs_filename};
 
-  auto arrow_reader_props = parquet::ArrowReaderProperties();
-  arrow_reader_props.set_batch_size(128 * 1024);
-
-  parquet::arrow::FileReaderBuilder reader_builder;
-  PARQUET_THROW_NOT_OK(
-      reader_builder.OpenFile(pairs_filename, false, reader_properties));
-  reader_builder.memory_pool(pool);
-  reader_builder.properties(arrow_reader_props);
-
-  std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-  PARQUET_ASSIGN_OR_THROW(arrow_reader, reader_builder.Build());
-
-  std::shared_ptr<::arrow::RecordBatchReader> rb_reader;
-  PARQUET_THROW_NOT_OK(arrow_reader->GetRecordBatchReader(&rb_reader));
+  std::shared_ptr<::arrow::RecordBatchReader> rb_reader{
+      reader.record_batch_reader()};
 
   for (arrow::Result<std::shared_ptr<arrow::RecordBatch>> maybe_batch :
        *rb_reader) {
@@ -178,30 +164,15 @@ int main(int argc, char* argv[]) {
   }
 
   const auto pairs_filename = std::string{argv[1]};
-  const auto filename = std::string{argv[2]};
+  const auto book_filename = std::string{argv[2]};
 
   auto level_book = model::level_book_t{e_1000};
   process_pairs(pairs_filename, level_book);
 
-  auto* pool = arrow::default_memory_pool();
-  auto reader_properties = parquet::ReaderProperties(pool);
-  reader_properties.set_buffer_size(4096 * 4);
-  reader_properties.enable_buffered_stream();
+  pq::reader_t reader{book_filename};
 
-  auto arrow_reader_props = parquet::ArrowReaderProperties();
-  arrow_reader_props.set_batch_size(128 * 1024);
-
-  parquet::arrow::FileReaderBuilder reader_builder;
-  PARQUET_THROW_NOT_OK(
-      reader_builder.OpenFile(filename, false, reader_properties));
-  reader_builder.memory_pool(pool);
-  reader_builder.properties(arrow_reader_props);
-
-  std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-  PARQUET_ASSIGN_OR_THROW(arrow_reader, reader_builder.Build());
-
-  std::shared_ptr<::arrow::RecordBatchReader> rb_reader;
-  PARQUET_THROW_NOT_OK(arrow_reader->GetRecordBatchReader(&rb_reader));
+  std::shared_ptr<::arrow::RecordBatchReader> rb_reader{
+      reader.record_batch_reader()};
 
   for (arrow::Result<std::shared_ptr<arrow::RecordBatch>> maybe_batch :
        *rb_reader) {
@@ -246,48 +217,5 @@ int main(int argc, char* argv[]) {
         return -1;
       }
     }
-  }
-
-  /*
-     handle_msg: bogus crc32 expected: 2542650875 actual: 1140764732 msg:
-     {"channel":"book","type":"update","data":[{"symbol":"SOL/USD","bids":[{"price":146.91,"qty":917.15439679}],"asks":[],"checksum":2542650875,"timestamp":"2024-07-01T19:30:11.454069Z"}]}
-  */
-
-  const std::string bad_msg = R"MSG(
-  {
-    "channel": "book",
-    "type": "update",
-    "data": [
-      {
-        "symbol": "SOL/USD",
-        "bids": [
-           {"price":146.91,"qty":917.15439679}
-        ],
-        "asks": [],
-        "checksum": 2542650875,
-        "timestamp":"2024-07-01T19:30:11.454069Z"
-      }
-    ]
-  }
-  )MSG";
-  simdjson::ondemand::parser parser;
-  simdjson::padded_string bad_response{bad_msg};
-  simdjson::ondemand::document bad_doc = parser.iterate(bad_response);
-  const auto bad_update = krakpot::response::book_t::from_json(bad_doc);
-  try {
-    dump_sides(level_book.sides(bad_update.symbol()));
-    std::cout << "checksum: " << level_book.crc32(bad_update.symbol())
-              << std::endl;
-    std::cout << "-------------------------------------------------------------"
-                 "-------------------"
-              << std::endl;
-    level_book.accept(bad_update);
-  } catch (const std::exception& ex) {
-    std::cerr << ex.what() << std::endl;
-    std::cerr << bad_update.str() << std::endl;
-    dump_sides(level_book.sides(bad_update.symbol()));
-    std::cout << "checksum: " << level_book.crc32(bad_update.symbol())
-              << std::endl;
-    return -1;
   }
 }

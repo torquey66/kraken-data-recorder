@@ -7,8 +7,8 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
 
-#add_compile_options(-fsanitize=address)
-#add_link_options(-fsanitize=address)
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
@@ -45,14 +45,16 @@ add_library(krakpot_base
 # TODO: split these into 'src' and 'include' directories or the like
 include_directories(${CMAKE_SOURCE_DIR}/parquet)
 add_library(krakpot_parquet
-  parquet/assets_sink.hpp
   parquet/assets_sink.cpp
-  parquet/book_sink.hpp
+  parquet/assets_sink.hpp
   parquet/book_sink.cpp
-  parquet/pairs_sink.hpp
+  parquet/book_sink.hpp
   parquet/pairs_sink.cpp
-  parquet/trade_sink.hpp
+  parquet/pairs_sink.hpp
+  parquet/reader.hpp
   parquet/trade_sink.cpp
+  parquet/trade_sink.hpp
+  parquet/writer.hpp
 )
 
 target_link_libraries(krakpot_base
