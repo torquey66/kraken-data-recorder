@@ -1,8 +1,8 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "io.hpp"
 #include "responses.hpp"
-#include "writer.hpp"
 
 #include <arrow/api.h>
 
@@ -17,20 +17,17 @@ struct book_sink_t final {
 
   book_sink_t(std::string parquet_dir, sink_id_t);
 
-  void accept(const response::book_t &);
+  void accept(const response::book_t&);
 
-private:
+ private:
   void reset_builders();
 
   static std::shared_ptr<arrow::DataType> quote_struct();
   static std::shared_ptr<arrow::Schema> schema();
 
   std::shared_ptr<arrow::Schema> m_schema;
-
-  std::string m_parquet_dir;
-  std::string m_book_filename;
-  std::shared_ptr<arrow::io::FileOutputStream> m_book_file;
-  std::unique_ptr<parquet::arrow::FileWriter> m_os;
+  std::string m_sink_filename;
+  writer_t m_writer;
 
   std::shared_ptr<arrow::Int64Builder> m_recv_tm_builder;
   std::shared_ptr<arrow::StringBuilder> m_type_builder;
@@ -50,5 +47,5 @@ private:
   std::shared_ptr<arrow::Int64Builder> m_timestamp_builder;
 };
 
-} // namespace pq
-} // namespace krakpot
+}  // namespace pq
+}  // namespace krakpot

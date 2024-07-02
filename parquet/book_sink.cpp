@@ -8,33 +8,36 @@ namespace krakpot {
 namespace pq {
 
 book_sink_t::book_sink_t(std::string parquet_dir, sink_id_t id)
-    : m_schema{schema()}, m_parquet_dir{parquet_dir},
-      m_book_filename{sink_filename(parquet_dir, c_sink_name, id)},
-      m_book_file{open_sink_file(m_book_filename)},
-      m_os{open_writer(m_book_file, m_schema)},
+    : m_schema{schema()},
+      m_sink_filename{parquet_filename(parquet_dir, c_sink_name, id)},
+      m_writer{m_sink_filename, m_schema},
       m_recv_tm_builder{std::make_shared<arrow::Int64Builder>()},
       m_type_builder{std::make_shared<arrow::StringBuilder>()},
       m_bid_price_builder{std::make_shared<arrow::StringBuilder>()},
       m_bid_qty_builder{std::make_shared<arrow::StringBuilder>()},
       m_bid_builder{std::make_shared<arrow::StructBuilder>(
-          quote_struct(), arrow::default_memory_pool(),
+          quote_struct(),
+          arrow::default_memory_pool(),
           std::vector<std::shared_ptr<arrow::ArrayBuilder>>{
               m_bid_price_builder, m_bid_qty_builder})},
-      m_bids_builder{std::make_shared<arrow::ListBuilder>(
-          arrow::default_memory_pool(), m_bid_builder)},
+      m_bids_builder{
+          std::make_shared<arrow::ListBuilder>(arrow::default_memory_pool(),
+                                               m_bid_builder)},
       m_ask_price_builder{std::make_shared<arrow::StringBuilder>()},
       m_ask_qty_builder{std::make_shared<arrow::StringBuilder>()},
       m_ask_builder{std::make_shared<arrow::StructBuilder>(
-          quote_struct(), arrow::default_memory_pool(),
+          quote_struct(),
+          arrow::default_memory_pool(),
           std::vector<std::shared_ptr<arrow::ArrayBuilder>>{
               m_ask_price_builder, m_ask_qty_builder})},
-      m_asks_builder{std::make_shared<arrow::ListBuilder>(
-          arrow::default_memory_pool(), m_ask_builder)},
+      m_asks_builder{
+          std::make_shared<arrow::ListBuilder>(arrow::default_memory_pool(),
+                                               m_ask_builder)},
       m_crc32_builder{std::make_shared<arrow::UInt64Builder>()},
       m_symbol_builder{std::make_shared<arrow::StringBuilder>()},
       m_timestamp_builder{std::make_shared<arrow::Int64Builder>()} {}
 
-void book_sink_t::accept(const response::book_t &book) {
+void book_sink_t::accept(const response::book_t& book) {
   reset_builders();
 
   PARQUET_THROW_NOT_OK(
@@ -48,7 +51,7 @@ void book_sink_t::accept(const response::book_t &book) {
   PARQUET_THROW_NOT_OK(m_bids_builder->Reserve(1));
 
   PARQUET_THROW_NOT_OK(m_bids_builder->Append(book.bids().size()));
-  for (const auto &bid : book.bids()) {
+  for (const auto& bid : book.bids()) {
     PARQUET_THROW_NOT_OK(m_bid_builder->Append());
     PARQUET_THROW_NOT_OK(m_bid_price_builder->Append(bid.first.token().str()));
     PARQUET_THROW_NOT_OK(m_bid_qty_builder->Append(bid.second.token().str()));
@@ -60,7 +63,7 @@ void book_sink_t::accept(const response::book_t &book) {
   PARQUET_THROW_NOT_OK(m_asks_builder->Reserve(1));
 
   PARQUET_THROW_NOT_OK(m_asks_builder->Append(book.asks().size()));
-  for (const auto &ask : book.asks()) {
+  for (const auto& ask : book.asks()) {
     PARQUET_THROW_NOT_OK(m_ask_builder->Append());
     PARQUET_THROW_NOT_OK(m_ask_price_builder->Append(ask.first.token().str()));
     PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second.token().str()));
@@ -91,7 +94,7 @@ void book_sink_t::accept(const response::book_t &book) {
 
   std::shared_ptr<arrow::RecordBatch> batch =
       arrow::RecordBatch::Make(m_schema, 1, columns);
-  PARQUET_THROW_NOT_OK(m_os->WriteRecordBatch(*batch));
+  PARQUET_THROW_NOT_OK(m_writer.arrow_file_writer().WriteRecordBatch(*batch));
 }
 
 void book_sink_t::reset_builders() {

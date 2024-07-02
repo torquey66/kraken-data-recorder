@@ -1,8 +1,8 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "io.hpp"
 #include "responses.hpp"
-#include "writer.hpp"
 
 #include <arrow/api.h>
 
@@ -25,11 +25,8 @@ struct pairs_sink_t final {
   static std::shared_ptr<arrow::Schema> schema();
 
   std::shared_ptr<arrow::Schema> m_schema;
-
-  std::string m_parquet_dir;
-  std::string m_pairs_filename;
-  std::shared_ptr<arrow::io::FileOutputStream> m_pairs_file;
-  std::unique_ptr<parquet::arrow::FileWriter> m_os;
+  std::string m_sink_filename;
+  writer_t m_writer;
 
   arrow::Int64Builder m_recv_tm_builder;
   arrow::StringBuilder m_base_builder;
@@ -50,5 +47,5 @@ struct pairs_sink_t final {
   arrow::StringBuilder m_symbol_builder;
 };
 
-} // namespace pq
-} // namespace krakpot
+}  // namespace pq
+}  // namespace krakpot
