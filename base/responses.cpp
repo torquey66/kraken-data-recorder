@@ -8,8 +8,8 @@ namespace {
 
 template <typename O>
 krakpot::decimal_t extract_decimal(O& obj, std::string field) {
-  const auto token = std::string_view{obj[field].raw_json_token()};
-  const auto result = krakpot::decimal_t{obj[field].get_double(), token};
+  //  const auto token = std::string_view{obj[field].raw_json_token()};
+  const auto result = krakpot::decimal_t{obj[field].get_double() /* token */};
   return result;
 }
 

@@ -57,18 +57,21 @@ uint64_t sides_t::crc32() const {
 
 nlohmann::json sides_t::to_json() const {
   auto bids_json = nlohmann::json{};
-  for (const auto &bid : bids()) {
-    const nlohmann::json quote{{bid.first.str(), bid.second.str()}};
+  for (const auto& bid : bids()) {
+    const nlohmann::json quote{
+        {bid.first.str(price_precision()), bid.second.str(qty_precision())}};
     bids_json.push_back(quote);
   }
 
   auto asks_json = nlohmann::json{};
-  for (const auto &ask : asks()) {
-    const nlohmann::json quote{{ask.first.str(), ask.second.str()}};
+  for (const auto& ask : asks()) {
+    const nlohmann::json quote{
+        {ask.first.str(price_precision()), ask.second.str(qty_precision())}};
     asks_json.push_back(quote);
   }
 
-  const nlohmann::json result = {{c_book_bids, bids_json}, {c_book_asks, asks_json}};
+  const nlohmann::json result = {{c_book_bids, bids_json},
+                                 {c_book_asks, asks_json}};
   return result;
 }
 

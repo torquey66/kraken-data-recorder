@@ -33,8 +33,7 @@ std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
     const auto qty_str = std::string(qty_view.begin(), qty_view.end());
     const auto price = std::stod(price_str);
     const auto qty = std::stod(qty_str);
-    const auto quote =
-        std::make_pair(decimal_t(price, price_str), decimal_t(qty, qty_str));
+    const auto quote = std::make_pair(decimal_t{price}, decimal_t{qty});
     result.push_back(quote);
   }
   return result;

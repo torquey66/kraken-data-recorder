@@ -13,8 +13,8 @@ book_sink_t::book_sink_t(std::string parquet_dir, sink_id_t id)
       m_writer{m_sink_filename, m_schema},
       m_recv_tm_builder{std::make_shared<arrow::Int64Builder>()},
       m_type_builder{std::make_shared<arrow::StringBuilder>()},
-      m_bid_price_builder{std::make_shared<arrow::StringBuilder>()},
-      m_bid_qty_builder{std::make_shared<arrow::StringBuilder>()},
+      m_bid_price_builder{std::make_shared<arrow::DoubleBuilder>()},
+      m_bid_qty_builder{std::make_shared<arrow::DoubleBuilder>()},
       m_bid_builder{std::make_shared<arrow::StructBuilder>(
           quote_struct(),
           arrow::default_memory_pool(),
@@ -23,8 +23,8 @@ book_sink_t::book_sink_t(std::string parquet_dir, sink_id_t id)
       m_bids_builder{
           std::make_shared<arrow::ListBuilder>(arrow::default_memory_pool(),
                                                m_bid_builder)},
-      m_ask_price_builder{std::make_shared<arrow::StringBuilder>()},
-      m_ask_qty_builder{std::make_shared<arrow::StringBuilder>()},
+      m_ask_price_builder{std::make_shared<arrow::DoubleBuilder>()},
+      m_ask_qty_builder{std::make_shared<arrow::DoubleBuilder>()},
       m_ask_builder{std::make_shared<arrow::StructBuilder>(
           quote_struct(),
           arrow::default_memory_pool(),
@@ -53,8 +53,8 @@ void book_sink_t::accept(const response::book_t& book) {
   PARQUET_THROW_NOT_OK(m_bids_builder->Append(book.bids().size()));
   for (const auto& bid : book.bids()) {
     PARQUET_THROW_NOT_OK(m_bid_builder->Append());
-    PARQUET_THROW_NOT_OK(m_bid_price_builder->Append(bid.first.token().str()));
-    PARQUET_THROW_NOT_OK(m_bid_qty_builder->Append(bid.second.token().str()));
+    PARQUET_THROW_NOT_OK(m_bid_price_builder->Append(bid.first.value()));
+    PARQUET_THROW_NOT_OK(m_bid_qty_builder->Append(bid.second.value()));
   }
 
   PARQUET_THROW_NOT_OK(m_ask_price_builder->Reserve(book.asks().size()));
@@ -65,8 +65,8 @@ void book_sink_t::accept(const response::book_t& book) {
   PARQUET_THROW_NOT_OK(m_asks_builder->Append(book.asks().size()));
   for (const auto& ask : book.asks()) {
     PARQUET_THROW_NOT_OK(m_ask_builder->Append());
-    PARQUET_THROW_NOT_OK(m_ask_price_builder->Append(ask.first.token().str()));
-    PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second.token().str()));
+    PARQUET_THROW_NOT_OK(m_ask_price_builder->Append(ask.first.value()));
+    PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second.value()));
   }
 
   PARQUET_THROW_NOT_OK(m_symbol_builder->Append(book.symbol()));
@@ -115,8 +115,8 @@ void book_sink_t::reset_builders() {
 
 std::shared_ptr<arrow::DataType> book_sink_t::quote_struct() {
   const auto field_vector =
-      arrow::FieldVector{arrow::field("price", arrow::utf8(), false),
-                         arrow::field("qty", arrow::utf8(), false)};
+      arrow::FieldVector{arrow::field("price", arrow::float64(), false),
+                         arrow::field("qty", arrow::float64(), false)};
   return arrow::struct_(field_vector);
 }
 
