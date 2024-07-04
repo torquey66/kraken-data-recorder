@@ -6,59 +6,77 @@
 #include <boost/crc.hpp>
 
 #include <array>
+#include <cmath>
+#include <cstdio>
 #include <string>
 #include <string_view>
 
 namespace krakpot {
 
-#pragma pack(push, 1)
+/*
 struct token_t final {
-  template <typename S>
-  token_t(S chars) {
-    const auto chars_size = size_t(chars.end() - chars.begin());
-    if (chars_size > m_chars.size()) {
-      throw std::runtime_error("token overflow");
-    }
-    m_chars.fill('\0');
-    std::copy(chars.begin(), chars.end(), m_chars.begin());
+template <typename S>
+token_t(S chars) {
+  const auto chars_size = size_t(chars.end() - chars.begin());
+  if (chars_size > m_chars.size()) {
+    throw std::runtime_error("token overflow");
   }
+  m_chars.fill('\0');
+  std::copy(chars.begin(), chars.end(), m_chars.begin());
+}
 
-  bool operator==(const token_t& rhs) const = default;
+bool operator==(const token_t& rhs) const = default;
 
-  std::string str() const {
-    return std::string{m_chars.data(), m_chars.size()};
-  }
+std::string str() const {
+  return std::string{m_chars.data(), m_chars.size()};
+}
 
-  void process(boost::crc_32_type&, int64_t) const;
+void process(boost::crc_32_type&, int64_t) const;
 
- private:
-  std::array<char, 24> m_chars;
+private:
+std::array<char, 24> m_chars;
 };
+*/
 
 struct decimal_t final {
-  decimal_t() : m_value{c_NaN}, m_token{std::string{c_NaN_str}} {}
+  // TODO: remove redundant definition with types.hpp
+  using integer_t = int64_t;
 
-  template <typename S>
-  explicit decimal_t(double value, S token) : m_value{value}, m_token{token} {}
+  decimal_t() : m_value{c_NaN} {}
+  explicit decimal_t(double value) : m_value{value} {}
 
   auto operator<=>(const decimal_t& rhs) const {
     return m_value <=> rhs.m_value;
   }
   bool operator==(const decimal_t& rhs) const = default;
 
-  auto value() const { return m_value; }
-  auto& token() const { return m_token; }
+  double value() const { return m_value; }
 
-  auto str() const { return m_token.str(); }
+  integer_t scaled_value(integer_t precision) const {
+    double result = m_value;
+    while (precision-- > 0) {
+      result *= 10;
+    }
+    return static_cast<integer_t>(std::round(result));
+  }
 
-  void process(boost::crc_32_type& crc32, int64_t precision) const {
-    return m_token.process(crc32, precision);
+  auto str(integer_t precision) const {
+    std::array<char, 64> buffer;
+    const std::string fmt{"%." + std::to_string(precision) + "f"};
+    const auto num_written =
+        std::snprintf(buffer.data(), buffer.size(), fmt.c_str(), value());
+    return std::string(buffer.data(), num_written);
+  }
+
+  void process(boost::crc_32_type& crc32, integer_t precision) const {
+    const std::string buffer{std::to_string(scaled_value(precision))};
+    for (const auto ch : buffer) {
+      crc32.process_byte(ch);
+    }
   }
 
  private:
-  double m_value;
-  token_t m_token;
+  double m_value = 0.0;
 };
-#pragma pack(pop)
 
 }  // namespace krakpot
