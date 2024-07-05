@@ -8,8 +8,10 @@ namespace {
 
 template <typename O>
 krakpot::decimal_t extract_decimal(O& obj, std::string field) {
-  //  const auto token = std::string_view{obj[field].raw_json_token()};
-  const auto result = krakpot::decimal_t{obj[field].get_double() /* token */};
+  const auto token = std::string_view{obj[field].raw_json_token()};
+  //  const auto result = krakpot::decimal_t{obj[field].get_double() /* token
+  //  */};
+  const auto result = krakpot::decimal_t{token};
   return result;
 }
 
@@ -127,18 +129,17 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
 }
 
 nlohmann::json book_t::to_json() const {
-
   auto asks = nlohmann::json::array();
-  for (const auto &ask : m_asks) {
-    const nlohmann::json ask_json = {{c_book_price, ask.first.value()},
-                                     {c_book_qty, ask.second.value()}};
+  for (const auto& ask : m_asks) {
+    const nlohmann::json ask_json = {{c_book_price, ask.first.str()},
+                                     {c_book_qty, ask.second.str()}};
     asks.push_back(ask_json);
   }
 
   auto bids = nlohmann::json::array();
-  for (const auto &bid : m_bids) {
-    const nlohmann::json bid_json = {{c_book_price, bid.first.value()},
-                                     {c_book_qty, bid.second.value()}};
+  for (const auto& bid : m_bids) {
+    const nlohmann::json bid_json = {{c_book_price, bid.first.str()},
+                                     {c_book_qty, bid.second.str()}};
     bids.push_back(bid_json);
   }
 
@@ -212,13 +213,15 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
 }
 
 nlohmann::json trades_t::to_json() const {
-
   auto trades = nlohmann::json::array();
-  for (const auto &trade : m_trades) {
+  for (const auto& trade : m_trades) {
     const nlohmann::json trade_json = {
-        {c_trade_ord_type, trade.ord_type}, {c_trade_price, trade.price.value()},
-        {c_trade_qty, trade.qty.value()},   {c_trade_side, trade.side},
-        {c_trade_symbol, trade.symbol},     {c_trade_timestamp, trade.timestamp.str()},
+        {c_trade_ord_type, trade.ord_type},
+        {c_trade_price, trade.price.str()},
+        {c_trade_qty, trade.qty.str()},
+        {c_trade_side, trade.side},
+        {c_trade_symbol, trade.symbol},
+        {c_trade_timestamp, trade.timestamp.str()},
         {c_trade_trade_id, trade.trade_id},
     };
     trades.push_back(trade_json);

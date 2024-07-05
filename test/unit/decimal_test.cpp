@@ -58,7 +58,7 @@ TEST_CASE("crc32") {
   };
   for (const auto& row : rows) {
     const auto [value, token, precision, expected] = row;
-    const krakpot::decimal_t decimal{value};
+    const krakpot::decimal_t decimal{token};
     const boost::crc_32_type in_crc;
     auto actual_crc = in_crc;
     decimal.process(actual_crc, precision);
