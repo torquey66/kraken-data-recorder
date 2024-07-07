@@ -1,9 +1,5 @@
 #include "decimal.hpp"
 
-#include <algorithm>
-
-#include <iostream>
-
 namespace krakpot {
 
 void decimal_t::process(boost::crc_32_type& crc32, int64_t precision) const {

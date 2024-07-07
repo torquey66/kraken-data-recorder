@@ -31,39 +31,16 @@ TEST_CASE("timestamp_t roundtrip iso8601") {
 
 TEST_CASE("book_t parse") {
   static const std::string test_str = R"RESPONSE(
-  {
-    "channel": "book",
-    "type": "update",
-    "data": [
-      {
-        "symbol": "ETH/AUD",
-        "bids": [],
-        "asks": [
-          {
-            "price": 5061.98,
-            "qty": 0E-8
-          },
-         {
-            "price": 5061.96,
-            "qty": 0.59920000
-          }
-        ],
-        "checksum": 745923772,
-        "timestamp": "2024-04-04T22:01:57.362980Z"
-      }
-    ]
-  }
+{"channel":"book","data":[{"asks":[{"price":34726.4,"qty":0},{"price":34739.7,"qty":2.1541}],"bids":[],"checksum":4022926185,"symbol":"BTC/USD","timestamp":"2022-06-13T08:09:10.123456Z"}],"type":"update"}
   )RESPONSE";
 
   simdjson::ondemand::parser parser;
   simdjson::padded_string test_response{test_str};
   simdjson::ondemand::document doc = parser.iterate(test_response);
-
   const auto book = krakpot::response::book_t::from_json(doc);
-  const auto result_str = book.str();
+
+  const auto result_str = book.str(1, 8);
   const auto result_json = nlohmann::json::parse(result_str);
-
   const auto test_json = nlohmann::json::parse(test_str);
-
   CHECK(test_json == result_json);
 }
