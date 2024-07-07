@@ -7,8 +7,10 @@
 namespace krakpot {
 namespace pq {
 
-book_sink_t::book_sink_t(std::string parquet_dir, sink_id_t id)
-    : m_schema{schema()},
+book_sink_t::book_sink_t(std::string parquet_dir,
+                         sink_id_t id,
+                         integer_t book_depth)
+    : m_schema{schema(book_depth)},
       m_sink_filename{parquet_filename(parquet_dir, c_sink_name, id)},
       m_writer{m_sink_filename, m_schema},
       m_recv_tm_builder{std::make_shared<arrow::Int64Builder>()},
@@ -37,7 +39,9 @@ book_sink_t::book_sink_t(std::string parquet_dir, sink_id_t id)
       m_symbol_builder{std::make_shared<arrow::StringBuilder>()},
       m_timestamp_builder{std::make_shared<arrow::Int64Builder>()} {}
 
-void book_sink_t::accept(const response::book_t& book) {
+void book_sink_t::accept(const response::book_t& book,
+                         integer_t price_precision,
+                         integer_t qty_precision) {
   reset_builders();
 
   PARQUET_THROW_NOT_OK(
@@ -53,8 +57,10 @@ void book_sink_t::accept(const response::book_t& book) {
   PARQUET_THROW_NOT_OK(m_bids_builder->Append(book.bids().size()));
   for (const auto& bid : book.bids()) {
     PARQUET_THROW_NOT_OK(m_bid_builder->Append());
-    PARQUET_THROW_NOT_OK(m_bid_price_builder->Append(bid.first.token().str()));
-    PARQUET_THROW_NOT_OK(m_bid_qty_builder->Append(bid.second.token().str()));
+    PARQUET_THROW_NOT_OK(
+        m_bid_price_builder->Append(bid.first.str(price_precision)));
+    PARQUET_THROW_NOT_OK(
+        m_bid_qty_builder->Append(bid.second.str(qty_precision)));
   }
 
   PARQUET_THROW_NOT_OK(m_ask_price_builder->Reserve(book.asks().size()));
@@ -65,8 +71,10 @@ void book_sink_t::accept(const response::book_t& book) {
   PARQUET_THROW_NOT_OK(m_asks_builder->Append(book.asks().size()));
   for (const auto& ask : book.asks()) {
     PARQUET_THROW_NOT_OK(m_ask_builder->Append());
-    PARQUET_THROW_NOT_OK(m_ask_price_builder->Append(ask.first.token().str()));
-    PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second.token().str()));
+    PARQUET_THROW_NOT_OK(
+        m_ask_price_builder->Append(ask.first.str(price_precision)));
+    PARQUET_THROW_NOT_OK(
+        m_ask_qty_builder->Append(ask.second.str(qty_precision)));
   }
 
   PARQUET_THROW_NOT_OK(m_symbol_builder->Append(book.symbol()));
@@ -120,21 +128,25 @@ std::shared_ptr<arrow::DataType> book_sink_t::quote_struct() {
   return arrow::struct_(field_vector);
 }
 
-std::shared_ptr<arrow::Schema> book_sink_t::schema() {
+std::shared_ptr<arrow::Schema> book_sink_t::schema(integer_t book_depth) {
+  auto metadata = std::make_shared<arrow::KeyValueMetadata>();
+  metadata->Append("book_depth", std::to_string(book_depth));
+
   // TODO: add KeyValueMetadata for enum fields
 
   auto field_vector = arrow::FieldVector{
       arrow::field(c_header_recv_tm, arrow::int64(),
-                   false), // TODO: replace with timestamp type?
+                   false),  // TODO: replace with timestamp type?
       arrow::field(c_header_type, arrow::utf8(), false),
       arrow::field(c_book_bids, arrow::list(quote_struct()), false),
       arrow::field(c_book_asks, arrow::list(quote_struct()), false),
       arrow::field(c_book_checksum, arrow::uint64(), false),
       arrow::field(c_book_symbol, arrow::utf8(), false),
       arrow::field(c_book_timestamp, arrow::int64(),
-                   false), // TODO: replace with timestamp type?
+                   false),  // TODO: replace with timestamp type?
   };
-  return arrow::schema(field_vector);
+  return arrow::schema(field_vector)->WithMetadata(metadata);
+  ;
 }
 
 } // namespace pq

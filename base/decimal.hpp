@@ -4,52 +4,54 @@
 #include "constants.hpp"
 
 #include <boost/crc.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+#include <iomanip>
+#include <sstream>
 #include <string>
-#include <string_view>
 
 namespace krakpot {
 
-struct token_t final {
+struct decimal_t final {
+  // TODO: remove redundant definition with types.hpp
+  using integer_t = int64_t;
+
+  // Note: The value 72 is chosen such that sizeof(decimal_t) is 64 on
+  // my machine, which is not coincidentally its L1 cache size.
+  //
+  // TODO: figure out if there's a portable way to tune or at least
+  // verify this at compile time.
+  using wide_float_t =
+      boost::multiprecision::number<boost::multiprecision::cpp_dec_float<72>>;
+
+  decimal_t() : m_value{c_NaN} {}
 
   template <typename S>
-  token_t(S chars) : m_chars{chars.begin(), chars.end()} {}
+  decimal_t(S str) : m_value{str} {}
 
-  token_t(const char *str) : m_chars{str} {}
+  bool operator<(const decimal_t& rhs) const { return m_value < rhs.m_value; }
+  bool operator>(const decimal_t& rhs) const { return m_value > rhs.m_value; }
+  bool operator==(const decimal_t& rhs) const { return m_value == rhs.m_value; }
+  bool operator!=(const decimal_t& rhs) const { return m_value != rhs.m_value; }
 
-  bool operator==(const token_t &rhs) const = default;
+  wide_float_t value() const { return m_value; }
 
-  std::string str() const { return m_chars; }
+  double double_value(integer_t precision) const {
+    return std::strtod(str(precision).c_str(), nullptr);
+  }
 
-  void process(boost::crc_32_type&, int64_t) const;
+  std::string str(integer_t precision) const {
+    // TODO: find a better way to format values, ideally one that
+    // doesn't trigger a heap allocation.
+    std::ostringstream os;
+    os << std::fixed << std::setprecision(precision) << m_value;
+    return os.str();
+  }
+
+  void process(boost::crc_32_type& crc32, integer_t precision) const;
 
  private:
-  std::string m_chars;
+  wide_float_t m_value = 0.0;
 };
 
-struct decimal_t final {
-
-  decimal_t() : m_value{c_NaN}, m_token{c_NaN_str} {}
-
-  template <typename S>
-  explicit decimal_t(double value, S token) : m_value{value}, m_token{token} {}
-
-  auto operator<=>(const decimal_t &rhs) const {
-    return m_value <=> rhs.m_value;
-  }
-  bool operator==(const decimal_t &rhs) const = default;
-
-  auto value() const { return m_value; }
-  auto &token() const { return m_token; }
-
-  auto str() const { return m_token.str(); }
-
-  void process(boost::crc_32_type& crc32, int64_t precision) const {
-    return m_token.process(crc32, precision);
-  }
-
-private:
-  double m_value;
-  token_t m_token;
-};
-
-} // namespace krakpot
+}  // namespace krakpot

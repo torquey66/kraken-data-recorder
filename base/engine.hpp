@@ -3,8 +3,9 @@
 
 #include "config.hpp"
 #include "metrics.hpp"
-#include "sink.hpp"
+#include "refdata.hpp"
 #include "session.hpp"
+#include "sink.hpp"
 
 #include <simdjson.h>
 
@@ -19,26 +20,25 @@
 namespace krakpot {
 
 struct engine_t final {
-
-  engine_t(session_t &, const config_t &, const sink_t&);
+  engine_t(session_t&, const config_t&, const sink_t&);
 
   /** Return false to cease processing and shut down. */
   bool handle_msg(msg_t);
 
-private:
+ private:
   using doc_t = simdjson::ondemand::document;
 
-  bool handle_instrument_msg(doc_t &);
-  bool handle_instrument_snapshot(doc_t &);
-  bool handle_instrument_update(doc_t &);
+  bool handle_instrument_msg(doc_t&);
+  bool handle_instrument_snapshot(doc_t&);
+  bool handle_instrument_update(doc_t&);
 
-  bool handle_book_msg(doc_t &);
-  bool handle_trade_msg(doc_t &);
+  bool handle_book_msg(doc_t&);
+  bool handle_trade_msg(doc_t&);
 
-  bool handle_heartbeat_msg(doc_t &);
-  bool handle_pong_msg(doc_t &);
+  bool handle_heartbeat_msg(doc_t&);
+  bool handle_pong_msg(doc_t&);
 
-  session_t &m_session;
+  session_t& m_session;
   config_t m_config;
 
   simdjson::ondemand::parser m_parser;
@@ -54,4 +54,4 @@ private:
   metrics_t m_metrics;
 };
 
-} // namespace krakpot
+}  // namespace krakpot

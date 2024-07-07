@@ -17,7 +17,9 @@ struct trades_sink_t final {
 
   trades_sink_t(std::string parquet_dir, sink_id_t);
 
-  void accept(const response::trades_t&);
+  void accept(const response::trades_t&,
+              integer_t price_precision,
+              integer_t qty_precision);
 
  private:
   void reset_builders();
@@ -30,8 +32,8 @@ struct trades_sink_t final {
 
   arrow::Int64Builder m_recv_tm_builder;
   arrow::StringBuilder m_ord_type_builder;
-  arrow::DoubleBuilder m_price_builder;
-  arrow::DoubleBuilder m_qty_builder;
+  arrow::StringBuilder m_price_builder;
+  arrow::StringBuilder m_qty_builder;
   arrow::StringBuilder m_side_builder;
   arrow::StringBuilder m_symbol_builder;
   arrow::Int64Builder m_timestamp_builder;

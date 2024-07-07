@@ -15,15 +15,17 @@ namespace pq {
 struct book_sink_t final {
   static constexpr char c_sink_name[] = "book";
 
-  book_sink_t(std::string parquet_dir, sink_id_t);
+  book_sink_t(std::string parquet_dir, sink_id_t, integer_t book_depth);
 
-  void accept(const response::book_t&);
+  void accept(const response::book_t&,
+              integer_t price_precision,
+              integer_t qty_precision);
 
  private:
   void reset_builders();
 
   static std::shared_ptr<arrow::DataType> quote_struct();
-  static std::shared_ptr<arrow::Schema> schema();
+  static std::shared_ptr<arrow::Schema> schema(integer_t book_depth);
 
   std::shared_ptr<arrow::Schema> m_schema;
   std::string m_sink_filename;
