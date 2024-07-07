@@ -12,7 +12,9 @@ trades_sink_t::trades_sink_t(std::string parquet_dir, sink_id_t id)
       m_sink_filename{parquet_filename(parquet_dir, c_sink_name, id)},
       m_writer{m_sink_filename, m_schema} {}
 
-void trades_sink_t::accept(const response::trades_t& trades) {
+void trades_sink_t::accept(const response::trades_t& trades,
+                           integer_t price_precision,
+                           integer_t qty_precision) {
   reset_builders();
 
   for (const auto& trade : trades) {
@@ -20,8 +22,9 @@ void trades_sink_t::accept(const response::trades_t& trades) {
         m_recv_tm_builder.Append(trades.header().recv_tm().micros()));
     PARQUET_THROW_NOT_OK(
         m_ord_type_builder.Append(std::string(1, trade.ord_type)));
-    PARQUET_THROW_NOT_OK(m_price_builder.Append(trade.price.str()));
-    PARQUET_THROW_NOT_OK(m_qty_builder.Append(trade.qty.str()));
+    PARQUET_THROW_NOT_OK(
+        m_price_builder.Append(trade.price.str(price_precision)));
+    PARQUET_THROW_NOT_OK(m_qty_builder.Append(trade.qty.str(qty_precision)));
     PARQUET_THROW_NOT_OK(m_side_builder.Append(std::string(1, trade.side)));
     PARQUET_THROW_NOT_OK(m_symbol_builder.Append(trade.symbol));
     PARQUET_THROW_NOT_OK(m_timestamp_builder.Append(trade.timestamp.micros()));

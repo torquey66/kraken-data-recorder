@@ -81,7 +81,8 @@ int main(int argc, char* argv[]) {
 
     krakpot::pq::assets_sink_t assets_sink{config.parquet_dir(), now};
     krakpot::pq::pairs_sink_t pairs_sink{config.parquet_dir(), now};
-    krakpot::pq::book_sink_t book_sink{config.parquet_dir(), now};
+    krakpot::pq::book_sink_t book_sink{config.parquet_dir(), now,
+                                       config.book_depth()};
     krakpot::pq::trades_sink_t trades_sink{config.parquet_dir(), now};
     krakpot::model::level_book_t level_book{config.book_depth()};
 
@@ -99,17 +100,22 @@ int main(int argc, char* argv[]) {
           pairs_sink.accept(response.header(), response.pairs());
         };
 
+    // !@# TODO: replace use of level book with refdata
     const auto noop_accept_book = [](const krakpot::response::book_t&) {};
     const auto accept_book =
         [&book_sink, &level_book](const krakpot::response::book_t& response) {
           level_book.accept(response);
-          book_sink.accept(response);
+
+          const auto& sides = level_book.sides(response.symbol());
+          book_sink.accept(response, sides.price_precision(),
+                           sides.qty_precision());
         };
 
+    // !@# TODO: replace use of hardcoded precisions with refdata
     const auto noop_accept_trades = [](const krakpot::response::trades_t&) {};
     const auto accept_trades =
         [&trades_sink](const krakpot::response::trades_t& response) {
-          trades_sink.accept(response);
+          trades_sink.accept(response, 3, 8);
         };
     const krakpot::sink_t sink{
         //        krakpot::sink_t{noop_accept_instrument},

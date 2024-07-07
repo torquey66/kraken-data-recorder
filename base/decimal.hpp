@@ -6,13 +6,9 @@
 #include <boost/crc.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-#include <array>
-#include <cmath>
-#include <cstdio>
 #include <iomanip>
 #include <sstream>
 #include <string>
-#include <string_view>
 
 namespace krakpot {
 
@@ -40,8 +36,14 @@ struct decimal_t final {
 
   wide_float_t value() const { return m_value; }
 
-  auto str(integer_t precision = 16) const {
-    std::ostringstream os;  // !@# TODO: remove heap allocation per invocation
+  double double_value(integer_t precision) const {
+    return std::strtod(str(precision).c_str(), nullptr);
+  }
+
+  std::string str(integer_t precision) const {
+    // TODO: find a better way to format values, ideally one that
+    // doesn't trigger a heap allocation.
+    std::ostringstream os;
     os << std::fixed << std::setprecision(precision) << m_value;
     return os.str();
   }

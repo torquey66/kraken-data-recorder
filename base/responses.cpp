@@ -4,18 +4,18 @@
 
 #include <chrono>
 
+#include <iostream>
+
 namespace {
 
 template <typename O>
 krakpot::decimal_t extract_decimal(O& obj, std::string field) {
   const auto token = std::string_view{obj[field].raw_json_token()};
-  //  const auto result = krakpot::decimal_t{obj[field].get_double() /* token
-  //  */};
   const auto result = krakpot::decimal_t{token};
   return result;
 }
 
-} // namespace
+}  // namespace
 
 namespace krakpot {
 namespace response {
@@ -128,18 +128,21 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
   return result;
 }
 
-nlohmann::json book_t::to_json() const {
+nlohmann::json book_t::to_json(integer_t price_precision,
+                               integer_t qty_precision) const {
   auto asks = nlohmann::json::array();
   for (const auto& ask : m_asks) {
-    const nlohmann::json ask_json = {{c_book_price, ask.first.str()},
-                                     {c_book_qty, ask.second.str()}};
+    const nlohmann::json ask_json = {
+        {c_book_price, ask.first.double_value(price_precision)},
+        {c_book_qty, ask.second.double_value(qty_precision)}};
     asks.push_back(ask_json);
   }
 
   auto bids = nlohmann::json::array();
   for (const auto& bid : m_bids) {
-    const nlohmann::json bid_json = {{c_book_price, bid.first.str()},
-                                     {c_book_qty, bid.second.str()}};
+    const nlohmann::json bid_json = {
+        {c_book_price, bid.first.double_value(price_precision)},
+        {c_book_qty, bid.second.double_value(qty_precision)}};
     bids.push_back(bid_json);
   }
 
@@ -212,13 +215,14 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   return result;
 }
 
-nlohmann::json trades_t::to_json() const {
+nlohmann::json trades_t::to_json(integer_t price_precision,
+                                 integer_t qty_precision) const {
   auto trades = nlohmann::json::array();
   for (const auto& trade : m_trades) {
     const nlohmann::json trade_json = {
         {c_trade_ord_type, trade.ord_type},
-        {c_trade_price, trade.price.str()},
-        {c_trade_qty, trade.qty.str()},
+        {c_trade_price, trade.price.double_value(price_precision)},
+        {c_trade_qty, trade.qty.double_value(qty_precision)},
         {c_trade_side, trade.side},
         {c_trade_symbol, trade.symbol},
         {c_trade_timestamp, trade.timestamp.str()},

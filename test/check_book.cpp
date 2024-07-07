@@ -29,32 +29,32 @@ std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
   for (auto sidx = 0; sidx < slice->length(); ++sidx) {
     const auto price_view = price_array->Value(sidx);
     const auto qty_view = qty_array->Value(sidx);
-    const auto price_str = std::string(price_view.begin(), price_view.end());
-    const auto qty_str = std::string(qty_view.begin(), qty_view.end());
-    const auto price = std::stod(price_str);
-    const auto qty = std::stod(qty_str);
-    const auto quote = std::make_pair(decimal_t{price}, decimal_t{qty});
+    const auto quote =
+        std::make_pair(decimal_t{price_view}, decimal_t{qty_view});
     result.push_back(quote);
   }
   return result;
 }
 
+/*
 void dump_sides(const model::sides_t& sides, const size_t max_depth = 10) {
   const auto& bids = sides.bids();
   const auto& asks = sides.asks();
   auto bid_it = bids.begin();
   auto ask_it = asks.begin();
   for (size_t depth = 0; depth < max_depth; ++depth) {
-    const auto bid_px = bid_it != bids.end() ? bid_it->first.value() : c_NaN;
-    const auto bid_qty = bid_it != bids.end() ? bid_it->second.value() : c_NaN;
-    const auto ask_px = ask_it != asks.end() ? ask_it->first.value() : c_NaN;
-    const auto ask_qty = ask_it != asks.end() ? ask_it->second.value() : c_NaN;
-    std::cerr << std::setprecision(8) << bid_qty << " @ " << bid_px << "     "
-              << ask_qty << " @ " << ask_px << std::endl;
+    const auto bid_px = bid_it != bids.end() ? bid_it->first.str() : "";
+    const auto bid_qty = bid_it != bids.end() ? bid_it->second.str() : "";
+    const auto ask_px = ask_it != asks.end() ? ask_it->first.str() : "";
+    const auto ask_qty = ask_it != asks.end() ? ask_it->second.str() : "";
+    std::cerr << std::right << std::setw(30) << bid_qty << " @ " << bid_px
+              << "     " << std::right << std::setw(30) << ask_qty << " @ "
+              << ask_px << std::endl;
     ++bid_it;
     ++ask_it;
   }
 }
+*/
 
 void process_pairs(std::string pairs_filename,
                    model::level_book_t& level_book) {
@@ -166,6 +166,7 @@ int main(int argc, char* argv[]) {
   const auto book_filename = std::string{argv[2]};
 
   auto level_book = model::level_book_t{e_1000};
+  //  auto level_book = model::level_book_t{e_100};
   process_pairs(pairs_filename, level_book);
 
   pq::reader_t reader{book_filename};
@@ -211,8 +212,9 @@ int main(int argc, char* argv[]) {
         level_book.accept(response);
       } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
-        std::cerr << response.str() << std::endl;
-        dump_sides(level_book.sides(symbol_str));
+        //        std::cerr << response.str() << std::endl;
+        std::cerr << "idx: " << idx << " recv_tm:  " << recv_tm << std::endl;
+        //        dump_sides(level_book.sides(symbol_str));
         return -1;
       }
     }

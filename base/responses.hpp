@@ -82,8 +82,11 @@ struct book_t final {
 
   static book_t from_json(simdjson::ondemand::document &);
 
-  nlohmann::json to_json() const;
-  std::string str() const { return to_json().dump(); }
+  nlohmann::json to_json(integer_t price_precision,
+                         integer_t qty_precision) const;
+  std::string str(integer_t price_precision, integer_t qty_precision) const {
+    return to_json(price_precision, qty_precision).dump();
+  }
 
 private:
   header_t m_header;
@@ -114,8 +117,13 @@ struct trades_t final {
 
   static trades_t from_json(simdjson::ondemand::document &);
 
-  nlohmann::json to_json() const;
-  std::string str() const { return to_json().dump(); }
+  nlohmann::json to_json(integer_t price_precision,
+                         integer_t qty_precision) const;
+
+  // !@# TODO: replace these with refdata returned per-symbol
+  std::string str(integer_t price_precision, integer_t qty_precision) const {
+    return to_json(price_precision, qty_precision).dump();
+  }
 
   auto begin() const { return m_trades.begin(); }
   auto end() const { return m_trades.end(); }

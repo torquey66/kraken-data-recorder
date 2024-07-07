@@ -17,7 +17,9 @@ struct trades_sink_t final {
 
   trades_sink_t(std::string parquet_dir, sink_id_t);
 
-  void accept(const response::trades_t&);
+  void accept(const response::trades_t&,
+              integer_t price_precision,
+              integer_t qty_precision);
 
  private:
   void reset_builders();
