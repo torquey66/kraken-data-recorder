@@ -2,6 +2,7 @@
 #pragma once
 
 #include "io.hpp"
+#include "refdata.hpp"
 #include "responses.hpp"
 
 #include <arrow/api.h>
@@ -17,9 +18,7 @@ struct trades_sink_t final {
 
   trades_sink_t(std::string parquet_dir, sink_id_t);
 
-  void accept(const response::trades_t&,
-              integer_t price_precision,
-              integer_t qty_precision);
+  void accept(const response::trades_t&, const model::refdata_t&);
 
  private:
   void reset_builders();

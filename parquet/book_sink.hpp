@@ -2,6 +2,7 @@
 #pragma once
 
 #include "io.hpp"
+#include "refdata.hpp"
 #include "responses.hpp"
 
 #include <arrow/api.h>
@@ -17,9 +18,7 @@ struct book_sink_t final {
 
   book_sink_t(std::string parquet_dir, sink_id_t, integer_t book_depth);
 
-  void accept(const response::book_t&,
-              integer_t price_precision,
-              integer_t qty_precision);
+  void accept(const response::book_t&, const model::refdata_t&);
 
  private:
   void reset_builders();
