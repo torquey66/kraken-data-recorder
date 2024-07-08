@@ -84,13 +84,16 @@ int main(int argc, char* argv[]) {
     krakpot::pq::book_sink_t book_sink{config.parquet_dir(), now,
                                        config.book_depth()};
     krakpot::pq::trades_sink_t trades_sink{config.parquet_dir(), now};
+
     krakpot::model::level_book_t level_book{config.book_depth()};
+    krakpot::model::refdata_t refdata;
 
     const auto accept_instrument =
-        [&level_book, &assets_sink,
-         &pairs_sink](const krakpot::response::instrument_t& response) {
+        [&level_book, &assets_sink, &pairs_sink,
+         &refdata](const krakpot::response::instrument_t& response) {
           assets_sink.accept(response.header(), response.assets());
           pairs_sink.accept(response.header(), response.pairs());
+          refdata.accept(response);
           for (const auto& pair : response.pairs()) {
             level_book.accept(pair);
             BOOST_LOG_TRIVIAL(debug)
@@ -100,19 +103,16 @@ int main(int argc, char* argv[]) {
 
     // !@# TODO: replace use of level book with refdata
     const auto noop_accept_book = [](const krakpot::response::book_t&) {};
-    const auto accept_book =
-        [&book_sink, &level_book](const krakpot::response::book_t& response) {
-          const auto& sides = level_book.sides(response.symbol());
-          book_sink.accept(response, sides.price_precision(),
-                           sides.qty_precision());
-          level_book.accept(response);
-        };
+    const auto accept_book = [&book_sink, &level_book, &refdata](
+                                 const krakpot::response::book_t& response) {
+      book_sink.accept(response, refdata);
+      level_book.accept(response);
+    };
 
-    // !@# TODO: replace use of hardcoded precisions with refdata
     const auto noop_accept_trades = [](const krakpot::response::trades_t&) {};
     const auto accept_trades =
-        [&trades_sink](const krakpot::response::trades_t& response) {
-          trades_sink.accept(response, 3, 8);
+        [&trades_sink, &refdata](const krakpot::response::trades_t& response) {
+          trades_sink.accept(response, refdata);
         };
     const krakpot::sink_t sink{
         accept_instrument,

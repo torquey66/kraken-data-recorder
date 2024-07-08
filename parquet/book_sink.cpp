@@ -40,8 +40,15 @@ book_sink_t::book_sink_t(std::string parquet_dir,
       m_timestamp_builder{std::make_shared<arrow::Int64Builder>()} {}
 
 void book_sink_t::accept(const response::book_t& book,
-                         integer_t price_precision,
-                         integer_t qty_precision) {
+                         const model::refdata_t& refdata) {
+  const std::optional<model::refdata_t::pair_precision_t> precision{
+      refdata.pair_precision(book.symbol())};
+  if (!precision) {
+    const std::string msg{"cannot find refdata for symbol: " + book.symbol()};
+    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << msg;
+    throw std::runtime_error{msg};
+  }
+
   reset_builders();
 
   PARQUET_THROW_NOT_OK(
@@ -58,9 +65,9 @@ void book_sink_t::accept(const response::book_t& book,
   for (const auto& bid : book.bids()) {
     PARQUET_THROW_NOT_OK(m_bid_builder->Append());
     PARQUET_THROW_NOT_OK(
-        m_bid_price_builder->Append(bid.first.str(price_precision)));
+        m_bid_price_builder->Append(bid.first.str(precision->price_precision)));
     PARQUET_THROW_NOT_OK(
-        m_bid_qty_builder->Append(bid.second.str(qty_precision)));
+        m_bid_qty_builder->Append(bid.second.str(precision->qty_precision)));
   }
 
   PARQUET_THROW_NOT_OK(m_ask_price_builder->Reserve(book.asks().size()));
@@ -72,9 +79,9 @@ void book_sink_t::accept(const response::book_t& book,
   for (const auto& ask : book.asks()) {
     PARQUET_THROW_NOT_OK(m_ask_builder->Append());
     PARQUET_THROW_NOT_OK(
-        m_ask_price_builder->Append(ask.first.str(price_precision)));
+        m_ask_price_builder->Append(ask.first.str(precision->price_precision)));
     PARQUET_THROW_NOT_OK(
-        m_ask_qty_builder->Append(ask.second.str(qty_precision)));
+        m_ask_qty_builder->Append(ask.second.str(precision->qty_precision)));
   }
 
   PARQUET_THROW_NOT_OK(m_symbol_builder->Append(book.symbol()));

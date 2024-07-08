@@ -26,20 +26,22 @@ find_package(simdjson)
 include_directories(${CMAKE_SOURCE_DIR}/base)
 add_library(krakpot_base
   base/asset.cpp
+  base/constants.hpp
   base/config.cpp
   base/decimal.cpp
+  base/decimal.hpp
   base/engine.cpp
   base/level_book.cpp
   base/metrics.cpp
   base/pair.cpp
+  base/refdata.cpp
+  base/refdata.hpp
   base/requests.cpp
   base/responses.cpp
-  base/session.cpp
-  base/types.cpp
-  base/constants.hpp
-  base/decimal.hpp
   base/responses.hpp
+  base/session.cpp
   base/sink.hpp
+  base/types.cpp
 )
 
 # TODO: split these into 'src' and 'include' directories or the like
