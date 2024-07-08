@@ -26,7 +26,6 @@ namespace krakpot {
  * - enables client code to send messages to the venue
  */
 struct session_t final {
-
   using ioc_t = boost::asio::io_context;
   using ssl_context_t = boost::asio::ssl::context;
   using websocket_t = boost::beast::websocket::stream<
@@ -34,9 +33,10 @@ struct session_t final {
 
   using recv_cb_t = std::function<bool(msg_t)>;
 
-  session_t(ioc_t &, ssl_context_t &, const config_t &);
+  session_t(ioc_t&, ssl_context_t&, const config_t&);
 
-  void start_processing(const recv_cb_t &);
+  bool keep_processing() const { return m_keep_processing; }
+  void start_processing(const recv_cb_t&);
   void stop_processing() {
     m_keep_processing = false;
     m_ping_timer.cancel();

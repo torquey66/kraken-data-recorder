@@ -86,29 +86,26 @@ int main(int argc, char* argv[]) {
     krakpot::pq::trades_sink_t trades_sink{config.parquet_dir(), now};
     krakpot::model::level_book_t level_book{config.book_depth()};
 
-    // const auto noop_accept_instrument =
-    //     [](const krakpot::response::instrument_t&) {};
     const auto accept_instrument =
         [&level_book, &assets_sink,
          &pairs_sink](const krakpot::response::instrument_t& response) {
+          assets_sink.accept(response.header(), response.assets());
+          pairs_sink.accept(response.header(), response.pairs());
           for (const auto& pair : response.pairs()) {
             level_book.accept(pair);
             BOOST_LOG_TRIVIAL(debug)
                 << "created/updated book for symbol: " << pair.symbol();
           }
-          assets_sink.accept(response.header(), response.assets());
-          pairs_sink.accept(response.header(), response.pairs());
         };
 
     // !@# TODO: replace use of level book with refdata
     const auto noop_accept_book = [](const krakpot::response::book_t&) {};
     const auto accept_book =
         [&book_sink, &level_book](const krakpot::response::book_t& response) {
-          level_book.accept(response);
-
           const auto& sides = level_book.sides(response.symbol());
           book_sink.accept(response, sides.price_precision(),
                            sides.qty_precision());
+          level_book.accept(response);
         };
 
     // !@# TODO: replace use of hardcoded precisions with refdata
@@ -118,8 +115,6 @@ int main(int argc, char* argv[]) {
           trades_sink.accept(response, 3, 8);
         };
     const krakpot::sink_t sink{
-        //        krakpot::sink_t{noop_accept_instrument},
-        //        krakpot::sink_t{accept_instrument},
         accept_instrument,
         config.capture_book()
             ? krakpot::sink_t::accept_book_t{accept_book}
@@ -141,13 +136,11 @@ int main(int argc, char* argv[]) {
     };
     session.start_processing(handle_recv);
 
-    while (!shutting_down) {
+    while (!shutting_down && session.keep_processing()) {
       ioc.run_one();
     }
     BOOST_LOG_TRIVIAL(error) << "session.stop_processing()";
-    //    session.stop_processing();
-    boost::asio::post(ioc, [&session]() { session.stop_processing(); });
-    ioc.run();
+    session.stop_processing();
   } catch (const std::exception& ex) {
     ioc.stop();
     BOOST_LOG_TRIVIAL(error) << ex.what();
