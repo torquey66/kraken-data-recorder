@@ -29,10 +29,11 @@ void session_t::fail(bst::error_code ec, char const *what) {
   m_keep_processing = false;
 }
 
-void session_t::start_processing(const recv_cb_t &handle_recv) {
+void session_t::start_processing(const recv_cb_t& handle_recv) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
 
   m_handle_recv = handle_recv;
+  m_keep_processing = true;
   m_resolver.async_resolve(m_config.kraken_host(), m_config.kraken_port(),
                            [this](error_code ec, resolver::results_type rt) {
                              this->on_resolve(ec, rt);
@@ -144,6 +145,10 @@ void session_t::on_ping_timer(error_code ec) {
   }
 
   if (!m_keep_processing) {
+    BOOST_LOG_TRIVIAL(debug)
+        << __FUNCTION__
+        << " returning -  m_keep_processing:" << m_keep_processing;
+    ;
     return;
   }
 
@@ -156,7 +161,7 @@ void session_t::on_ping_timer(error_code ec) {
         boost::posix_time::seconds(m_config.ping_interval_secs()));
     m_ping_timer.async_wait([this](error_code ec) { this->on_ping_timer(ec); });
 
-  } catch (const std::exception &ex) {
+  } catch (const std::exception& ex) {
     BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ex.what();
     m_keep_processing = false;
   }
@@ -181,16 +186,26 @@ void session_t::on_read(error_code ec, size_t size) {
     // !@# TODO - see whether we can eliminate this copy by connecting
     // simdjson's iterator directly to buffer sequence
     m_read_msg_str = boost::beast::buffers_to_string(m_read_buffer.data());
-    m_read_buffer.consume(size);
+    if (m_read_msg_str.size() != size) {
+      BOOST_LOG_TRIVIAL(error)
+          << __FUNCTION__ << "read expected size: " << size
+          << " but received size: " << m_read_msg_str.size();
+      stop_processing();
+      return;
+    }
+    //    m_read_buffer.consume(size);
+    m_read_buffer.consume(m_read_msg_str.size());
     if (!m_handle_recv(std::string_view(m_read_msg_str))) {
       BOOST_LOG_TRIVIAL(error)
           << __FUNCTION__ << "handle_recv() returned false -- stop processing";
-      boost::asio::post(m_ioc, [this]() { stop_processing(); });
+      stop_processing();
+      return;
     }
   } catch (const std::exception& ex) {
     BOOST_LOG_TRIVIAL(error) << ex.what();
     BOOST_LOG_TRIVIAL(error) << "msg: " << m_read_msg_str;
-    boost::asio::post(m_ioc, [this]() { stop_processing(); });
+    stop_processing();
+    return;
   }
 
   if (m_keep_processing) {

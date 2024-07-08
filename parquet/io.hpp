@@ -36,6 +36,12 @@ struct reader_t final {
     return m_record_batch_reader;
   }
 
+  std::shared_ptr<::arrow::Schema> get_schema() const {
+    std::shared_ptr<::arrow::Schema> result;
+    PARQUET_THROW_NOT_OK(m_arrow_file_reader->GetSchema(&result));
+    return result;
+  }
+
  private:
   parquet::ReaderProperties m_reader_properties;
   parquet::ArrowReaderProperties m_arrow_reader_properties;
