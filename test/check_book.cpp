@@ -4,6 +4,7 @@
 #include "responses.hpp"
 #include "types.hpp"
 
+#include <arrow/api.h>
 #include <arrow/array.h>
 #include <arrow/io/api.h>
 #include <arrow/record_batch.h>
@@ -36,17 +37,20 @@ std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
   return result;
 }
 
-/*
 void dump_sides(const model::sides_t& sides, const size_t max_depth = 10) {
   const auto& bids = sides.bids();
   const auto& asks = sides.asks();
   auto bid_it = bids.begin();
   auto ask_it = asks.begin();
   for (size_t depth = 0; depth < max_depth; ++depth) {
-    const auto bid_px = bid_it != bids.end() ? bid_it->first.str() : "";
-    const auto bid_qty = bid_it != bids.end() ? bid_it->second.str() : "";
-    const auto ask_px = ask_it != asks.end() ? ask_it->first.str() : "";
-    const auto ask_qty = ask_it != asks.end() ? ask_it->second.str() : "";
+    const auto bid_px =
+        bid_it != bids.end() ? bid_it->first.str(sides.price_precision()) : "";
+    const auto bid_qty =
+        bid_it != bids.end() ? bid_it->second.str(sides.qty_precision()) : "";
+    const auto ask_px =
+        ask_it != asks.end() ? ask_it->first.str(sides.price_precision()) : "";
+    const auto ask_qty =
+        ask_it != asks.end() ? ask_it->second.str(sides.qty_precision()) : "";
     std::cerr << std::right << std::setw(30) << bid_qty << " @ " << bid_px
               << "     " << std::right << std::setw(30) << ask_qty << " @ "
               << ask_px << std::endl;
@@ -54,7 +58,6 @@ void dump_sides(const model::sides_t& sides, const size_t max_depth = 10) {
     ++ask_it;
   }
 }
-*/
 
 void process_pairs(std::string pairs_filename,
                    model::level_book_t& level_book) {
@@ -70,8 +73,7 @@ void process_pairs(std::string pairs_filename,
     }
 
     const auto& batch = *maybe_batch.ValueOrDie();
-    // const auto recv_tm_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-    //     batch.GetColumnByName(c_header_recv_tm));
+
     const auto base_array = std::dynamic_pointer_cast<arrow::StringArray>(
         batch.GetColumnByName(c_pair_base));
     const auto cost_min_array = std::dynamic_pointer_cast<arrow::DoubleArray>(
@@ -115,7 +117,6 @@ void process_pairs(std::string pairs_filename,
         batch.GetColumnByName(c_pair_symbol));
 
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
-      //      const auto recv_tm = recv_tm_array->Value(idx);
       const auto base = base_array->Value(idx);
       const auto cost_min = cost_min_array->Value(idx);
       const auto cost_precision = cost_precision_array->Value(idx);
@@ -155,22 +156,7 @@ void process_pairs(std::string pairs_filename,
   }
 }
 
-int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    std::cerr << "usage: " << argv[0] << " <pairs parquet file>"
-              << " <book parquet file>" << std::endl;
-    return -1;
-  }
-
-  const auto pairs_filename = std::string{argv[1]};
-  const auto book_filename = std::string{argv[2]};
-
-  auto level_book = model::level_book_t{e_1000};
-  //  auto level_book = model::level_book_t{e_100};
-  process_pairs(pairs_filename, level_book);
-
-  pq::reader_t reader{book_filename};
-
+void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
   std::shared_ptr<::arrow::RecordBatchReader> rb_reader{
       reader.record_batch_reader()};
 
@@ -211,12 +197,48 @@ int main(int argc, char* argv[]) {
       try {
         level_book.accept(response);
       } catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        //        std::cerr << response.str() << std::endl;
         std::cerr << "idx: " << idx << " recv_tm:  " << recv_tm << std::endl;
-        //        dump_sides(level_book.sides(symbol_str));
-        return -1;
+        dump_sides(level_book.sides(symbol_str));
+        throw ex;
       }
     }
+  }
+}
+
+int main(int argc, char* argv[]) {
+  if (argc != 3) {
+    std::cerr << "usage: " << argv[0] << " <pairs parquet file>"
+              << " <book parquet file>" << std::endl;
+    return -1;
+  }
+
+  const auto pairs_filename = std::string{argv[1]};
+  const auto book_filename = std::string{argv[2]};
+
+  try {
+    pq::reader_t book_reader{book_filename};
+
+    std::shared_ptr<::arrow::Schema> schema{book_reader.get_schema()};
+    if (!schema) {
+      throw std::runtime_error("book_reader is missing a schema");
+    }
+    const auto metadata{schema->metadata()};
+    if (!metadata) {
+      throw std::runtime_error("book_reader schema has no metadata");
+    }
+    const auto depth_result{metadata->Get("book_depth")};
+    if (!depth_result.ok()) {
+      throw std::runtime_error(
+          "missing 'book_depth' metadata in book parquet file");
+    }
+    const depth_t book_depth{atol(depth_result.ValueOrDie().c_str())};
+    std::cout << "book_depth: " << book_depth << std::endl;
+
+    auto level_book = model::level_book_t{book_depth};
+    process_pairs(pairs_filename, level_book);
+    process_book(book_reader, level_book);
+  } catch (const std::exception& ex) {
+    std::cerr << ex.what() << std::endl;
+    return 1;
   }
 }
