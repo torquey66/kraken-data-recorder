@@ -2,6 +2,38 @@
 
 namespace krakpot {
 
+std::string format_frac_part(wide_float_t frac_part, integer_t precision) {
+  std::string result;
+  for (auto counter = 0; counter < precision; ++counter) {
+    frac_part *= 10;
+    const auto int_part = frac_part.convert_to<uint64_t>();
+    result += std::to_string(int_part);
+    frac_part -= int_part;
+  }
+  return result;
+}
+
+std::string decimal_t::str(integer_t precision) const {
+  if (m_value.is_zero()) {
+    if (precision > 0) {
+      std::string str = "0.";
+      str.append(precision, '0');
+      return str;
+    } else {
+      return "0";
+    }
+  } else if (m_value.sign() == -1) {
+    const wide_float_t abs_value{-m_value};
+    return "-" + abs_value.str(precision);
+  }
+
+  const wide_float_t int_part = boost::multiprecision::floor(m_value);
+  const wide_float_t frac_part = m_value - int_part;
+  const auto int_str = std::to_string(int_part.convert_to<uint64_t>());
+  const auto frac_str = format_frac_part(frac_part, precision);
+  return int_str + (frac_str.empty() ? "" : "." + frac_str);
+}
+
 void decimal_t::process(boost::crc_32_type& crc32, int64_t precision) const {
   const auto chars = str(precision);
   auto in_leading_zeros = true;
