@@ -20,8 +20,6 @@ struct pairs_sink_t final {
   void accept(const response::header_t&, const std::vector<response::pair_t>&);
 
  private:
-  void reset_builders();
-
   static std::shared_ptr<arrow::Schema> schema();
 
   std::shared_ptr<arrow::Schema> m_schema;
