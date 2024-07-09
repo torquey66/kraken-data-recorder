@@ -39,6 +39,14 @@ book_sink_t::book_sink_t(std::string parquet_dir,
       m_symbol_builder{std::make_shared<arrow::StringBuilder>()},
       m_timestamp_builder{std::make_shared<arrow::Int64Builder>()} {}
 
+book_sink_t::~book_sink_t() {
+  try {
+    flush();
+  } catch (const std::exception& ex) {
+    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " failed to flush() sink";
+  }
+}
+
 void book_sink_t::accept(const response::book_t& book,
                          const model::refdata_t& refdata) {
   const std::optional<model::refdata_t::pair_precision_t> precision{
@@ -48,8 +56,6 @@ void book_sink_t::accept(const response::book_t& book,
     BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << msg;
     throw std::runtime_error{msg};
   }
-
-  reset_builders();
 
   PARQUET_THROW_NOT_OK(
       m_recv_tm_builder->Append(book.header().recv_tm().micros()));
@@ -87,6 +93,12 @@ void book_sink_t::accept(const response::book_t& book,
   PARQUET_THROW_NOT_OK(m_symbol_builder->Append(book.symbol()));
   PARQUET_THROW_NOT_OK(m_timestamp_builder->Append(book.timestamp().micros()));
 
+  if (++m_num_rows >= c_flush_threshold) {
+    flush();
+  }
+}
+
+void book_sink_t::flush() {
   std::shared_ptr<arrow::Array> recv_tm_array;
   std::shared_ptr<arrow::Array> type_array;
   std::shared_ptr<arrow::Array> bids_array;
@@ -108,24 +120,10 @@ void book_sink_t::accept(const response::book_t& book,
       crc32_array,   symbol_array, timestamp_array};
 
   std::shared_ptr<arrow::RecordBatch> batch =
-      arrow::RecordBatch::Make(m_schema, 1, columns);
+      arrow::RecordBatch::Make(m_schema, m_num_rows, columns);
   PARQUET_THROW_NOT_OK(m_writer.arrow_file_writer().WriteRecordBatch(*batch));
-}
 
-void book_sink_t::reset_builders() {
-  m_recv_tm_builder->Reset();
-  m_type_builder->Reset();
-  m_bid_price_builder->Reset();
-  m_bid_qty_builder->Reset();
-  m_bid_builder->Reset();
-  m_bids_builder->Reset();
-  m_ask_price_builder->Reset();
-  m_ask_qty_builder->Reset();
-  m_ask_builder->Reset();
-  m_asks_builder->Reset();
-  m_crc32_builder->Reset();
-  m_symbol_builder->Reset();
-  m_timestamp_builder->Reset();
+  m_num_rows = 0;
 }
 
 std::shared_ptr<arrow::DataType> book_sink_t::quote_struct() {

@@ -17,17 +17,22 @@ struct trades_sink_t final {
   static constexpr char c_sink_name[] = "trades";
 
   trades_sink_t(std::string parquet_dir, sink_id_t);
+  ~trades_sink_t();
 
   void accept(const response::trades_t&, const model::refdata_t&);
 
  private:
-  void reset_builders();
+  static constexpr size_t c_flush_threshold = 4096;
 
   static std::shared_ptr<arrow::Schema> schema();
+
+  void flush();
 
   std::shared_ptr<arrow::Schema> m_schema;
   std::string m_sink_filename;
   writer_t m_writer;
+
+  size_t m_num_rows = 0;
 
   arrow::Int64Builder m_recv_tm_builder;
   arrow::StringBuilder m_ord_type_builder;

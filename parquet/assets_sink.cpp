@@ -10,8 +10,6 @@ assets_sink_t::assets_sink_t(std::string parquet_dir, sink_id_t id)
 
 void assets_sink_t::accept(const response::header_t& header,
                            const std::vector<response::asset_t>& assets) {
-  reset_builders();
-
   for (const auto& asset : assets) {
     PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
     PARQUET_THROW_NOT_OK(m_borrowable_builder.Append(asset.borrowable()));
@@ -58,17 +56,6 @@ void assets_sink_t::accept(const response::header_t& header,
   std::shared_ptr<arrow::RecordBatch> batch =
       arrow::RecordBatch::Make(m_schema, assets.size(), columns);
   PARQUET_THROW_NOT_OK(m_writer.arrow_file_writer().WriteRecordBatch(*batch));
-}
-
-void assets_sink_t::reset_builders() {
-  m_recv_tm_builder.Reset();
-  m_borrowable_builder.Reset();
-  m_collateral_value_builder.Reset();
-  m_id_builder.Reset();
-  m_margin_rate_builder.Reset();
-  m_precision_builder.Reset();
-  m_precision_display_builder.Reset();
-  m_status_builder.Reset();
 }
 
 std::shared_ptr<arrow::Schema> assets_sink_t::schema() {
