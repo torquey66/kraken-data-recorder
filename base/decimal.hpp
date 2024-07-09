@@ -6,24 +6,22 @@
 #include <boost/crc.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-#include <iomanip>
-#include <sstream>
 #include <string>
 
 namespace krakpot {
 
-struct decimal_t final {
-  // TODO: remove redundant definition with types.hpp
-  using integer_t = int64_t;
+// TODO: remove redundant definition with types.hpp
+using integer_t = int64_t;
 
+using wide_float_t =
+    boost::multiprecision::number<boost::multiprecision::cpp_dec_float<72>>;
+
+struct decimal_t final {
   // Note: The value 72 is chosen such that sizeof(decimal_t) is 64 on
   // my machine, which is not coincidentally its L1 cache size.
   //
   // TODO: figure out if there's a portable way to tune or at least
   // verify this at compile time.
-  using wide_float_t =
-      boost::multiprecision::number<boost::multiprecision::cpp_dec_float<72>>;
-
   decimal_t() : m_value{c_NaN} {}
 
   template <typename S>
@@ -40,13 +38,7 @@ struct decimal_t final {
     return std::strtod(str(precision).c_str(), nullptr);
   }
 
-  std::string str(integer_t precision) const {
-    // TODO: find a better way to format values, ideally one that
-    // doesn't trigger a heap allocation.
-    std::ostringstream os;
-    os << std::fixed << std::setprecision(precision) << m_value;
-    return os.str();
-  }
+  std::string str(integer_t precision) const;
 
   void process(boost::crc_32_type& crc32, integer_t precision) const;
 

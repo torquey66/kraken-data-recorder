@@ -8,30 +8,8 @@ pairs_sink_t::pairs_sink_t(std::string parquet_dir, sink_id_t id)
       m_sink_filename{parquet_filename(parquet_dir, c_sink_name, id)},
       m_writer{m_sink_filename, m_schema} {}
 
-void pairs_sink_t::reset_builders() {
-  m_recv_tm_builder.Reset();
-  m_base_builder.Reset();
-  m_cost_min_builder.Reset();
-  m_cost_precision_builder.Reset();
-  m_has_index_builder.Reset();
-  m_margin_initial_builder.Reset();
-  m_marginable_builder.Reset();
-  m_position_limit_long_builder.Reset();
-  m_position_limit_short_builder.Reset();
-  m_price_increment_builder.Reset();
-  m_price_precision_builder.Reset();
-  m_qty_increment_builder.Reset();
-  m_qty_min_builder.Reset();
-  m_qty_precision_builder.Reset();
-  m_quote_builder.Reset();
-  m_status_builder.Reset();
-  m_symbol_builder.Reset();
-}
-
 void pairs_sink_t::accept(const response::header_t& header,
                           const std::vector<response::pair_t>& pairs) {
-  reset_builders();
-
   for (const auto& pair : pairs) {
     PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
     PARQUET_THROW_NOT_OK(m_base_builder.Append(pair.base()));
