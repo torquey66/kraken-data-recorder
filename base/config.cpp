@@ -12,6 +12,20 @@ std::string to_string(std::string_view sv) {
 
 namespace krakpot {
 
+nlohmann::json config_t::to_json() const {
+  const nlohmann::json result = {
+      {c_book_depth, book_depth()},
+      {c_capture_book, capture_book()},
+      {c_capture_trades, capture_trades()},
+      {c_kraken_host, kraken_host()},
+      {c_kraken_port, kraken_port()},
+      {c_pair_filter, pair_filter()},
+      {c_parquet_dir, parquet_dir()},
+      {c_ping_interval_secs, ping_interval_secs()},
+  };
+  return result;
+}
+
 config_t config_t::from_json(simdjson::ondemand::document &doc) {
   config_t result;
 
