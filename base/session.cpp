@@ -139,7 +139,6 @@ void session_t::on_handshake(error_code ec) {
 }
 
 void session_t::on_ping_timer(error_code ec) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   if (ec) {
     fail(ec, __FUNCTION__);
   }
@@ -165,8 +164,6 @@ void session_t::on_ping_timer(error_code ec) {
     BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ex.what();
     m_keep_processing = false;
   }
-
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded";
 }
 
 void session_t::on_write(error_code ec, size_t size) {
