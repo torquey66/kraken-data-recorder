@@ -91,6 +91,16 @@ bool engine_t::handle_instrument_snapshot(doc_t& doc) {
   std::transform(pairs.begin(), pairs.end(), std::back_inserter(symbols),
                  [](const auto& pair) { return pair.symbol(); });
 
+  const auto& pair_filter = m_config.pair_filter();
+  if (!pair_filter.empty()) {
+    const auto end =
+        std::remove_if(symbols.begin(), symbols.end(),
+                       [&pair_filter](const std::string& symbol) {
+                         return pair_filter.find(symbol) == pair_filter.end();
+                       });
+    symbols.erase(end, symbols.end());
+  };
+
   if (m_config.capture_book()) {
     const request::subscribe_book_t subscribe_book{
         ++m_book_req_id, m_config.book_depth(), true, symbols};
