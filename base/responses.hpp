@@ -6,7 +6,6 @@
 
 #include <simdjson.h>
 #include <boost/json.hpp>
-#include <nlohmann/json.hpp>
 
 #include <string>
 #include <vector>
@@ -33,8 +32,8 @@ struct header_t final {
   const std::string& channel() const { return m_channel; }
   const std::string& type() const { return m_type; }
 
-  nlohmann::json to_json() const;
-  std::string str() const { return to_json().dump(); }
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
  private:
   timestamp_t m_recv_tm;
@@ -87,10 +86,10 @@ struct book_t final {
 
   static book_t from_json(simdjson::ondemand::document&);
 
-  nlohmann::json to_json(integer_t price_precision,
-                         integer_t qty_precision) const;
+  boost::json::object to_json_obj(integer_t price_precision,
+                                  integer_t qty_precision) const;
   std::string str(integer_t price_precision, integer_t qty_precision) const {
-    return to_json(price_precision, qty_precision).dump();
+    return boost::json::serialize(to_json_obj(price_precision, qty_precision));
   }
 
  private:
@@ -122,12 +121,10 @@ struct trades_t final {
 
   static trades_t from_json(simdjson::ondemand::document&);
 
-  nlohmann::json to_json(integer_t price_precision,
-                         integer_t qty_precision) const;
-
-  // !@# TODO: replace these with refdata returned per-symbol
+  boost::json::object to_json_obj(integer_t price_precision,
+                                  integer_t qty_precision) const;
   std::string str(integer_t price_precision, integer_t qty_precision) const {
-    return to_json(price_precision, qty_precision).dump();
+    return boost::json::serialize(to_json_obj(price_precision, qty_precision));
   }
 
   auto begin() const { return m_trades.begin(); }
