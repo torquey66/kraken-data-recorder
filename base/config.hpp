@@ -4,7 +4,7 @@
 #include "types.hpp"
 
 #include <simdjson.h>
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #include <cstdint>
 #include <string>
@@ -43,7 +43,9 @@ struct config_t final {
         m_capture_book{capture_book},
         m_capture_trades{capture_trades} {}
 
-  nlohmann::json to_json() const;
+  // !@# TODO: consider a c++20 concept for to_json/str behavior
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
   static config_t from_json(simdjson::ondemand::document&);
   static config_t from_json_str(const std::string&);

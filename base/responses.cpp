@@ -2,9 +2,8 @@
 
 #include "responses.hpp"
 
+#include <algorithm>
 #include <chrono>
-
-#include <iostream>
 
 namespace {
 
@@ -20,9 +19,10 @@ krakpot::decimal_t extract_decimal(O& obj, std::string field) {
 namespace krakpot {
 namespace response {
 
-nlohmann::json header_t::to_json() const {
-  const nlohmann::json result = {
-      {c_header_recv_tm, recv_tm().str()}, {c_header_channel, channel()}, {c_header_type, type()}};
+boost::json::object header_t::to_json_obj() const {
+  const boost::json::object result = {{c_header_recv_tm, recv_tm().str()},
+                                      {c_header_channel, channel()},
+                                      {c_header_type, type()}};
   return result;
 }
 
@@ -49,25 +49,22 @@ instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
   return result;
 }
 
-nlohmann::json instrument_t::to_json() const {
+boost::json::object instrument_t::to_json_obj() const {
+  auto assets = boost::json::array{};
+  std::transform(m_assets.begin(), m_assets.end(), std::back_inserter(assets),
+                 [](const asset_t& asset) { return asset.to_json_obj(); });
 
-  auto assets = nlohmann::json{};
-  for (const auto &asset : m_assets) {
-    assets.push_back(asset.to_json());
-  }
+  auto pairs = boost::json::array{};
+  std::transform(m_pairs.begin(), m_pairs.end(), std::back_inserter(pairs),
+                 [](const pair_t& pair) { return pair.to_json_obj(); });
 
-  auto pairs = nlohmann::json{};
-  for (const auto &pair : m_pairs) {
-    pairs.push_back(pair.to_json());
-  }
-
-  auto data = nlohmann::json{};
+  auto data = boost::json::object{};
   data[c_instrument_pairs] = pairs;
   data[c_instrument_assets] = assets;
 
-  const nlohmann::json result = {{c_header_channel, m_header.channel()},
-                                 {c_response_data, data},
-                                 {c_header_type, m_header.type()}};
+  const boost::json::object result = {{c_header_channel, m_header.channel()},
+                                      {c_response_data, data},
+                                      {c_header_type, m_header.type()}};
 
   return result;
 }
@@ -128,37 +125,39 @@ book_t book_t::from_json(simdjson::ondemand::document &response) {
   return result;
 }
 
-nlohmann::json book_t::to_json(integer_t price_precision,
-                               integer_t qty_precision) const {
-  auto asks = nlohmann::json::array();
-  for (const auto& ask : m_asks) {
-    const nlohmann::json ask_json = {
-        {c_book_price, ask.first.double_value(price_precision)},
-        {c_book_qty, ask.second.double_value(qty_precision)}};
-    asks.push_back(ask_json);
-  }
+boost::json::object book_t::to_json_obj(integer_t price_precision,
+                                        integer_t qty_precision) const {
+  auto asks = boost::json::array();
+  std::transform(m_asks.begin(), m_asks.end(), std::back_inserter(asks),
+                 [price_precision, qty_precision](const ask_t& ask) {
+                   const boost::json::object result = {
+                       {c_book_price, ask.first.double_value(price_precision)},
+                       {c_book_qty, ask.second.double_value(qty_precision)}};
+                   return result;
+                 });
 
-  auto bids = nlohmann::json::array();
-  for (const auto& bid : m_bids) {
-    const nlohmann::json bid_json = {
-        {c_book_price, bid.first.double_value(price_precision)},
-        {c_book_qty, bid.second.double_value(qty_precision)}};
-    bids.push_back(bid_json);
-  }
+  auto bids = boost::json::array();
+  std::transform(m_bids.begin(), m_bids.end(), std::back_inserter(bids),
+                 [price_precision, qty_precision](const bid_t& bid) {
+                   const boost::json::object result = {
+                       {c_book_price, bid.first.double_value(price_precision)},
+                       {c_book_qty, bid.second.double_value(qty_precision)}};
+                   return result;
+                 });
 
-  auto content = nlohmann::json{};
+  auto content = boost::json::object{};
   content[c_book_asks] = asks;
   content[c_book_bids] = bids;
   content[c_book_checksum] = m_crc32;
   content[c_book_symbol] = m_symbol;
   content[c_book_timestamp] = m_timestamp.str();
 
-  auto data = nlohmann::json::array();
+  auto data = boost::json::array();
   data.push_back(content);
 
-  const nlohmann::json result = {{c_header_channel, m_header.channel()},
-                                 {c_response_data, data},
-                                 {c_header_type, m_header.type()}};
+  const boost::json::object result = {{c_header_channel, m_header.channel()},
+                                      {c_response_data, data},
+                                      {c_header_type, m_header.type()}};
 
   return result;
 }
@@ -215,25 +214,27 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   return result;
 }
 
-nlohmann::json trades_t::to_json(integer_t price_precision,
-                                 integer_t qty_precision) const {
-  auto trades = nlohmann::json::array();
-  for (const auto& trade : m_trades) {
-    const nlohmann::json trade_json = {
-        {c_trade_ord_type, trade.ord_type},
-        {c_trade_price, trade.price.double_value(price_precision)},
-        {c_trade_qty, trade.qty.double_value(qty_precision)},
-        {c_trade_side, trade.side},
-        {c_trade_symbol, trade.symbol},
-        {c_trade_timestamp, trade.timestamp.str()},
-        {c_trade_trade_id, trade.trade_id},
-    };
-    trades.push_back(trade_json);
-  }
+boost::json::object trades_t::to_json_obj(integer_t price_precision,
+                                          integer_t qty_precision) const {
+  auto trades = boost::json::array();
+  std::transform(
+      m_trades.begin(), m_trades.end(), std::back_inserter(trades),
+      [price_precision, qty_precision](const trade_t& trade) {
+        const boost::json::object result = {
+            {c_trade_ord_type, trade.ord_type},
+            {c_trade_price, trade.price.double_value(price_precision)},
+            {c_trade_qty, trade.qty.double_value(qty_precision)},
+            {c_trade_side, trade.side},
+            {c_trade_symbol, trade.symbol},
+            {c_trade_timestamp, trade.timestamp.str()},
+            {c_trade_trade_id, trade.trade_id},
+        };
+        return result;
+      });
 
-  const nlohmann::json result = {{c_header_channel, m_header.channel()},
-                                 {c_response_data, trades},
-                                 {c_header_type, m_header.type()}};
+  const boost::json::object result = {{c_header_channel, m_header.channel()},
+                                      {c_response_data, trades},
+                                      {c_header_type, m_header.type()}};
   return result;
 }
 

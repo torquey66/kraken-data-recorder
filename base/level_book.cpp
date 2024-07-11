@@ -55,23 +55,27 @@ uint64_t sides_t::crc32() const {
   return result.checksum();
 }
 
-nlohmann::json sides_t::to_json() const {
-  auto bids_json = nlohmann::json{};
-  for (const auto& bid : bids()) {
-    const nlohmann::json quote{
-        {bid.first.str(price_precision()), bid.second.str(qty_precision())}};
-    bids_json.push_back(quote);
-  }
+boost::json::object sides_t::to_json_obj() const {
+  auto bid_objs = boost::json::array{};
+  std::transform(
+      bids().begin(), bids().end(), std::back_inserter(bid_objs),
+      [this](const auto& kv) {
+        const boost::json::object quote{
+            {kv.first.str(price_precision()), kv.second.str(qty_precision())}};
+        return quote;
+      });
 
-  auto asks_json = nlohmann::json{};
-  for (const auto& ask : asks()) {
-    const nlohmann::json quote{
-        {ask.first.str(price_precision()), ask.second.str(qty_precision())}};
-    asks_json.push_back(quote);
-  }
+  auto ask_objs = boost::json::array{};
+  std::transform(
+      asks().begin(), asks().end(), std::back_inserter(ask_objs),
+      [this](const auto& kv) {
+        const boost::json::object quote{
+            {kv.first.str(price_precision()), kv.second.str(qty_precision())}};
+        return quote;
+      });
 
-  const nlohmann::json result = {{c_book_bids, bids_json},
-                                 {c_book_asks, asks_json}};
+  const boost::json::object result = {{c_book_bids, bid_objs},
+                                      {c_book_asks, ask_objs}};
   return result;
 }
 
@@ -135,9 +139,9 @@ uint64_t level_book_t::crc32(symbol_t symbol) const {
 
 std::string level_book_t::str(std::string symbol) const {
   const auto& side = m_sides.at(symbol);
-  const nlohmann::json result{{c_book_symbol, symbol},
-                              {c_book_side, side.str()}};
-  return result.dump(3);
+  const boost::json::object result{{c_book_symbol, symbol},
+                                   {c_book_side, side.str()}};
+  return boost::json::serialize(result);
 }
 
 }  // namespace model

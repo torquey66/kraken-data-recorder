@@ -4,8 +4,8 @@
 #include "asset.hpp"
 #include "pair.hpp"
 
-#include <nlohmann/json.hpp>
 #include <simdjson.h>
+#include <boost/json.hpp>
 
 #include <string>
 #include <vector>
@@ -29,13 +29,13 @@ struct header_t final {
       : m_recv_tm(recv_tm), m_channel(channel), m_type(type) {}
 
   const timestamp_t recv_tm() const { return m_recv_tm; }
-  const std::string &channel() const { return m_channel; }
-  const std::string &type() const { return m_type; }
+  const std::string& channel() const { return m_channel; }
+  const std::string& type() const { return m_type; }
 
-  nlohmann::json to_json() const;
-  std::string str() const { return to_json().dump(); }
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
-private:
+ private:
   timestamp_t m_recv_tm;
   std::string m_channel;
   std::string m_type;
@@ -53,8 +53,8 @@ struct instrument_t final {
   const std::vector<asset_t>& assets() const { return m_assets; }
   const std::vector<pair_t>& pairs() const { return m_pairs; }
 
-  nlohmann::json to_json() const;
-  std::string str() const { return to_json().dump(); }
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
  private:
   header_t m_header;
@@ -70,25 +70,29 @@ struct book_t final {
   using bids_t = std::vector<bid_t>;
 
   book_t() = default;
-  book_t(const header_t &, const asks_t &, const bids_t &, uint64_t,
-         std::string, timestamp_t);
+  book_t(const header_t&,
+         const asks_t&,
+         const bids_t&,
+         uint64_t,
+         std::string,
+         timestamp_t);
 
-  const header_t &header() const { return m_header; }
-  const bids_t &bids() const { return m_bids; }
-  const asks_t &asks() const { return m_asks; }
+  const header_t& header() const { return m_header; }
+  const bids_t& bids() const { return m_bids; }
+  const asks_t& asks() const { return m_asks; }
   uint64_t crc32() const { return m_crc32; }
-  const std::string &symbol() const { return m_symbol; }
+  const std::string& symbol() const { return m_symbol; }
   timestamp_t timestamp() const { return m_timestamp; }
 
-  static book_t from_json(simdjson::ondemand::document &);
+  static book_t from_json(simdjson::ondemand::document&);
 
-  nlohmann::json to_json(integer_t price_precision,
-                         integer_t qty_precision) const;
+  boost::json::object to_json_obj(integer_t price_precision,
+                                  integer_t qty_precision) const;
   std::string str(integer_t price_precision, integer_t qty_precision) const {
-    return to_json(price_precision, qty_precision).dump();
+    return boost::json::serialize(to_json_obj(price_precision, qty_precision));
   }
 
-private:
+ private:
   header_t m_header;
   asks_t m_asks;
   bids_t m_bids;
@@ -113,23 +117,21 @@ struct trades_t final {
 
   trades_t() = default;
 
-  const header_t &header() const { return m_header; }
+  const header_t& header() const { return m_header; }
 
-  static trades_t from_json(simdjson::ondemand::document &);
+  static trades_t from_json(simdjson::ondemand::document&);
 
-  nlohmann::json to_json(integer_t price_precision,
-                         integer_t qty_precision) const;
-
-  // !@# TODO: replace these with refdata returned per-symbol
+  boost::json::object to_json_obj(integer_t price_precision,
+                                  integer_t qty_precision) const;
   std::string str(integer_t price_precision, integer_t qty_precision) const {
-    return to_json(price_precision, qty_precision).dump();
+    return boost::json::serialize(to_json_obj(price_precision, qty_precision));
   }
 
   auto begin() const { return m_trades.begin(); }
   auto end() const { return m_trades.end(); }
   auto size() const { return m_trades.size(); }
 
-private:
+ private:
   static ord_type_t parse_ord_type(std::string_view);
   static side_t parse_side(std::string_view);
 
@@ -137,5 +139,5 @@ private:
   std::vector<trade_t> m_trades;
 };
 
-} // namespace response
-} // namespace krakpot
+}  // namespace response
+}  // namespace krakpot

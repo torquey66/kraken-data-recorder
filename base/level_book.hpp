@@ -6,7 +6,7 @@
 #include "types.hpp"
 
 #include <boost/crc.hpp>
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #include <map>
 #include <unordered_map>
@@ -31,22 +31,23 @@ struct sides_t final {
   const bid_side_t& bids() const { return m_bids; }
   const ask_side_t& asks() const { return m_asks; }
 
-  void accept_snapshot(const response::book_t &);
-  void accept_update(const response::book_t &);
+  void accept_snapshot(const response::book_t&);
+  void accept_update(const response::book_t&);
 
   uint64_t crc32() const;
 
-  nlohmann::json to_json() const;
-  std::string str() const { return to_json().dump(); }
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
-private:
-  template <typename Q, typename S> void apply_update(const Q &, S &);
+ private:
+  template <typename Q, typename S>
+  void apply_update(const Q&, S&);
 
   void clear();
   void verify_checksum(uint64_t) const;
 
   template <typename S>
-  boost::crc_32_type update_checksum(const boost::crc_32_type, const S &) const;
+  boost::crc_32_type update_checksum(const boost::crc_32_type, const S&) const;
 
   depth_t m_book_depth;
   integer_t m_price_precision = 0;
@@ -62,18 +63,18 @@ private:
 struct level_book_t final {
   using symbol_t = std::string;
 
-  const sides_t &sides(symbol_t) const;
+  const sides_t& sides(symbol_t) const;
 
   level_book_t(depth_t book_depth) : m_book_depth{book_depth} {};
 
   void accept(const response::pair_t&);
-  void accept(const response::book_t &);
+  void accept(const response::book_t&);
 
   uint64_t crc32(symbol_t symbol) const;
 
   std::string str(std::string) const;
 
-private:
+ private:
   depth_t m_book_depth;
   std::unordered_map<symbol_t, sides_t> m_sides;
 };
@@ -96,9 +97,9 @@ boost::crc_32_type sides_t::update_checksum(boost::crc_32_type crc32,
 }
 
 template <typename Q, typename S>
-void sides_t::apply_update(const Q &quotes, S &side) {
-  for (const auto &quote : quotes) {
-    const auto &[price, qty] = quote;
+void sides_t::apply_update(const Q& quotes, S& side) {
+  for (const auto& quote : quotes) {
+    const auto& [price, qty] = quote;
     auto it = side.find(price);
     if (it != side.end()) {
       if (qty.value() == 0) {
@@ -117,5 +118,5 @@ void sides_t::apply_update(const Q &quotes, S &side) {
   }
 }
 
-} // namespace model
-} // namespace krakpot
+}  // namespace model
+}  // namespace krakpot

@@ -9,7 +9,6 @@ class KrakpotRecipe(ConanFile):
         self.requires("boost/1.85.0", force=True)
         self.requires("date/3.0.1")
         self.requires("doctest/2.4.11")
-        self.requires("nlohmann_json/3.11.3")
         self.requires("openssl/3.2.0")
         self.requires("simdjson/3.6.1")
         self.requires("thrift/0.17.0")

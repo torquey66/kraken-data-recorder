@@ -3,8 +3,8 @@
 
 #include "types.hpp"
 
-#include <nlohmann/json.hpp>
 #include <simdjson.h>
+#include <boost/json.hpp>
 
 #include <optional>
 #include <string>
@@ -19,7 +19,6 @@ namespace response {
  *     https://docs.kraken.com/websockets-v2/#instrument
  */
 struct pair_t final {
-
   // clang-format off
   enum status_t : int8_t {
     e_invalid          = -1,
@@ -54,8 +53,8 @@ struct pair_t final {
 
   static pair_t from_json(simdjson::ondemand::object&);
 
-  nlohmann::json to_json() const;
-  std::string str() const { return to_json().dump(); }
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
   std::string base() const { return m_base; }
   double_t cost_min() const { return m_cost_min; }
@@ -78,7 +77,7 @@ struct pair_t final {
   status_t status() const { return m_status; }
   std::string symbol() const { return m_symbol; }
 
-private:
+ private:
   static const std::unordered_map<std::string, status_t> c_str_to_status;
   static const std::unordered_map<status_t, std::string> c_status_to_str;
 
@@ -100,5 +99,5 @@ private:
   std::string m_symbol;
 };
 
-} // namespace response
-} // namespace krakpot
+}  // namespace response
+}  // namespace krakpot

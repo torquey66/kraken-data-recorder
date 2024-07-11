@@ -18,7 +18,6 @@ find_package(Arrow)
 find_package(Boost)                                                                                                                          
 find_package(date)
 find_package(doctest)                                                                                                                        
-find_package(nlohmann_json)                                                                                                                  
 find_package(OpenSSL)                                                                                                                        
 find_package(simdjson)                                                                                                                       
 
@@ -26,8 +25,8 @@ find_package(simdjson)
 include_directories(${CMAKE_SOURCE_DIR}/base)
 add_library(krakpot_base
   base/asset.cpp
-  base/constants.hpp
   base/config.cpp
+  base/constants.hpp
   base/decimal.cpp
   base/decimal.hpp
   base/engine.cpp
@@ -63,7 +62,6 @@ target_link_libraries(krakpot_base
   arrow::arrow
   boost::boost
   date::date
-  nlohmann_json::nlohmann_json
   openssl::openssl
   simdjson::simdjson
 )
