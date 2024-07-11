@@ -10,7 +10,6 @@
 #include <arrow/record_batch.h>
 #include <arrow/scalar.h>
 #include <parquet/arrow/reader.h>
-#include <nlohmann/json.hpp>
 
 #include <iomanip>
 #include <iostream>
