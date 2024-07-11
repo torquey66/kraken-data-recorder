@@ -54,8 +54,8 @@ asset_t asset_t::from_json(simdjson::ondemand::object &asset_obj) {
   return result;
 }
 
-nlohmann::json asset_t::to_json() const {
-  nlohmann::json result = {
+boost::json::object asset_t::to_json_obj() const {
+  boost::json::object result = {
       {c_asset_borrowable, m_borrowable},
       {c_asset_collateral_value, m_collateral_value},
       {c_asset_id, m_id},
@@ -71,7 +71,6 @@ nlohmann::json asset_t::to_json() const {
   if (it != c_status_to_str.end()) {
     result[c_asset_status] = it->second;
   }
-
   return result;
 }
 

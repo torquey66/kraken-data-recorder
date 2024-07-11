@@ -49,25 +49,24 @@ instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
   return result;
 }
 
-nlohmann::json instrument_t::to_json() const {
-
-  auto assets = nlohmann::json{};
-  for (const auto &asset : m_assets) {
-    assets.push_back(asset.to_json());
+boost::json::object instrument_t::to_json_obj() const {
+  auto assets = boost::json::array{};
+  for (const auto& asset : m_assets) {
+    assets.push_back(asset.to_json_obj());
   }
 
-  auto pairs = nlohmann::json{};
-  for (const auto &pair : m_pairs) {
-    pairs.push_back(pair.to_json());
+  auto pairs = boost::json::array{};
+  for (const auto& pair : m_pairs) {
+    pairs.push_back(pair.to_json_obj());
   }
 
-  auto data = nlohmann::json{};
+  auto data = boost::json::object{};
   data[c_instrument_pairs] = pairs;
   data[c_instrument_assets] = assets;
 
-  const nlohmann::json result = {{c_header_channel, m_header.channel()},
-                                 {c_response_data, data},
-                                 {c_header_type, m_header.type()}};
+  const boost::json::object result = {{c_header_channel, m_header.channel()},
+                                      {c_response_data, data},
+                                      {c_header_type, m_header.type()}};
 
   return result;
 }

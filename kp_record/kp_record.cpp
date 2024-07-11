@@ -72,8 +72,7 @@ int main(int argc, char* argv[]) {
                  vm[config_t::c_capture_book].as<bool>(),
                  vm[config_t::c_capture_trades].as<bool>()};
 
-    BOOST_LOG_TRIVIAL(info)
-        << "starting up with config: " << config.to_json().dump(3);
+    BOOST_LOG_TRIVIAL(info) << "starting up with config: " << config.str();
 
     boost::asio::ssl::context ctx{boost::asio::ssl::context::tlsv13_client};
     ctx.set_options(boost::asio::ssl::context::default_workarounds |
