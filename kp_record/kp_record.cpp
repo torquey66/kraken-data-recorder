@@ -13,6 +13,7 @@
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/ssl.hpp>
+#include <boost/json.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
 
@@ -59,18 +60,23 @@ int main(int argc, char* argv[]) {
       return 1;
     }
 
-    const auto pair_filter_json =
-        nlohmann::json::parse(vm[config_t::c_pair_filter].as<std::string>());
+    const boost::json::array pair_filter_json{
+        boost::json::parse(vm[config_t::c_pair_filter].as<std::string>())
+            .as_array()};
+    config_t::symbol_filter_t pair_filter;
+    for (const auto& symbol : pair_filter_json) {
+      pair_filter.insert(boost::json::serialize(symbol));
+    }
 
-    const auto config =
-        config_t{vm[config_t::c_ping_interval_secs].as<size_t>(),
-                 vm[config_t::c_kraken_host].as<std::string>(),
-                 vm[config_t::c_kraken_port].as<std::string>(),
-                 pair_filter_json.get<config_t::symbol_filter_t>(),
-                 vm[config_t::c_parquet_dir].as<std::string>(),
-                 krakpot::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
-                 vm[config_t::c_capture_book].as<bool>(),
-                 vm[config_t::c_capture_trades].as<bool>()};
+    const auto config = config_t{
+        vm[config_t::c_ping_interval_secs].as<size_t>(),
+        vm[config_t::c_kraken_host].as<std::string>(),
+        vm[config_t::c_kraken_port].as<std::string>(), pair_filter,
+        //                 pair_filter_json.get<config_t::symbol_filter_t>(),
+        vm[config_t::c_parquet_dir].as<std::string>(),
+        krakpot::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
+        vm[config_t::c_capture_book].as<bool>(),
+        vm[config_t::c_capture_trades].as<bool>()};
 
     BOOST_LOG_TRIVIAL(info) << "starting up with config: " << config.str();
 
