@@ -2,24 +2,32 @@
 
 #include "config.hpp"
 
+#include <algorithm>
+
 namespace {
 
 std::string to_string(std::string_view sv) {
   return std::string{sv.data(), sv.size()};
 }
 
-} // namespace
+}  // namespace
 
 namespace krakpot {
 
-nlohmann::json config_t::to_json() const {
-  const nlohmann::json result = {
+boost::json::object config_t::to_json_obj() const {
+  auto pair_filter_array = boost::json::array{};
+  std::transform(
+      pair_filter().begin(), pair_filter().end(),
+      std::back_inserter(pair_filter_array),
+      [](const std::string& pair) { return boost::json::string{pair}; });
+
+  const boost::json::object result = {
       {c_book_depth, book_depth()},
       {c_capture_book, capture_book()},
       {c_capture_trades, capture_trades()},
       {c_kraken_host, kraken_host()},
       {c_kraken_port, kraken_port()},
-      {c_pair_filter, pair_filter()},
+      {c_pair_filter, pair_filter_array},
       {c_parquet_dir, parquet_dir()},
       {c_ping_interval_secs, ping_interval_secs()},
   };

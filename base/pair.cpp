@@ -113,8 +113,8 @@ pair_t pair_t::from_json(simdjson::ondemand::object& pair_obj) {
   return result;
 }
 
-nlohmann::json pair_t::to_json() const {
-  nlohmann::json result{
+boost::json::object pair_t::to_json_obj() const {
+  boost::json::object result{
       {c_pair_base, m_base},
       {c_pair_cost_min, m_cost_min},
       {c_pair_cost_precision, m_cost_precision},
