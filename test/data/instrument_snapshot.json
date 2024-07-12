@@ -1130,8 +1130,9 @@
         "status": "enabled",
         "precision": 5,
         "precision_display": 0,
-        "borrowable": false,
-        "collateral_value": 0.00
+        "borrowable": true,
+        "collateral_value": 0.00,
+        "margin_rate": 0.020000
       },
       {
         "id": "LUNA.S",
@@ -1493,8 +1494,9 @@
         "status": "enabled",
         "precision": 8,
         "precision_display": 5,
-        "borrowable": false,
-        "collateral_value": 0.00
+        "borrowable": true,
+        "collateral_value": 0.00,
+        "margin_rate": 0.020000
       },
       {
         "id": "PICA",
@@ -1754,6 +1756,14 @@
         "collateral_value": 0.00
       },
       {
+        "id": "MPL",
+        "status": "enabled",
+        "precision": 7,
+        "precision_display": 5,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
         "id": "REQ",
         "status": "enabled",
         "precision": 10,
@@ -1928,6 +1938,14 @@
         "status": "enabled",
         "precision": 10,
         "precision_display": 5,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "OSMO",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
         "borrowable": false,
         "collateral_value": 0.00
       },
@@ -2227,8 +2245,9 @@
         "status": "enabled",
         "precision": 2,
         "precision_display": 0,
-        "borrowable": false,
-        "collateral_value": 0.00
+        "borrowable": true,
+        "collateral_value": 0.00,
+        "margin_rate": 0.020000
       },
       {
         "id": "SEI",
@@ -2314,6 +2333,14 @@
         "collateral_value": 0.00
       },
       {
+        "id": "TAO",
+        "status": "enabled",
+        "precision": 8,
+        "precision_display": 6,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
         "id": "BONK",
         "status": "enabled",
         "precision": 2,
@@ -2326,8 +2353,9 @@
         "status": "enabled",
         "precision": 5,
         "precision_display": 3,
-        "borrowable": false,
-        "collateral_value": 0.00
+        "borrowable": true,
+        "collateral_value": 0.00,
+        "margin_rate": 0.020000
       },
       {
         "id": "DYM",
@@ -2339,6 +2367,214 @@
       },
       {
         "id": "HNT",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "ONDO",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "BEAM",
+        "status": "enabled",
+        "precision": 4,
+        "precision_display": 2,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "W",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "PDA",
+        "status": "enabled",
+        "precision": 4,
+        "precision_display": 2,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "ZETA",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "ARKM",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "ETHFI",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "ENA",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "ALT",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "PENDLE",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "AEVO",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "PORTAL",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "BIGTIME",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "SAFE",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "DRIFT",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "MNT",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "WEN",
+        "status": "enabled",
+        "precision": 2,
+        "precision_display": 1,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "BODEN",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "TREMP",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "TNSR",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "ZEUS",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "NOS",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "TRAC",
+        "status": "enabled",
+        "precision": 5,
+        "precision_display": 3,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "KUJI",
+        "status": "enabled",
+        "precision": 6,
+        "precision_display": 4,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "HONEY",
+        "status": "enabled",
+        "precision": 4,
+        "precision_display": 2,
+        "borrowable": false,
+        "collateral_value": 0.00
+      },
+      {
+        "id": "ZRO",
         "status": "enabled",
         "precision": 6,
         "precision_display": 4,
@@ -2634,22 +2870,6 @@
         "tick_size": 0.00001,
         "price_increment": 0.00001,
         "qty_min": 10.00000000
-      },
-      {
-        "symbol": "USD/AED",
-        "base": "USD",
-        "quote": "AED",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 3,
-        "cost_precision": 5,
-        "marginable": false,
-        "has_index": false,
-        "cost_min": 3.00,
-        "tick_size": 0.001,
-        "price_increment": 0.001,
-        "qty_min": 5.00000000
       },
       {
         "symbol": "BTC/USD",
@@ -3033,7 +3253,7 @@
         "position_limit_short": 970000,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 60.00000000
+        "qty_min": 30.00000000
       },
       {
         "symbol": "ETC/ETH",
@@ -3112,25 +3332,6 @@
         "qty_min": 0.30000000
       },
       {
-        "symbol": "REP/BTC",
-        "base": "REP",
-        "quote": "BTC",
-        "status": "reduce_only",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 6,
-        "cost_precision": 6,
-        "marginable": true,
-        "has_index": false,
-        "cost_min": 0.00002,
-        "margin_initial": 0.50,
-        "position_limit_long": 0,
-        "position_limit_short": 0,
-        "tick_size": 0.000001,
-        "price_increment": 0.000001,
-        "qty_min": 5.00000000
-      },
-      {
         "symbol": "REP/EUR",
         "base": "REP",
         "quote": "EUR",
@@ -3169,7 +3370,7 @@
         "symbol": "ZEC/BTC",
         "base": "ZEC",
         "quote": "BTC",
-        "status": "online",
+        "status": "cancel_only",
         "qty_precision": 8,
         "qty_increment": 1E-8,
         "price_precision": 5,
@@ -3258,22 +3459,6 @@
         "position_limit_short": 570000,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 10.00000000
-      },
-      {
-        "symbol": "XRP/JPY",
-        "base": "XRP",
-        "quote": "JPY",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 3,
-        "cost_precision": 8,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 50,
-        "tick_size": 0.001,
-        "price_increment": 0.001,
         "qty_min": 10.00000000
       },
       {
@@ -3407,22 +3592,6 @@
         "qty_min": 0.30000000
       },
       {
-        "symbol": "MLN/ETH",
-        "base": "MLN",
-        "quote": "ETH",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 5,
-        "cost_precision": 8,
-        "marginable": false,
-        "has_index": false,
-        "cost_min": 0.00020,
-        "tick_size": 0.00001,
-        "price_increment": 0.00001,
-        "qty_min": 0.30000000
-      },
-      {
         "symbol": "MLN/USD",
         "base": "MLN",
         "quote": "USD",
@@ -3510,22 +3679,6 @@
         "tick_size": 0.001,
         "price_increment": 0.001,
         "qty_min": 0.20000000
-      },
-      {
-        "symbol": "GNO/BTC",
-        "base": "GNO",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 5,
-        "cost_precision": 8,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 0.00001,
-        "price_increment": 0.00001,
-        "qty_min": 0.02000000
       },
       {
         "symbol": "GNO/USD",
@@ -3668,7 +3821,7 @@
         "position_limit_short": 180,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 0.02500000
+        "qty_min": 0.01000000
       },
       {
         "symbol": "BCH/USD",
@@ -3687,7 +3840,7 @@
         "position_limit_short": 560,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.02500000
+        "qty_min": 0.01000000
       },
       {
         "symbol": "BCH/EUR",
@@ -3706,7 +3859,7 @@
         "position_limit_short": 340,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.02500000
+        "qty_min": 0.01000000
       },
       {
         "symbol": "ADA/BTC",
@@ -3793,25 +3946,6 @@
         "margin_initial": 0.50,
         "position_limit_long": 51000,
         "position_limit_short": 21000,
-        "tick_size": 1E-7,
-        "price_increment": 1E-7,
-        "qty_min": 4.00000000
-      },
-      {
-        "symbol": "XTZ/ETH",
-        "base": "XTZ",
-        "quote": "ETH",
-        "status": "reduce_only",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 7,
-        "cost_precision": 8,
-        "marginable": true,
-        "has_index": true,
-        "cost_min": 0.00020,
-        "margin_initial": 0.50,
-        "position_limit_long": 0,
-        "position_limit_short": 0,
         "tick_size": 1E-7,
         "price_increment": 1E-7,
         "qty_min": 4.00000000
@@ -3996,76 +4130,6 @@
         "tick_size": 0.0001,
         "price_increment": 0.0001,
         "qty_min": 0.50000000
-      },
-      {
-        "symbol": "WAVES/BTC",
-        "base": "WAVES",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 8,
-        "cost_precision": 8,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 1E-8,
-        "price_increment": 1E-8,
-        "qty_min": 2.00000000
-      },
-      {
-        "symbol": "WAVES/ETH",
-        "base": "WAVES",
-        "quote": "ETH",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 7,
-        "cost_precision": 8,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00020,
-        "tick_size": 1E-7,
-        "price_increment": 1E-7,
-        "qty_min": 2.00000000
-      },
-      {
-        "symbol": "WAVES/USD",
-        "base": "WAVES",
-        "quote": "USD",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 4,
-        "cost_precision": 6,
-        "marginable": true,
-        "has_index": true,
-        "cost_min": 0.50,
-        "margin_initial": 0.33,
-        "position_limit_long": 13000,
-        "position_limit_short": 6200,
-        "tick_size": 0.0001,
-        "price_increment": 0.0001,
-        "qty_min": 2.00000000
-      },
-      {
-        "symbol": "WAVES/EUR",
-        "base": "WAVES",
-        "quote": "EUR",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 4,
-        "cost_precision": 6,
-        "marginable": true,
-        "has_index": true,
-        "cost_min": 0.45,
-        "margin_initial": 0.33,
-        "position_limit_long": 15000,
-        "position_limit_short": 7200,
-        "tick_size": 0.0001,
-        "price_increment": 0.0001,
-        "qty_min": 2.00000000
       },
       {
         "symbol": "BAT/BTC",
@@ -4288,22 +4352,6 @@
         "cost_min": 0.00002,
         "tick_size": 1E-10,
         "price_increment": 1E-10,
-        "qty_min": 650.00000000
-      },
-      {
-        "symbol": "SC/ETH",
-        "base": "SC",
-        "quote": "ETH",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 8,
-        "cost_precision": 10,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00020,
-        "tick_size": 1E-8,
-        "price_increment": 1E-8,
         "qty_min": 650.00000000
       },
       {
@@ -4637,70 +4685,6 @@
         "qty_min": 5.00000000
       },
       {
-        "symbol": "LSK/BTC",
-        "base": "LSK",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 9,
-        "cost_precision": 9,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 1E-9,
-        "price_increment": 1E-9,
-        "qty_min": 3.00000000
-      },
-      {
-        "symbol": "LSK/ETH",
-        "base": "LSK",
-        "quote": "ETH",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 8,
-        "cost_precision": 9,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00020,
-        "tick_size": 1E-8,
-        "price_increment": 1E-8,
-        "qty_min": 3.00000000
-      },
-      {
-        "symbol": "LSK/USD",
-        "base": "LSK",
-        "quote": "USD",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 6,
-        "cost_precision": 6,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.50,
-        "tick_size": 0.000001,
-        "price_increment": 0.000001,
-        "qty_min": 3.00000000
-      },
-      {
-        "symbol": "LSK/EUR",
-        "base": "LSK",
-        "quote": "EUR",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 6,
-        "cost_precision": 6,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.45,
-        "tick_size": 0.000001,
-        "price_increment": 0.000001,
-        "qty_min": 3.00000000
-      },
-      {
         "symbol": "USDT/EUR",
         "base": "USDT",
         "quote": "EUR",
@@ -4828,7 +4812,7 @@
         "position_limit_short": 6100000,
         "tick_size": 1E-7,
         "price_increment": 1E-7,
-        "qty_min": 60.00000000
+        "qty_min": 30.00000000
       },
       {
         "symbol": "DOGE/EUR",
@@ -4847,7 +4831,7 @@
         "position_limit_short": 1500000,
         "tick_size": 1E-7,
         "price_increment": 1E-7,
-        "qty_min": 60.00000000
+        "qty_min": 30.00000000
       },
       {
         "symbol": "BTC/USDC",
@@ -4958,7 +4942,7 @@
         "cost_min": 50,
         "tick_size": 1,
         "price_increment": 1,
-        "qty_min": 0.02500000
+        "qty_min": 0.01000000
       },
       {
         "symbol": "LTC/JPY",
@@ -5158,7 +5142,7 @@
         "cost_min": 1.00,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.02500000
+        "qty_min": 0.01000000
       },
       {
         "symbol": "XRP/AUD",
@@ -5222,7 +5206,7 @@
         "cost_min": 0.00020,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 0.02500000
+        "qty_min": 0.01000000
       },
       {
         "symbol": "LTC/ETH",
@@ -5270,7 +5254,7 @@
         "cost_min": 0.43,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.02500000
+        "qty_min": 0.01000000
       },
       {
         "symbol": "XRP/USDT",
@@ -5305,7 +5289,7 @@
         "cost_min": 0.5000,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.02500000
+        "qty_min": 0.01000000
       },
       {
         "symbol": "LTC/USDT",
@@ -5379,22 +5363,6 @@
         "tick_size": 0.0001,
         "price_increment": 0.0001,
         "qty_min": 10.00000000
-      },
-      {
-        "symbol": "OXT/BTC",
-        "base": "OXT",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 8,
-        "cost_precision": 9,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 1E-8,
-        "price_increment": 1E-8,
-        "qty_min": 50.00000000
       },
       {
         "symbol": "OXT/EUR",
@@ -5636,22 +5604,6 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 8.00000000
-      },
-      {
-        "symbol": "KNC/BTC",
-        "base": "KNC",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 8,
-        "cost_precision": 9,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 1E-8,
-        "price_increment": 1E-8,
         "qty_min": 8.00000000
       },
       {
@@ -6000,22 +5952,6 @@
         "cost_min": 0.00002,
         "tick_size": 1E-7,
         "price_increment": 1E-7,
-        "qty_min": 10.00000000
-      },
-      {
-        "symbol": "CRV/ETH",
-        "base": "CRV",
-        "quote": "ETH",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 6,
-        "cost_precision": 8,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00020,
-        "tick_size": 0.000001,
-        "price_increment": 0.000001,
         "qty_min": 10.00000000
       },
       {
@@ -6388,22 +6324,6 @@
         "qty_min": 0.00100000
       },
       {
-        "symbol": "YFI/BTC",
-        "base": "YFI",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 4,
-        "cost_precision": 6,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 0.0001,
-        "price_increment": 0.0001,
-        "qty_min": 0.00100000
-      },
-      {
         "symbol": "YFI/EUR",
         "base": "YFI",
         "quote": "EUR",
@@ -6739,7 +6659,7 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 1.00000000
+        "qty_min": 0.50000000
       },
       {
         "symbol": "ANT/BTC",
@@ -6755,7 +6675,7 @@
         "cost_min": 0.00002,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 1.00000000
+        "qty_min": 0.50000000
       },
       {
         "symbol": "ANT/ETH",
@@ -6771,7 +6691,7 @@
         "cost_min": 0.00020,
         "tick_size": 0.000001,
         "price_increment": 0.000001,
-        "qty_min": 1.00000000
+        "qty_min": 0.50000000
       },
       {
         "symbol": "ANT/EUR",
@@ -6787,23 +6707,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 1.00000000
-      },
-      {
-        "symbol": "ETH2.S/ETH",
-        "base": "ETH2.S",
-        "quote": "ETH",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 4,
-        "cost_precision": 8,
-        "marginable": false,
-        "has_index": false,
-        "cost_min": 0.00020,
-        "tick_size": 0.0001,
-        "price_increment": 0.0001,
-        "qty_min": 0.00100000
+        "qty_min": 0.50000000
       },
       {
         "symbol": "GRT/USD",
@@ -6822,7 +6726,7 @@
         "position_limit_short": 350000,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 29.00000000
+        "qty_min": 17.00000000
       },
       {
         "symbol": "GRT/BTC",
@@ -6838,7 +6742,7 @@
         "cost_min": 0.00002,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 29.00000000
+        "qty_min": 17.00000000
       },
       {
         "symbol": "GRT/EUR",
@@ -6857,7 +6761,7 @@
         "position_limit_short": 200000,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 29.00000000
+        "qty_min": 17.00000000
       },
       {
         "symbol": "MANA/USD",
@@ -6895,22 +6799,6 @@
         "position_limit_short": 18000,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 10.00000000
-      },
-      {
-        "symbol": "MANA/ETH",
-        "base": "MANA",
-        "quote": "ETH",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 7,
-        "cost_precision": 9,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00020,
-        "tick_size": 1E-7,
-        "price_increment": 1E-7,
         "qty_min": 10.00000000
       },
       {
@@ -7042,7 +6930,7 @@
         "cost_min": 0.43,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 29.00000000
+        "qty_min": 17.00000000
       },
       {
         "symbol": "KSM/GBP",
@@ -7112,22 +7000,6 @@
         "qty_min": 40.00000000
       },
       {
-        "symbol": "XTZ/GBP",
-        "base": "XTZ",
-        "quote": "GBP",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 4,
-        "cost_precision": 6,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.43,
-        "tick_size": 0.0001,
-        "price_increment": 0.0001,
-        "qty_min": 4.00000000
-      },
-      {
         "symbol": "ADA/AUD",
         "base": "ADA",
         "quote": "AUD",
@@ -7179,38 +7051,6 @@
         "qty_min": 5.00000000
       },
       {
-        "symbol": "XTZ/AUD",
-        "base": "XTZ",
-        "quote": "AUD",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 4,
-        "cost_precision": 6,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 1.00,
-        "tick_size": 0.0001,
-        "price_increment": 0.0001,
-        "qty_min": 4.00000000
-      },
-      {
-        "symbol": "FLOW/GBP",
-        "base": "FLOW",
-        "quote": "GBP",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 3,
-        "cost_precision": 5,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.43,
-        "tick_size": 0.001,
-        "price_increment": 0.001,
-        "qty_min": 5.00000000
-      },
-      {
         "symbol": "DOGE/USDT",
         "base": "DOGE",
         "quote": "USDT",
@@ -7224,13 +7064,13 @@
         "cost_min": 0.5000,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 60.00000000
+        "qty_min": 30.00000000
       },
       {
         "symbol": "OCEAN/USD",
         "base": "OCEAN",
         "quote": "USD",
-        "status": "online",
+        "status": "reduce_only",
         "qty_precision": 8,
         "qty_increment": 1E-8,
         "price_precision": 4,
@@ -7243,7 +7083,7 @@
         "position_limit_short": 120000,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 10.00000000
+        "qty_min": 6.00000000
       },
       {
         "symbol": "OCEAN/BTC",
@@ -7259,7 +7099,7 @@
         "cost_min": 0.00002,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 10.00000000
+        "qty_min": 6.00000000
       },
       {
         "symbol": "OCEAN/GBP",
@@ -7275,13 +7115,13 @@
         "cost_min": 0.43,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 10.00000000
+        "qty_min": 6.00000000
       },
       {
         "symbol": "OCEAN/EUR",
         "base": "OCEAN",
         "quote": "EUR",
-        "status": "online",
+        "status": "reduce_only",
         "qty_precision": 8,
         "qty_increment": 1E-8,
         "price_precision": 4,
@@ -7294,7 +7134,7 @@
         "position_limit_short": 71000,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 10.00000000
+        "qty_min": 6.00000000
       },
       {
         "symbol": "EWT/USD",
@@ -7409,38 +7249,6 @@
         "qty_min": 4.00000000
       },
       {
-        "symbol": "SUSHI/GBP",
-        "base": "SUSHI",
-        "quote": "GBP",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 3,
-        "cost_precision": 5,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.43,
-        "tick_size": 0.001,
-        "price_increment": 0.001,
-        "qty_min": 4.00000000
-      },
-      {
-        "symbol": "SUSHI/BTC",
-        "base": "SUSHI",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 7,
-        "cost_precision": 9,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 1E-7,
-        "price_increment": 1E-7,
-        "qty_min": 4.00000000
-      },
-      {
         "symbol": "LPT/USD",
         "base": "LPT",
         "quote": "USD",
@@ -7518,7 +7326,7 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 5.00000000
+        "qty_min": 3.00000000
       },
       {
         "symbol": "GHST/EUR",
@@ -7534,7 +7342,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 5.00000000
+        "qty_min": 3.00000000
       },
       {
         "symbol": "GHST/BTC",
@@ -7550,7 +7358,7 @@
         "cost_min": 0.00002,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 5.00000000
+        "qty_min": 3.00000000
       },
       {
         "symbol": "BNT/USD",
@@ -7585,22 +7393,6 @@
         "qty_min": 6.00000000
       },
       {
-        "symbol": "BNT/BTC",
-        "base": "BNT",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 7,
-        "cost_precision": 9,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 1E-7,
-        "price_increment": 1E-7,
-        "qty_min": 6.00000000
-      },
-      {
         "symbol": "REN/USD",
         "base": "REN",
         "quote": "USD",
@@ -7630,22 +7422,6 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 90.00000000
-      },
-      {
-        "symbol": "REN/BTC",
-        "base": "REN",
-        "quote": "BTC",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 8,
-        "cost_precision": 10,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 0.00002,
-        "tick_size": 1E-8,
-        "price_increment": 1E-8,
         "qty_min": 90.00000000
       },
       {
@@ -7732,7 +7508,7 @@
         "cost_min": 0.50,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 3.00000000
+        "qty_min": 1.80000000
       },
       {
         "symbol": "RARI/EUR",
@@ -7748,7 +7524,7 @@
         "cost_min": 0.45,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 3.00000000
+        "qty_min": 1.80000000
       },
       {
         "symbol": "RARI/BTC",
@@ -7764,7 +7540,7 @@
         "cost_min": 0.00002,
         "tick_size": 1E-7,
         "price_increment": 1E-7,
-        "qty_min": 3.00000000
+        "qty_min": 1.80000000
       },
       {
         "symbol": "ANKR/USD",
@@ -7780,7 +7556,7 @@
         "cost_min": 0.50,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 202.00000000
+        "qty_min": 120.00000000
       },
       {
         "symbol": "ANKR/EUR",
@@ -7796,7 +7572,7 @@
         "cost_min": 0.45,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 202.00000000
+        "qty_min": 120.00000000
       },
       {
         "symbol": "ANKR/BTC",
@@ -7812,7 +7588,7 @@
         "cost_min": 0.00002,
         "tick_size": 1E-9,
         "price_increment": 1E-9,
-        "qty_min": 202.00000000
+        "qty_min": 120.00000000
       },
       {
         "symbol": "MATIC/USD",
@@ -8038,7 +7814,7 @@
         "position_limit_short": 24000,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.05000000
+        "qty_min": 0.02000000
       },
       {
         "symbol": "SOL/EUR",
@@ -8057,7 +7833,7 @@
         "position_limit_short": 6100,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.05000000
+        "qty_min": 0.02000000
       },
       {
         "symbol": "SOL/GBP",
@@ -8076,7 +7852,7 @@
         "position_limit_short": 2100,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.05000000
+        "qty_min": 0.02000000
       },
       {
         "symbol": "SOL/BTC",
@@ -8095,7 +7871,7 @@
         "position_limit_short": 2200,
         "tick_size": 1E-7,
         "price_increment": 1E-7,
-        "qty_min": 0.05000000
+        "qty_min": 0.02000000
       },
       {
         "symbol": "SRM/USD",
@@ -8705,7 +8481,7 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 50.00000000
+        "qty_min": 25.00000000
       },
       {
         "symbol": "PHA/EUR",
@@ -8721,7 +8497,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 50.00000000
+        "qty_min": 25.00000000
       },
       {
         "symbol": "MOVR/USD",
@@ -8865,7 +8641,7 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 300.00000000
+        "qty_min": 110.00000000
       },
       {
         "symbol": "OXY/EUR",
@@ -8881,7 +8657,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 300.00000000
+        "qty_min": 110.00000000
       },
       {
         "symbol": "OMG/JPY",
@@ -8914,22 +8690,6 @@
         "tick_size": 0.1,
         "price_increment": 0.1,
         "qty_min": 0.20000000
-      },
-      {
-        "symbol": "BAT/JPY",
-        "base": "BAT",
-        "quote": "JPY",
-        "status": "online",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 2,
-        "cost_precision": 5,
-        "marginable": false,
-        "has_index": true,
-        "cost_min": 50,
-        "tick_size": 0.01,
-        "price_increment": 0.01,
-        "qty_min": 20.00000000
       },
       {
         "symbol": "SGB/USD",
@@ -9112,12 +8872,15 @@
         "qty_increment": 0.00001,
         "price_precision": 8,
         "cost_precision": 5,
-        "marginable": false,
+        "marginable": true,
         "has_index": true,
         "cost_min": 0.50,
+        "margin_initial": 0.33,
+        "position_limit_long": 1500000000,
+        "position_limit_short": 1500000000,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 500000.00000
+        "qty_min": 200000.00000
       },
       {
         "symbol": "SHIB/EUR",
@@ -9133,7 +8896,7 @@
         "cost_min": 0.45,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 500000.00000
+        "qty_min": 200000.00000
       },
       {
         "symbol": "KINT/USD",
@@ -9373,7 +9136,7 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 2.00000000
+        "qty_min": 1.20000000
       },
       {
         "symbol": "AKT/EUR",
@@ -9389,7 +9152,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 2.00000000
+        "qty_min": 1.20000000
       },
       {
         "symbol": "SBR/USD",
@@ -9533,7 +9296,7 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 350.00000000
+        "qty_min": 180.00000000
       },
       {
         "symbol": "MNGO/EUR",
@@ -9549,7 +9312,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 350.00000000
+        "qty_min": 180.00000000
       },
       {
         "symbol": "ENS/USD",
@@ -9725,7 +9488,7 @@
         "cost_min": 0.50,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 300.00000000
+        "qty_min": 130.00000000
       },
       {
         "symbol": "JASMY/EUR",
@@ -9741,7 +9504,7 @@
         "cost_min": 0.45,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 300.00000000
+        "qty_min": 130.00000000
       },
       {
         "symbol": "AUDIO/USD",
@@ -9792,7 +9555,7 @@
         "position_limit_short": 5000,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 1.00000000
+        "qty_min": 0.50000000
       },
       {
         "symbol": "RNDR/EUR",
@@ -9808,7 +9571,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 1.00000000
+        "qty_min": 0.50000000
       },
       {
         "symbol": "POWR/USD",
@@ -9851,9 +9614,12 @@
         "qty_increment": 1E-8,
         "price_precision": 3,
         "cost_precision": 5,
-        "marginable": false,
-        "has_index": false,
+        "marginable": true,
+        "has_index": true,
         "cost_min": 0.50,
+        "margin_initial": 0.33,
+        "position_limit_long": 3000,
+        "position_limit_short": 3000,
         "tick_size": 0.001,
         "price_increment": 0.001,
         "qty_min": 0.40000000
@@ -9868,7 +9634,7 @@
         "price_precision": 3,
         "cost_precision": 5,
         "marginable": false,
-        "has_index": false,
+        "has_index": true,
         "cost_min": 0.45,
         "tick_size": 0.001,
         "price_increment": 0.001,
@@ -10051,7 +9817,7 @@
         "position_limit_short": 10000,
         "tick_size": 0.001,
         "price_increment": 0.001,
-        "qty_min": 1.50000000
+        "qty_min": 0.70000000
       },
       {
         "symbol": "NEAR/EUR",
@@ -10067,7 +9833,7 @@
         "cost_min": 0.45,
         "tick_size": 0.001,
         "price_increment": 0.001,
-        "qty_min": 1.50000000
+        "qty_min": 0.70000000
       },
       {
         "symbol": "RARE/USD",
@@ -10179,7 +9945,7 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 120.00000000
+        "qty_min": 40.00000000
       },
       {
         "symbol": "PSTAKE/EUR",
@@ -10195,7 +9961,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 120.00000000
+        "qty_min": 40.00000000
       },
       {
         "symbol": "QNT/USD",
@@ -10275,7 +10041,7 @@
         "cost_min": 0.50,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 200.00000000
+        "qty_min": 100.00000000
       },
       {
         "symbol": "GALA/EUR",
@@ -10291,7 +10057,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 200.00000000
+        "qty_min": 100.00000000
       },
       {
         "symbol": "MC/USD",
@@ -10339,7 +10105,7 @@
         "cost_min": 0.50,
         "tick_size": 0.000001,
         "price_increment": 0.000001,
-        "qty_min": 8500.00000000
+        "qty_min": 4000.00000000
       },
       {
         "symbol": "SPELL/EUR",
@@ -10355,7 +10121,7 @@
         "cost_min": 0.45,
         "tick_size": 0.000001,
         "price_increment": 0.000001,
-        "qty_min": 8500.00000000
+        "qty_min": 4000.00000000
       },
       {
         "symbol": "UMA/USD",
@@ -10662,7 +10428,7 @@
         "position_limit_short": 93000,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 10.00000000
+        "qty_min": 5.00000000
       },
       {
         "symbol": "FTM/EUR",
@@ -10681,7 +10447,7 @@
         "position_limit_short": 56000,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 10.00000000
+        "qty_min": 5.00000000
       },
       {
         "symbol": "HFT/USD",
@@ -10816,38 +10582,6 @@
         "tick_size": 0.000001,
         "price_increment": 0.000001,
         "qty_min": 450.00000000
-      },
-      {
-        "symbol": "BTC/AED",
-        "base": "BTC",
-        "quote": "AED",
-        "status": "cancel_only",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 0,
-        "cost_precision": 5,
-        "marginable": false,
-        "has_index": false,
-        "cost_min": 3.00,
-        "tick_size": 1,
-        "price_increment": 1,
-        "qty_min": 0.00010000
-      },
-      {
-        "symbol": "ETH/AED",
-        "base": "ETH",
-        "quote": "AED",
-        "status": "cancel_only",
-        "qty_precision": 8,
-        "qty_increment": 1E-8,
-        "price_precision": 1,
-        "cost_precision": 5,
-        "marginable": false,
-        "has_index": false,
-        "cost_min": 3.00,
-        "tick_size": 0.1,
-        "price_increment": 0.1,
-        "qty_min": 0.00200000
       },
       {
         "symbol": "DOT/JPY",
@@ -11071,7 +10805,7 @@
         "cost_min": 0.50,
         "tick_size": 0.001,
         "price_increment": 0.001,
-        "qty_min": 400.00000000
+        "qty_min": 200.00000000
       },
       {
         "symbol": "GST/EUR",
@@ -11087,7 +10821,7 @@
         "cost_min": 0.45,
         "tick_size": 0.001,
         "price_increment": 0.001,
-        "qty_min": 400.00000000
+        "qty_min": 200.00000000
       },
       {
         "symbol": "GMT/USD",
@@ -11349,7 +11083,7 @@
         "cost_min": 0.50,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 10.00000000
+        "qty_min": 4.00000000
       },
       {
         "symbol": "ROOK/EUR",
@@ -11365,7 +11099,7 @@
         "cost_min": 0.45,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 10.00000000
+        "qty_min": 4.00000000
       },
       {
         "symbol": "RLC/USD",
@@ -11403,7 +11137,7 @@
         "symbol": "FET/USD",
         "base": "FET",
         "quote": "USD",
-        "status": "online",
+        "status": "reduce_only",
         "qty_precision": 8,
         "qty_increment": 1E-8,
         "price_precision": 4,
@@ -11416,7 +11150,7 @@
         "position_limit_short": 20000,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 4.00000000
+        "qty_min": 2.50000000
       },
       {
         "symbol": "FET/EUR",
@@ -11432,7 +11166,7 @@
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 4.00000000
+        "qty_min": 2.50000000
       },
       {
         "symbol": "AGLD/USD",
@@ -11832,7 +11566,7 @@
         "cost_min": 0.50,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 90.00000000
+        "qty_min": 20.00000000
       },
       {
         "symbol": "TVK/EUR",
@@ -11848,7 +11582,7 @@
         "cost_min": 0.45,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 90.00000000
+        "qty_min": 20.00000000
       },
       {
         "symbol": "STG/USD",
@@ -11992,7 +11726,7 @@
         "cost_min": 0.50,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 500.00000000
+        "qty_min": 300.00000000
       },
       {
         "symbol": "MXC/EUR",
@@ -12008,7 +11742,7 @@
         "cost_min": 0.45,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 500.00000000
+        "qty_min": 300.00000000
       },
       {
         "symbol": "UNFI/USD",
@@ -12184,7 +11918,7 @@
         "cost_min": 0.5000,
         "tick_size": 1E-8,
         "price_increment": 1E-8,
-        "qty_min": 500000.00000
+        "qty_min": 200000.00000
       },
       {
         "symbol": "SOL/USDT",
@@ -12200,7 +11934,7 @@
         "cost_min": 0.5000,
         "tick_size": 0.01,
         "price_increment": 0.01,
-        "qty_min": 0.05000000
+        "qty_min": 0.02000000
       },
       {
         "symbol": "XMR/USDT",
@@ -12664,7 +12398,7 @@
         "cost_min": 0.50,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 90.00000000
+        "qty_min": 25.00000000
       },
       {
         "symbol": "TRU/EUR",
@@ -12680,7 +12414,7 @@
         "cost_min": 0.45,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 90.00000000
+        "qty_min": 25.00000000
       },
       {
         "symbol": "POND/USD",
@@ -12872,7 +12606,7 @@
         "cost_min": 0.50,
         "tick_size": 0.001,
         "price_increment": 0.001,
-        "qty_min": 4.00000000
+        "qty_min": 1.50000000
       },
       {
         "symbol": "ETHW/EUR",
@@ -12888,7 +12622,7 @@
         "cost_min": 0.45,
         "tick_size": 0.001,
         "price_increment": 0.001,
-        "qty_min": 4.00000000
+        "qty_min": 1.50000000
       },
       {
         "symbol": "ETHW/ETH",
@@ -12904,7 +12638,7 @@
         "cost_min": 0.00020,
         "tick_size": 0.000001,
         "price_increment": 0.000001,
-        "qty_min": 4.00000000
+        "qty_min": 1.50000000
       },
       {
         "symbol": "C98/USD",
@@ -13397,12 +13131,15 @@
         "qty_increment": 0.00001,
         "price_precision": 9,
         "cost_precision": 5,
-        "marginable": false,
-        "has_index": false,
+        "marginable": true,
+        "has_index": true,
         "cost_min": 0.50,
+        "margin_initial": 0.33,
+        "position_limit_long": 6000000000,
+        "position_limit_short": 6000000000,
         "tick_size": 1E-9,
         "price_increment": 1E-9,
-        "qty_min": 3000000.00000
+        "qty_min": 350000.00000
       },
       {
         "symbol": "PEPE/EUR",
@@ -13414,11 +13151,11 @@
         "price_precision": 9,
         "cost_precision": 5,
         "marginable": false,
-        "has_index": false,
+        "has_index": true,
         "cost_min": 0.45,
         "tick_size": 1E-9,
         "price_increment": 1E-9,
-        "qty_min": 3000000.00000
+        "qty_min": 350000.00000
       },
       {
         "symbol": "SEI/USD",
@@ -13635,7 +13372,7 @@
         "cost_min": 0.00020,
         "tick_size": 0.000001,
         "price_increment": 0.000001,
-        "qty_min": 0.05000000
+        "qty_min": 0.02000000
       },
       {
         "symbol": "PYTH/USD",
@@ -13747,7 +13484,7 @@
         "cost_min": 0.50,
         "tick_size": 1E-9,
         "price_increment": 1E-9,
-        "qty_min": 400000.00000
+        "qty_min": 150000.00000
       },
       {
         "symbol": "BONK/EUR",
@@ -13763,7 +13500,7 @@
         "cost_min": 0.45,
         "tick_size": 1E-9,
         "price_increment": 1E-9,
-        "qty_min": 400000.00000
+        "qty_min": 150000.00000
       },
       {
         "symbol": "JUP/USD",
@@ -13779,7 +13516,7 @@
         "cost_min": 0.50,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 10.00000
+        "qty_min": 5.00000
       },
       {
         "symbol": "JUP/EUR",
@@ -13795,7 +13532,7 @@
         "cost_min": 0.45,
         "tick_size": 0.00001,
         "price_increment": 0.00001,
-        "qty_min": 10.00000
+        "qty_min": 5.00000
       },
       {
         "symbol": "WIF/USD",
@@ -13806,12 +13543,15 @@
         "qty_increment": 0.00001,
         "price_precision": 4,
         "cost_precision": 8,
-        "marginable": false,
-        "has_index": false,
+        "marginable": true,
+        "has_index": true,
         "cost_min": 0.50,
+        "margin_initial": 0.33,
+        "position_limit_long": 14000,
+        "position_limit_short": 14000,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 10.00000
+        "qty_min": 1.50000
       },
       {
         "symbol": "WIF/EUR",
@@ -13823,11 +13563,11 @@
         "price_precision": 4,
         "cost_precision": 8,
         "marginable": false,
-        "has_index": false,
+        "has_index": true,
         "cost_min": 0.45,
         "tick_size": 0.0001,
         "price_increment": 0.0001,
-        "qty_min": 10.00000
+        "qty_min": 1.50000
       },
       {
         "symbol": "DYM/USD",
@@ -13892,6 +13632,982 @@
         "tick_size": 0.0001,
         "price_increment": 0.0001,
         "qty_min": 1.00000
+      },
+      {
+        "symbol": "ONDO/USD",
+        "base": "ONDO",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 5,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.00001,
+        "price_increment": 0.00001,
+        "qty_min": 3.50000
+      },
+      {
+        "symbol": "ONDO/EUR",
+        "base": "ONDO",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 5,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.00001,
+        "price_increment": 0.00001,
+        "qty_min": 3.50000
+      },
+      {
+        "symbol": "W/USD",
+        "base": "W",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 2.00000
+      },
+      {
+        "symbol": "W/EUR",
+        "base": "W",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 2.00000
+      },
+      {
+        "symbol": "BEAM/USD",
+        "base": "BEAM",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 5,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.00001,
+        "price_increment": 0.00001,
+        "qty_min": 100.00000
+      },
+      {
+        "symbol": "BEAM/EUR",
+        "base": "BEAM",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 5,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.00001,
+        "price_increment": 0.00001,
+        "qty_min": 100.00000
+      },
+      {
+        "symbol": "TAO/USD",
+        "base": "TAO",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 0.03000
+      },
+      {
+        "symbol": "TAO/EUR",
+        "base": "TAO",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 0.03000
+      },
+      {
+        "symbol": "PDA/USD",
+        "base": "PDA",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 5,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.00001,
+        "price_increment": 0.00001,
+        "qty_min": 50.00000
+      },
+      {
+        "symbol": "PDA/EUR",
+        "base": "PDA",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 5,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.00001,
+        "price_increment": 0.00001,
+        "qty_min": 50.00000
+      },
+      {
+        "symbol": "ZETA/USD",
+        "base": "ZETA",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 5.00000
+      },
+      {
+        "symbol": "ZETA/EUR",
+        "base": "ZETA",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 5.00000
+      },
+      {
+        "symbol": "ARKM/USD",
+        "base": "ARKM",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 3.00000
+      },
+      {
+        "symbol": "ARKM/EUR",
+        "base": "ARKM",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 3.00000
+      },
+      {
+        "symbol": "ETHFI/USD",
+        "base": "ETHFI",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 0.80000
+      },
+      {
+        "symbol": "ETHFI/EUR",
+        "base": "ETHFI",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 0.80000
+      },
+      {
+        "symbol": "ENA/USD",
+        "base": "ENA",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 5.00000
+      },
+      {
+        "symbol": "ENA/EUR",
+        "base": "ENA",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 5.00000
+      },
+      {
+        "symbol": "ALT/USD",
+        "base": "ALT",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 13.00000
+      },
+      {
+        "symbol": "ALT/EUR",
+        "base": "ALT",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 13.00000
+      },
+      {
+        "symbol": "PENDLE/USD",
+        "base": "PENDLE",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 2.00000
+      },
+      {
+        "symbol": "PENDLE/EUR",
+        "base": "PENDLE",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 2.00000
+      },
+      {
+        "symbol": "AEVO/USD",
+        "base": "AEVO",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 5.00000
+      },
+      {
+        "symbol": "AEVO/EUR",
+        "base": "AEVO",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 5.00000
+      },
+      {
+        "symbol": "PORTAL/USD",
+        "base": "PORTAL",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 10.00000
+      },
+      {
+        "symbol": "PORTAL/EUR",
+        "base": "PORTAL",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 10.00000
+      },
+      {
+        "symbol": "BIGTIME/USD",
+        "base": "BIGTIME",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 50.00000
+      },
+      {
+        "symbol": "BIGTIME/EUR",
+        "base": "BIGTIME",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 50.00000
+      },
+      {
+        "symbol": "SAFE/USD",
+        "base": "SAFE",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 2.50000
+      },
+      {
+        "symbol": "SAFE/EUR",
+        "base": "SAFE",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 2.50000
+      },
+      {
+        "symbol": "DRIFT/USD",
+        "base": "DRIFT",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 10.00000
+      },
+      {
+        "symbol": "DRIFT/EUR",
+        "base": "DRIFT",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 10.00000
+      },
+      {
+        "symbol": "MNT/USD",
+        "base": "MNT",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 10.00000
+      },
+      {
+        "symbol": "MNT/EUR",
+        "base": "MNT",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 10.00000
+      },
+      {
+        "symbol": "WEN/USD",
+        "base": "WEN",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 8,
+        "qty_increment": 1E-8,
+        "price_precision": 8,
+        "cost_precision": 12,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 1E-8,
+        "price_increment": 1E-8,
+        "qty_min": 25000.00000000
+      },
+      {
+        "symbol": "WEN/EUR",
+        "base": "WEN",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 8,
+        "qty_increment": 1E-8,
+        "price_precision": 8,
+        "cost_precision": 12,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 1E-8,
+        "price_increment": 1E-8,
+        "qty_min": 25000.00000000
+      },
+      {
+        "symbol": "BODEN/USD",
+        "base": "BODEN",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 10.00000
+      },
+      {
+        "symbol": "BODEN/EUR",
+        "base": "BODEN",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 10.00000
+      },
+      {
+        "symbol": "TREMP/USD",
+        "base": "TREMP",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 5.00000
+      },
+      {
+        "symbol": "TREMP/EUR",
+        "base": "TREMP",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 5.00000
+      },
+      {
+        "symbol": "TNSR/USD",
+        "base": "TNSR",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 4.00000
+      },
+      {
+        "symbol": "TNSR/EUR",
+        "base": "TNSR",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 4.00000
+      },
+      {
+        "symbol": "ZEUS/USD",
+        "base": "ZEUS",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 11.00000
+      },
+      {
+        "symbol": "ZEUS/EUR",
+        "base": "ZEUS",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 11.00000
+      },
+      {
+        "symbol": "NOS/USD",
+        "base": "NOS",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 1.00000
+      },
+      {
+        "symbol": "NOS/EUR",
+        "base": "NOS",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 1.00000
+      },
+      {
+        "symbol": "MPL/USD",
+        "base": "MPL",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 7,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 0.40000
+      },
+      {
+        "symbol": "MPL/EUR",
+        "base": "MPL",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 7,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 0.40000
+      },
+      {
+        "symbol": "SOL/AUD",
+        "base": "SOL",
+        "quote": "AUD",
+        "status": "online",
+        "qty_precision": 8,
+        "qty_increment": 1E-8,
+        "price_precision": 2,
+        "cost_precision": 5,
+        "marginable": false,
+        "has_index": true,
+        "cost_min": 1.00,
+        "tick_size": 0.01,
+        "price_increment": 0.01,
+        "qty_min": 0.02000000
+      },
+      {
+        "symbol": "DOGE/AUD",
+        "base": "DOGE",
+        "quote": "AUD",
+        "status": "online",
+        "qty_precision": 8,
+        "qty_increment": 1E-8,
+        "price_precision": 7,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": true,
+        "cost_min": 1.00,
+        "tick_size": 1E-7,
+        "price_increment": 1E-7,
+        "qty_min": 30.00000000
+      },
+      {
+        "symbol": "TRAC/USD",
+        "base": "TRAC",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 8.00000
+      },
+      {
+        "symbol": "TRAC/EUR",
+        "base": "TRAC",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 8.00000
+      },
+      {
+        "symbol": "KUJI/USD",
+        "base": "KUJI",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 2.00000
+      },
+      {
+        "symbol": "KUJI/EUR",
+        "base": "KUJI",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 2.00000
+      },
+      {
+        "symbol": "OSMO/USD",
+        "base": "OSMO",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 2.00000
+      },
+      {
+        "symbol": "OSMO/EUR",
+        "base": "OSMO",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 4,
+        "cost_precision": 8,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.0001,
+        "price_increment": 0.0001,
+        "qty_min": 2.00000
+      },
+      {
+        "symbol": "HONEY/USD",
+        "base": "HONEY",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 5,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.00001,
+        "price_increment": 0.00001,
+        "qty_min": 50.00000
+      },
+      {
+        "symbol": "HONEY/EUR",
+        "base": "HONEY",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 5,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.00001,
+        "price_increment": 0.00001,
+        "qty_min": 50.00000
+      },
+      {
+        "symbol": "ZRO/USD",
+        "base": "ZRO",
+        "quote": "USD",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 7,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.50,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 1.00000
+      },
+      {
+        "symbol": "ZRO/EUR",
+        "base": "ZRO",
+        "quote": "EUR",
+        "status": "online",
+        "qty_precision": 5,
+        "qty_increment": 0.00001,
+        "price_precision": 3,
+        "cost_precision": 7,
+        "marginable": false,
+        "has_index": false,
+        "cost_min": 0.45,
+        "tick_size": 0.001,
+        "price_increment": 0.001,
+        "qty_min": 1.00000
+      },
+      {
+        "symbol": "DOGE/GBP",
+        "base": "DOGE",
+        "quote": "GBP",
+        "status": "online",
+        "qty_precision": 8,
+        "qty_increment": 1E-8,
+        "price_precision": 7,
+        "cost_precision": 9,
+        "marginable": false,
+        "has_index": true,
+        "cost_min": 0.43,
+        "tick_size": 1E-7,
+        "price_increment": 1E-7,
+        "qty_min": 30.00000000
       }
     ]
   }

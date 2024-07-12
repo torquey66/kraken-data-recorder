@@ -1,5 +1,4 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
 #include <responses.hpp>
@@ -13,7 +12,7 @@
 #include <filesystem>
 #include <iostream>
 
-void dump_parquet(const std::string &filename) {
+void dump_parquet(const std::string& filename) {
   auto pool = arrow::default_memory_pool();
   auto result = arrow::io::ReadableFile::Open(filename);
   REQUIRE(result.ok());

@@ -3,7 +3,6 @@
 
 #include "types.hpp"
 
-#include <simdjson.h>
 #include <boost/json.hpp>
 
 #include <cstdint>
@@ -33,21 +32,15 @@ struct config_t final {
            std::string parquet_dir,
            depth_t book_depth,
            bool capture_book,
-           bool capture_trades)
-      : m_ping_interval_secs{ping_interval_secs},
-        m_kraken_host{kraken_host},
-        m_kraken_port{kraken_port},
-        m_pair_filter(pair_filter),
-        m_parquet_dir{parquet_dir},
-        m_book_depth{book_depth},
-        m_capture_book{capture_book},
-        m_capture_trades{capture_trades} {}
+           bool capture_trades);
+
+  bool operator==(const config_t&) const;
 
   // !@# TODO: consider a c++20 concept for to_json/str behavior
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
-  static config_t from_json(simdjson::ondemand::document&);
+  static config_t from_json(const boost::json::object&);
   static config_t from_json_str(const std::string&);
 
   size_t ping_interval_secs() const { return m_ping_interval_secs; }
