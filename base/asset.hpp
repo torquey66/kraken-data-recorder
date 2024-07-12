@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 
-#include <simdjson.h>
+#include <simdjson.h>  // !@#
 #include <boost/json.hpp>
 
 #include <optional>
@@ -31,7 +31,16 @@ struct asset_t final {
   };
   // clang-format on
 
-  static asset_t from_json(simdjson::ondemand::object&);
+  asset_t() {}
+  asset_t(bool borrowable,
+          double_t collateral_value,
+          std::string id,
+          std::optional<double_t> margin_rate,
+          integer_t precision,
+          integer_t precision_display,
+          status_t status);
+
+  bool operator==(const asset_t&) const;
 
   bool borrowable() const { return m_borrowable; }
   double_t collateral_value() const { return m_collateral_value; }
@@ -44,12 +53,16 @@ struct asset_t final {
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
+  static asset_t from_json_obj(const boost::json::object&);
+
+  static asset_t from_json(simdjson::ondemand::object& asset_obj);  // !@#
+
  private:
   static const std::unordered_map<std::string, status_t> c_str_to_status;
   static const std::unordered_map<status_t, std::string> c_status_to_str;
 
   bool m_borrowable = false;
-  double_t m_collateral_value = c_NaN;
+  double_t m_collateral_value = 0.;
   std::string m_id;
   std::optional<double_t> m_margin_rate;
   integer_t m_precision = 0;

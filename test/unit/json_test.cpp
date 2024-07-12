@@ -1,9 +1,12 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #include <doctest/doctest.h>
 
+#include <asset.hpp>
 #include <config.hpp>
 
 using namespace krakpot;
+
+/******************************************************************************/
 
 const auto pair_filter = config_t::symbol_filter_t{
     "BTC/USD",
@@ -29,4 +32,21 @@ TEST_CASE("config_t str roundtrip") {
   const auto config_json_str = config.str();
   const auto rt_config = config_t::from_json_str(config_json_str);
   CHECK(config == rt_config);
+}
+
+/******************************************************************************/
+
+const auto asset =
+    response::asset_t{true,
+                      100.00,
+                      "42",
+                      3.34,
+                      8,
+                      3,
+                      response::asset_t::e_fundingtemporarilydisabled};
+
+TEST_CASE("asset_t obj roundtrip") {
+  const auto asset_json_obj = asset.to_json_obj();
+  const auto rt_asset = response::asset_t::from_json_obj(asset_json_obj);
+  CHECK(asset == rt_asset);
 }

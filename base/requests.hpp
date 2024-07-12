@@ -1,6 +1,7 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "concepts.hpp"
 #include "types.hpp"
 
 #include <boost/json.hpp>
@@ -24,12 +25,17 @@ namespace request {
 struct ping_t final {
   ping_t(req_id_t req_id) : m_req_id(req_id) {}
 
+  req_id_t req_id() const { return m_req_id; }
+
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
  private:
   req_id_t m_req_id;
 };
+
+static_assert(is_request<ping_t>);
+static_assert(json_serializable<ping_t>);
 
 /**
  * See https://docs.kraken.com/websockets-v2/#instrument
@@ -38,6 +44,8 @@ struct subscribe_instrument_t final {
   subscribe_instrument_t(req_id_t req_id, bool snapshot = true)
       : m_req_id(req_id), m_snapshot(snapshot) {}
 
+  req_id_t req_id() const { return m_req_id; }
+
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
@@ -45,6 +53,9 @@ struct subscribe_instrument_t final {
   req_id_t m_req_id;
   bool m_snapshot;
 };
+
+static_assert(is_request<subscribe_instrument_t>);
+static_assert(json_serializable<subscribe_instrument_t>);
 
 /**
  * See https://docs.kraken.com/websockets-v2/#book
@@ -59,6 +70,8 @@ struct subscribe_book_t final {
         m_snapshot{snapshot},
         m_symbols{symbols} {}
 
+  req_id_t req_id() const { return m_req_id; }
+
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
@@ -69,6 +82,9 @@ struct subscribe_book_t final {
   std::vector<std::string> m_symbols;
 };
 
+static_assert(is_request<subscribe_book_t>);
+static_assert(json_serializable<subscribe_book_t>);
+
 /**
  * See https://docs.kraken.com/websockets-v2/#trade
  */
@@ -78,6 +94,8 @@ struct subscribe_trade_t final {
                     const std::vector<std::string>& symbols)
       : m_req_id(req_id), m_snapshot(snapshot), m_symbols(symbols) {}
 
+  req_id_t req_id() const { return m_req_id; }
+
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
@@ -86,6 +104,9 @@ struct subscribe_trade_t final {
   bool m_snapshot;
   std::vector<std::string> m_symbols;
 };
+
+static_assert(is_request<subscribe_trade_t>);
+static_assert(json_serializable<subscribe_trade_t>);
 
 }  // namespace request
 }  // namespace krakpot

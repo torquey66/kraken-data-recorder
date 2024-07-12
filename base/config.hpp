@@ -1,6 +1,7 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
+#include "concepts.hpp"
 #include "types.hpp"
 
 #include <boost/json.hpp>
@@ -62,5 +63,7 @@ struct config_t final {
   bool m_capture_book = true;
   bool m_capture_trades = true;
 };
+
+static_assert(json_serializable<config_t>);
 
 }  // namespace krakpot
