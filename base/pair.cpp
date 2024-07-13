@@ -63,6 +63,64 @@ pair_t::pair_t(std::string base,
       m_status{status},
       m_symbol{symbol} {}
 
+bool pair_t::operator==(const pair_t& rhs) const {
+  return m_base == rhs.m_base && m_cost_min == rhs.m_cost_min &&
+         m_cost_precision == rhs.m_cost_precision &&
+         m_has_index == rhs.m_has_index &&
+         m_margin_initial == rhs.m_margin_initial &&
+         m_marginable == rhs.m_marginable &&
+         m_position_limit_long == rhs.m_position_limit_long &&
+         m_position_limit_short == rhs.m_position_limit_short &&
+         m_price_increment == rhs.m_price_increment &&
+         m_price_precision == rhs.m_price_precision &&
+         m_qty_increment == rhs.m_qty_increment && m_qty_min == rhs.m_qty_min &&
+         m_qty_precision == rhs.m_qty_precision && m_quote == rhs.m_quote &&
+         m_status == rhs.m_status && m_symbol == rhs.m_symbol;
+}
+
+pair_t pair_t::from_json_obj(const boost::json::object& pair_obj) {
+  auto result = pair_t{};
+
+  result.m_base = pair_obj.at(c_pair_base).as_string();
+  result.m_cost_min = pair_obj.at(c_pair_cost_min).as_double();
+  result.m_cost_precision = pair_obj.at(c_pair_cost_precision).as_int64();
+  result.m_has_index = pair_obj.at(c_pair_has_index).as_bool();
+
+  if (pair_obj.contains(c_pair_margin_initial)) {
+    result.m_margin_initial = pair_obj.at(c_pair_margin_initial).as_double();
+  }
+
+  result.m_marginable = pair_obj.at(c_pair_marginable).as_bool();
+
+  if (pair_obj.contains(c_pair_position_limit_long)) {
+    result.m_position_limit_long =
+        pair_obj.at(c_pair_position_limit_long).as_int64();
+  }
+
+  if (pair_obj.contains(c_pair_position_limit_short)) {
+    result.m_position_limit_short =
+        pair_obj.at(c_pair_position_limit_long).as_int64();
+  }
+
+  result.m_price_increment = pair_obj.at(c_pair_price_increment).as_double();
+  result.m_price_precision = pair_obj.at(c_pair_price_precision).as_int64();
+  result.m_qty_increment = pair_obj.at(c_pair_qty_increment).as_double();
+  result.m_qty_min = pair_obj.at(c_pair_qty_min).as_double();
+  result.m_qty_precision = pair_obj.at(c_pair_qty_precision).as_int64();
+
+  result.m_quote = pair_obj.at(c_pair_quote).as_string();
+
+  const auto status_str = std::string{pair_obj.at(c_pair_status).as_string()};
+  const auto it = c_str_to_status.find(status_str);
+  if (it != c_str_to_status.end()) {
+    result.m_status = it->second;
+  }
+
+  result.m_symbol = pair_obj.at(c_pair_symbol).as_string();
+
+  return result;
+}
+
 pair_t pair_t::from_json(simdjson::ondemand::object& pair_obj) {
   auto result = pair_t{};
   auto buffer = std::string_view{};

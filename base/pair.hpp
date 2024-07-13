@@ -51,10 +51,13 @@ struct pair_t final {
          status_t status,
          std::string symbol);
 
-  static pair_t from_json(simdjson::ondemand::object&);
+  bool operator==(const pair_t&) const;
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
+
+  static pair_t from_json_obj(const boost::json::object&);
+  static pair_t from_json(simdjson::ondemand::object&);
 
   std::string base() const { return m_base; }
   double_t cost_min() const { return m_cost_min; }
