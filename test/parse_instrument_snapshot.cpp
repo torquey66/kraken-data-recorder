@@ -3,11 +3,13 @@
 #include <iostream>
 #include <simdjson.h>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   if (argc != 2) {
     std::cerr << "usage: " << argv[0] << " <json file>" << std::endl;
     return -1;
   }
+
+  /*
   const auto snapshot_file = std::string{argv[1]};
   try {
     auto parser = simdjson::ondemand::parser{};
@@ -19,4 +21,5 @@ int main(int argc, char *argv[]) {
     std::cerr << ex.what() << std::endl;
     return -1;
   }
+  */
 }

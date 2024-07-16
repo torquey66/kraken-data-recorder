@@ -163,7 +163,6 @@ static const std::string example_update_str = R"RESPONSE(
 */
 
 static const std::string pair_str = R"RESPONSE(
-[
   {
     "recv_tm": 1719859326224708,
     "base": "GST",
@@ -180,7 +179,6 @@ static const std::string pair_str = R"RESPONSE(
     "status": "online",
     "symbol": "GST/USD"
   }
-]
 )RESPONSE";
 
 static const std::string snapshot_str = R"RESPONSE(
@@ -192,12 +190,9 @@ TEST_CASE("book_t doc example snapshot") {
 
   simdjson::ondemand::parser parser;
 
-  simdjson::padded_string pair_response{pair_str};
-  simdjson::ondemand::document pair_doc = parser.iterate(pair_response);
-  for (simdjson::fallback::ondemand::object pair_obj : pair_doc) {
-    const auto pair = krakpot::response::pair_t::from_json(pair_obj);
-    book.accept(pair);
-  }
+  boost::json::object pair_obj = boost::json::parse(pair_str).as_object();
+  const auto pair = krakpot::response::pair_t::from_json_obj(pair_obj);
+  book.accept(pair);
 
   simdjson::padded_string snap_response{snapshot_str};
   simdjson::ondemand::document snap_doc = parser.iterate(snap_response);

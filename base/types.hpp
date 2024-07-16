@@ -99,6 +99,8 @@ struct timestamp_t final {
   timestamp_t() {}
   timestamp_t(int64_t in_micros) : m_micros(in_micros) {}
 
+  bool operator==(const timestamp_t&) const = default;
+
   std::string str() const { return to_iso_8601(m_micros); };
 
   int64_t micros() const { return m_micros; }
