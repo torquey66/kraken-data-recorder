@@ -30,6 +30,7 @@ add_library(krakpot_base
   base/decimal.cpp
   base/decimal.hpp
   base/engine.cpp
+  base/extract.hpp
   base/level_book.cpp
   base/metrics.cpp
   base/pair.cpp

@@ -28,9 +28,9 @@ struct engine_t final {
  private:
   using doc_t = simdjson::ondemand::document;
 
-  bool handle_instrument_msg(doc_t&);
-  bool handle_instrument_snapshot(doc_t&);
-  bool handle_instrument_update(doc_t&);
+  bool handle_instrument_msg(std::string_view);
+  bool handle_instrument_snapshot(const response::instrument_t&);
+  bool handle_instrument_update(const response::instrument_t&);
 
   bool handle_book_msg(doc_t&);
   bool handle_trade_msg(doc_t&);

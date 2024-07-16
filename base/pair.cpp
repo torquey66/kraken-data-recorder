@@ -2,6 +2,10 @@
 
 #include "pair.hpp"
 
+#include "extract.hpp"
+
+#include <boost/log/trivial.hpp>
+
 namespace krakpot {
 namespace response {
 
@@ -31,17 +35,17 @@ const std::unordered_map<pair_t::status_t, std::string>
 };
 
 pair_t::pair_t(std::string base,
-               double_t cost_min,
+               decimal_t cost_min,
                integer_t cost_precision,
                bool has_index,
                std::optional<double_t> margin_initial,
                bool marginable,
                std::optional<integer_t> position_limit_long,
                std::optional<integer_t> position_limit_short,
-               double_t price_increment,
+               decimal_t price_increment,
                integer_t price_precision,
-               double_t qty_increment,
-               double_t qty_min,
+               decimal_t qty_increment,
+               decimal_t qty_min,
                integer_t qty_precision,
                std::string quote,
                status_t status,
@@ -63,110 +67,54 @@ pair_t::pair_t(std::string base,
       m_status{status},
       m_symbol{symbol} {}
 
-bool pair_t::operator==(const pair_t& rhs) const {
-  return m_base == rhs.m_base && m_cost_min == rhs.m_cost_min &&
-         m_cost_precision == rhs.m_cost_precision &&
-         m_has_index == rhs.m_has_index &&
-         m_margin_initial == rhs.m_margin_initial &&
-         m_marginable == rhs.m_marginable &&
-         m_position_limit_long == rhs.m_position_limit_long &&
-         m_position_limit_short == rhs.m_position_limit_short &&
-         m_price_increment == rhs.m_price_increment &&
-         m_price_precision == rhs.m_price_precision &&
-         m_qty_increment == rhs.m_qty_increment && m_qty_min == rhs.m_qty_min &&
-         m_qty_precision == rhs.m_qty_precision && m_quote == rhs.m_quote &&
-         m_status == rhs.m_status && m_symbol == rhs.m_symbol;
-}
-
 pair_t pair_t::from_json_obj(const boost::json::object& pair_obj) {
   auto result = pair_t{};
 
-  result.m_base = pair_obj.at(c_pair_base).as_string();
-  result.m_cost_min = pair_obj.at(c_pair_cost_min).as_double();
-  result.m_cost_precision = pair_obj.at(c_pair_cost_precision).as_int64();
-  result.m_has_index = pair_obj.at(c_pair_has_index).as_bool();
+  try {
+    result.m_base = pair_obj.at(c_pair_base).as_string();
 
-  if (pair_obj.contains(c_pair_margin_initial)) {
-    result.m_margin_initial = pair_obj.at(c_pair_margin_initial).as_double();
+    result.m_cost_min = extract_decimal(pair_obj.at(c_pair_cost_min));
+    result.m_cost_precision = pair_obj.at(c_pair_cost_precision).as_int64();
+    result.m_has_index = pair_obj.at(c_pair_has_index).as_bool();
+
+    if (pair_obj.contains(c_pair_margin_initial)) {
+      result.m_margin_initial =
+          extract_double(pair_obj.at(c_pair_margin_initial));
+    }
+
+    result.m_marginable = pair_obj.at(c_pair_marginable).as_bool();
+
+    if (pair_obj.contains(c_pair_position_limit_long)) {
+      result.m_position_limit_long =
+          pair_obj.at(c_pair_position_limit_long).as_int64();
+    }
+
+    if (pair_obj.contains(c_pair_position_limit_short)) {
+      result.m_position_limit_short =
+          pair_obj.at(c_pair_position_limit_long).as_int64();
+    }
+
+    result.m_price_increment =
+        extract_decimal(pair_obj.at(c_pair_price_increment));
+    result.m_price_precision = pair_obj.at(c_pair_price_precision).as_int64();
+    result.m_qty_increment = extract_decimal(pair_obj.at(c_pair_qty_increment));
+    result.m_qty_min = extract_decimal(pair_obj.at(c_pair_qty_min));
+    result.m_qty_precision = pair_obj.at(c_pair_qty_precision).as_int64();
+
+    result.m_quote = pair_obj.at(c_pair_quote).as_string();
+
+    const auto status_str = std::string{pair_obj.at(c_pair_status).as_string()};
+    const auto it = c_str_to_status.find(status_str);
+    if (it != c_str_to_status.end()) {
+      result.m_status = it->second;
+    }
+
+    result.m_symbol = pair_obj.at(c_pair_symbol).as_string();
+  } catch (const std::exception& ex) {
+    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " what: " << ex.what()
+                             << " msg: " << boost::json::serialize(pair_obj);
+    throw ex;
   }
-
-  result.m_marginable = pair_obj.at(c_pair_marginable).as_bool();
-
-  if (pair_obj.contains(c_pair_position_limit_long)) {
-    result.m_position_limit_long =
-        pair_obj.at(c_pair_position_limit_long).as_int64();
-  }
-
-  if (pair_obj.contains(c_pair_position_limit_short)) {
-    result.m_position_limit_short =
-        pair_obj.at(c_pair_position_limit_long).as_int64();
-  }
-
-  result.m_price_increment = pair_obj.at(c_pair_price_increment).as_double();
-  result.m_price_precision = pair_obj.at(c_pair_price_precision).as_int64();
-  result.m_qty_increment = pair_obj.at(c_pair_qty_increment).as_double();
-  result.m_qty_min = pair_obj.at(c_pair_qty_min).as_double();
-  result.m_qty_precision = pair_obj.at(c_pair_qty_precision).as_int64();
-
-  result.m_quote = pair_obj.at(c_pair_quote).as_string();
-
-  const auto status_str = std::string{pair_obj.at(c_pair_status).as_string()};
-  const auto it = c_str_to_status.find(status_str);
-  if (it != c_str_to_status.end()) {
-    result.m_status = it->second;
-  }
-
-  result.m_symbol = pair_obj.at(c_pair_symbol).as_string();
-
-  return result;
-}
-
-pair_t pair_t::from_json(simdjson::ondemand::object& pair_obj) {
-  auto result = pair_t{};
-  auto buffer = std::string_view{};
-  simdjson::ondemand::value optional_val{};
-
-  buffer = pair_obj[c_pair_base].get_string();
-  result.m_base = std::string{buffer.begin(), buffer.end()};
-
-  result.m_cost_min = pair_obj[c_pair_cost_min].get_double();
-  result.m_cost_precision = pair_obj[c_pair_cost_precision].get_int64();
-  result.m_has_index = pair_obj[c_pair_has_index].get_bool();
-
-  if (pair_obj[c_pair_margin_initial].get(optional_val) == simdjson::SUCCESS) {
-    result.m_margin_initial = optional_val.get_double();
-  }
-
-  result.m_marginable = pair_obj[c_pair_marginable].get_bool();
-
-  if (pair_obj[c_pair_position_limit_long].get(optional_val) ==
-      simdjson::SUCCESS) {
-    result.m_position_limit_long = optional_val.get_int64();
-  }
-  if (pair_obj[c_pair_position_limit_short].get(optional_val) ==
-      simdjson::SUCCESS) {
-    result.m_position_limit_short = optional_val.get_int64();
-  }
-
-  result.m_price_increment = pair_obj[c_pair_price_increment].get_double();
-  result.m_price_precision = pair_obj[c_pair_price_precision].get_int64();
-  result.m_qty_increment = pair_obj[c_pair_qty_increment].get_double();
-  result.m_qty_min = pair_obj[c_pair_qty_min].get_double();
-  result.m_qty_precision = pair_obj[c_pair_qty_precision].get_int64();
-
-  buffer = pair_obj[c_pair_quote].get_string();
-  result.m_quote = std::string(buffer.begin(), buffer.end());
-
-  // TODO: improve error handling in the face of invalid status values
-  buffer = pair_obj[c_pair_status].get_string();
-  const auto status = std::string(buffer.begin(), buffer.end());
-  const auto it = c_str_to_status.find(status);
-  if (it != c_str_to_status.end()) {
-    result.m_status = it->second;
-  }
-
-  buffer = pair_obj[c_pair_symbol].get_string();
-  result.m_symbol = std::string(buffer.begin(), buffer.end());
 
   return result;
 }
@@ -174,13 +122,13 @@ pair_t pair_t::from_json(simdjson::ondemand::object& pair_obj) {
 boost::json::object pair_t::to_json_obj() const {
   boost::json::object result{
       {c_pair_base, m_base},
-      {c_pair_cost_min, m_cost_min},
+      {c_pair_cost_min, m_cost_min.str(m_cost_precision)},
       {c_pair_cost_precision, m_cost_precision},
       {c_pair_has_index, m_has_index},
-      {c_pair_price_increment, m_price_increment},
+      {c_pair_price_increment, m_price_increment.str(m_price_precision)},
       {c_pair_price_precision, m_price_precision},
-      {c_pair_qty_increment, m_qty_increment},
-      {c_pair_qty_min, m_qty_min},
+      {c_pair_qty_increment, m_qty_increment.str(m_qty_precision)},
+      {c_pair_qty_min, m_qty_min.str(m_qty_precision)},
       {c_pair_qty_precision, m_qty_precision},
       {c_pair_quote, m_quote},
       {c_pair_symbol, m_symbol},
@@ -209,5 +157,5 @@ boost::json::object pair_t::to_json_obj() const {
   return result;
 }
 
-} // namespace response
-} // namespace krakpot
+}  // namespace response
+}  // namespace krakpot

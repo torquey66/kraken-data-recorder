@@ -3,10 +3,10 @@
 
 #include "types.hpp"
 
-#include <simdjson.h>
 #include <boost/json.hpp>
 
 #include <optional>
+#include <ostream>
 #include <string>
 #include <unordered_map>
 
@@ -35,32 +35,31 @@ struct pair_t final {
 
   pair_t() {}
   pair_t(std::string base,
-         double_t cost_min,
+         decimal_t cost_min,
          integer_t cost_precision,
          bool has_index,
          std::optional<double_t> margin_initial,
          bool marginable,
          std::optional<integer_t> position_limit_long,
          std::optional<integer_t> position_limit_short,
-         double_t price_increment,
+         decimal_t price_increment,
          integer_t price_precision,
-         double_t qty_increment,
-         double_t qty_min,
+         decimal_t qty_increment,
+         decimal_t qty_min,
          integer_t qty_precision,
          std::string quote,
          status_t status,
          std::string symbol);
 
-  bool operator==(const pair_t&) const;
+  bool operator==(const pair_t&) const = default;
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
   static pair_t from_json_obj(const boost::json::object&);
-  static pair_t from_json(simdjson::ondemand::object&);
 
   std::string base() const { return m_base; }
-  double_t cost_min() const { return m_cost_min; }
+  decimal_t cost_min() const { return m_cost_min; }
   integer_t cost_precision() const { return m_cost_precision; }
   bool has_index() const { return m_has_index; }
   std::optional<double_t> margin_initial() const { return m_margin_initial; }
@@ -71,10 +70,10 @@ struct pair_t final {
   std::optional<integer_t> position_limit_short() const {
     return m_position_limit_short;
   }
-  double_t price_increment() const { return m_price_increment; }
+  decimal_t price_increment() const { return m_price_increment; }
   integer_t price_precision() const { return m_price_precision; }
-  double_t qty_increment() const { return m_qty_increment; }
-  double_t qty_min() const { return m_qty_min; }
+  decimal_t qty_increment() const { return m_qty_increment; }
+  decimal_t qty_min() const { return m_qty_min; }
   integer_t qty_precision() const { return m_qty_precision; }
   std::string quote() const { return m_quote; }
   status_t status() const { return m_status; }
@@ -85,22 +84,27 @@ struct pair_t final {
   static const std::unordered_map<status_t, std::string> c_status_to_str;
 
   std::string m_base;
-  double_t m_cost_min = c_NaN;
+  decimal_t m_cost_min;
   integer_t m_cost_precision = 0;
   bool m_has_index = false;
   std::optional<double_t> m_margin_initial;
   bool m_marginable = false;
   std::optional<integer_t> m_position_limit_long;
   std::optional<integer_t> m_position_limit_short;
-  double_t m_price_increment = c_NaN;
+  decimal_t m_price_increment;
   integer_t m_price_precision = 0;
-  double_t m_qty_increment = c_NaN;
-  double_t m_qty_min = c_NaN;
+  decimal_t m_qty_increment;
+  decimal_t m_qty_min;
   integer_t m_qty_precision = 0;
   std::string m_quote;
   status_t m_status = e_invalid;
   std::string m_symbol;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const pair_t& pair) {
+  os << pair.str();
+  return os;
+}
 
 }  // namespace response
 }  // namespace krakpot

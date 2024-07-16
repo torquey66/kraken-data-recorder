@@ -13,7 +13,8 @@ void pairs_sink_t::accept(const response::header_t& header,
   for (const auto& pair : pairs) {
     PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
     PARQUET_THROW_NOT_OK(m_base_builder.Append(pair.base()));
-    PARQUET_THROW_NOT_OK(m_cost_min_builder.Append(pair.cost_min()));
+    PARQUET_THROW_NOT_OK(
+        m_cost_min_builder.Append(pair.cost_min().str(pair.cost_precision())));
     PARQUET_THROW_NOT_OK(
         m_cost_precision_builder.Append(pair.cost_precision()));
     PARQUET_THROW_NOT_OK(m_has_index_builder.Append(pair.has_index()));
@@ -36,12 +37,14 @@ void pairs_sink_t::accept(const response::header_t& header,
     } else {
       PARQUET_THROW_NOT_OK(m_position_limit_short_builder.AppendNull());
     }
-    PARQUET_THROW_NOT_OK(
-        m_price_increment_builder.Append(pair.price_increment()));
+    PARQUET_THROW_NOT_OK(m_price_increment_builder.Append(
+        pair.price_increment().str(pair.price_precision())));
     PARQUET_THROW_NOT_OK(
         m_price_precision_builder.Append(pair.price_precision()));
-    PARQUET_THROW_NOT_OK(m_qty_increment_builder.Append(pair.qty_increment()));
-    PARQUET_THROW_NOT_OK(m_qty_min_builder.Append(pair.qty_min()));
+    PARQUET_THROW_NOT_OK(m_qty_increment_builder.Append(
+        pair.qty_increment().str(pair.qty_precision())));
+    PARQUET_THROW_NOT_OK(
+        m_qty_min_builder.Append(pair.qty_min().str(pair.qty_precision())));
     PARQUET_THROW_NOT_OK(m_qty_precision_builder.Append(pair.qty_precision()));
     PARQUET_THROW_NOT_OK(m_quote_builder.Append(pair.quote()));
     PARQUET_THROW_NOT_OK(m_status_builder.Append(pair.status()));
@@ -120,17 +123,17 @@ std::shared_ptr<arrow::Schema> pairs_sink_t::schema() {
       arrow::field(c_header_recv_tm, arrow::int64(),
                    false),  // TODO: replace with timestamp type
       arrow::field(c_pair_base, arrow::utf8(), false),
-      arrow::field(c_pair_cost_min, arrow::float64(), false),
+      arrow::field(c_pair_cost_min, arrow::utf8(), false),
       arrow::field(c_pair_cost_precision, arrow::int64(), false),
       arrow::field(c_pair_has_index, arrow::boolean(), false),
       arrow::field(c_pair_margin_initial, arrow::float64(), true),
       arrow::field(c_pair_marginable, arrow::boolean(), false),
       arrow::field(c_pair_position_limit_long, arrow::int64(), true),
       arrow::field(c_pair_position_limit_short, arrow::int64(), true),
-      arrow::field(c_pair_price_increment, arrow::float64(), false),
+      arrow::field(c_pair_price_increment, arrow::utf8(), false),
       arrow::field(c_pair_price_precision, arrow::int64(), false),
-      arrow::field(c_pair_qty_increment, arrow::float64(), false),
-      arrow::field(c_pair_qty_min, arrow::float64(), false),
+      arrow::field(c_pair_qty_increment, arrow::utf8(), false),
+      arrow::field(c_pair_qty_min, arrow::utf8(), false),
       arrow::field(c_pair_qty_precision, arrow::int64(), false),
       arrow::field(c_pair_quote, arrow::utf8(), false),
       arrow::field(c_pair_status, arrow::int8(), false),

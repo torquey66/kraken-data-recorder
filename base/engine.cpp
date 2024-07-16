@@ -19,7 +19,6 @@ engine_t::engine_t(session_t &session, const config_t &config,
     : m_session{session}, m_config{config}, m_sink(sink) {}
 
 bool engine_t::handle_msg(msg_t msg) {
-
   m_metrics.accept(msg);
 
   try {
@@ -29,7 +28,7 @@ bool engine_t::handle_msg(msg_t msg) {
     auto buffer = std::string_view{};
     if (doc[c_response_channel].get(buffer) == simdjson::SUCCESS) {
       if (buffer == c_channel_instrument) {
-        return handle_instrument_msg(doc);
+        return handle_instrument_msg(msg);
       }
       if (buffer == c_channel_book) {
         return handle_book_msg(doc);
@@ -54,7 +53,7 @@ bool engine_t::handle_msg(msg_t msg) {
           << ": unexpected message: " << simdjson::to_json_string(doc);
     }
 
-  } catch (const std::exception &ex) {
+  } catch (const std::exception& ex) {
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__ << ": " << ex.what() << " msg: " << msg;
     return false;
@@ -63,30 +62,33 @@ bool engine_t::handle_msg(msg_t msg) {
   return true;
 }
 
-bool engine_t::handle_instrument_msg(doc_t &doc) {
-
-  auto buffer = std::string_view{};
-  if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
+bool engine_t::handle_instrument_msg(std::string_view msg) {
+  try {
+    const boost::json::object doc = boost::json::parse(msg).as_object();
+    const auto instrument = response::instrument_t::from_json_obj(doc);
+    if (instrument.header().type() == c_instrument_snapshot) {
+      return handle_instrument_snapshot(instrument);
+    }
+    if (instrument.header().type() == c_instrument_update) {
+      return handle_instrument_update(instrument);
+    }
     BOOST_LOG_TRIVIAL(error)
-        << __FUNCTION__ << ": missing 'type' " << simdjson::to_json_string(doc);
+        << __FUNCTION__ << ": unknown 'type' " << instrument.header().type();
+    ;
+    return false;
+  } catch (const std::exception& ex) {
+    BOOST_LOG_TRIVIAL(error)
+        << __FUNCTION__ << ": " << ex.what() << " msg: " << msg;
     return false;
   }
-
-  if (buffer == c_instrument_snapshot) {
-    return handle_instrument_snapshot(doc);
-  } else if (buffer == c_instrument_update) {
-    return handle_instrument_update(doc);
-  }
-
-  BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": unknown 'type' " << buffer;
-  return false;
+  return true;
 }
 
-bool engine_t::handle_instrument_snapshot(doc_t& doc) {
-  const auto response = response::instrument_t::from_json(doc);
-  m_sink.accept(response);
+bool engine_t::handle_instrument_snapshot(
+    const response::instrument_t& instrument) {
+  m_sink.accept(instrument);
 
-  const auto& pairs = response.pairs();
+  const auto& pairs = instrument.pairs();
   auto symbols = std::vector<std::string>{};
   std::transform(pairs.begin(), pairs.end(), std::back_inserter(symbols),
                  [](const auto& pair) { return pair.symbol(); });
@@ -116,9 +118,9 @@ bool engine_t::handle_instrument_snapshot(doc_t& doc) {
   return true;
 }
 
-bool engine_t::handle_instrument_update(doc_t& doc) {
-  const auto response = response::instrument_t::from_json(doc);
-  m_sink.accept(response);
+bool engine_t::handle_instrument_update(
+    const response::instrument_t& instrument) {
+  m_sink.accept(instrument);
   return true;
 }
 

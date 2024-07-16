@@ -3,7 +3,6 @@
 
 #include "types.hpp"
 
-#include <simdjson.h>  // !@#
 #include <boost/json.hpp>
 
 #include <optional>
@@ -54,7 +53,6 @@ struct asset_t final {
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
   static asset_t from_json_obj(const boost::json::object&);
-  static asset_t from_json(simdjson::ondemand::object& asset_obj);  // !@#
 
  private:
   static const std::unordered_map<std::string, status_t> c_str_to_status;

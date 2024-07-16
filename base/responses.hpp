@@ -25,8 +25,9 @@ namespace response {
  */
 struct header_t final {
   header_t() = default;
-  header_t(timestamp_t recv_tm, std::string channel, std::string type)
-      : m_recv_tm(recv_tm), m_channel(channel), m_type(type) {}
+  header_t(timestamp_t recv_tm, std::string channel, std::string type);
+
+  bool operator==(const header_t&) const = default;
 
   const timestamp_t recv_tm() const { return m_recv_tm; }
   const std::string& channel() const { return m_channel; }
@@ -47,7 +48,11 @@ struct header_t final {
 struct instrument_t final {
   instrument_t() = default;
 
-  static instrument_t from_json(simdjson::ondemand::document&);
+  instrument_t(const header_t&,
+               const std::vector<asset_t>&,
+               const std::vector<pair_t>&);
+
+  bool operator==(const instrument_t&) const = default;
 
   const header_t& header() const { return m_header; }
   const std::vector<asset_t>& assets() const { return m_assets; }
@@ -55,6 +60,8 @@ struct instrument_t final {
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
+
+  static instrument_t from_json_obj(const boost::json::object&);
 
  private:
   header_t m_header;

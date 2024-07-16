@@ -74,34 +74,6 @@ asset_t asset_t::from_json_obj(const boost::json::object& asset_obj) {
   return result;
 }
 
-asset_t asset_t::from_json(simdjson::ondemand::object& asset_obj) {
-  auto result = asset_t{};
-  auto buffer = std::string_view{};
-  simdjson::ondemand::value optional_val{};
-
-  result.m_borrowable = asset_obj[c_asset_borrowable].get_bool();
-  result.m_collateral_value = asset_obj[c_asset_collateral_value].get_double();
-
-  buffer = asset_obj[c_asset_id].get_string();
-  result.m_id = std::string{buffer.begin(), buffer.end()};
-
-  if (asset_obj[c_asset_margin_rate].get(optional_val) == simdjson::SUCCESS) {
-    result.m_margin_rate = optional_val.get_double();
-  }
-
-  result.m_precision = asset_obj[c_asset_precision].get_int64();
-  result.m_precision_display = asset_obj[c_asset_precision_display].get_int64();
-
-  buffer = asset_obj[c_asset_status].get_string();
-  const auto status = std::string(buffer.begin(), buffer.end());
-  const auto it = c_str_to_status.find(status);
-  if (it != c_str_to_status.end()) {
-    result.m_status = it->second;
-  }
-
-  return result;
-}
-
 boost::json::object asset_t::to_json_obj() const {
   boost::json::object result = {
       {c_asset_borrowable, m_borrowable},

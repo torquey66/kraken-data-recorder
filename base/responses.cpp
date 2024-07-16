@@ -19,6 +19,14 @@ krakpot::decimal_t extract_decimal(O& obj, std::string field) {
 namespace krakpot {
 namespace response {
 
+header_t::header_t(timestamp_t recv_tm, std::string channel, std::string type)
+    : m_recv_tm{recv_tm}, m_channel{channel}, m_type{type} {}
+
+instrument_t::instrument_t(const header_t& header,
+                           const std::vector<asset_t>& assets,
+                           const std::vector<pair_t>& pairs)
+    : m_header{header}, m_assets{assets}, m_pairs{pairs} {}
+
 boost::json::object header_t::to_json_obj() const {
   const boost::json::object result = {{c_header_recv_tm, recv_tm().str()},
                                       {c_header_channel, channel()},
@@ -26,23 +34,25 @@ boost::json::object header_t::to_json_obj() const {
   return result;
 }
 
-instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
+instrument_t instrument_t::from_json_obj(
+    const boost::json::object& instrument_obj) {
   auto result = instrument_t{};
-  auto buffer = std::string_view{};
-
-  buffer = response[c_header_channel].get_string();
-  const auto channel = std::string{buffer.begin(), buffer.end()};
-  buffer = response[c_header_type].get_string();
-  const auto type = std::string{buffer.begin(), buffer.end()};
+  const auto channel =
+      std::string{instrument_obj.at(c_header_channel).as_string()};
+  const auto type = std::string{instrument_obj.at(c_header_type).as_string()};
+  // !@# TODO: consider deserializing req_tm if present for roundtrip tests,
+  // etc.
   result.m_header = header_t{timestamp_t::now(), channel, type};
 
-  for (simdjson::fallback::ondemand::object obj : response[c_response_data][c_instrument_assets]) {
-    const auto asset = asset_t::from_json(obj);
+  const auto& data_obj = instrument_obj.at(c_response_data).as_object();
+
+  for (const auto& asset_obj : data_obj.at(c_instrument_assets).as_array()) {
+    const auto asset = asset_t::from_json_obj(asset_obj.as_object());
     result.m_assets.push_back(asset);
   }
 
-  for (simdjson::fallback::ondemand::object obj : response[c_response_data][c_instrument_pairs]) {
-    const auto pair = pair_t::from_json(obj);
+  for (const auto& pair_obj : data_obj.at(c_instrument_pairs).as_array()) {
+    const auto pair = pair_t::from_json_obj(pair_obj.as_object());
     result.m_pairs.push_back(pair);
   }
 
