@@ -59,18 +59,16 @@ boost::json::object sides_t::to_json_obj() const {
   auto bid_objs = boost::json::array{};
   std::transform(
       bids().begin(), bids().end(), std::back_inserter(bid_objs),
-      [this](const auto& kv) {
-        const boost::json::object quote{
-            {kv.first.str(price_precision()), kv.second.str(qty_precision())}};
+      [](const auto& kv) {
+        const boost::json::object quote{{kv.first.str(), kv.second.str()}};
         return quote;
       });
 
   auto ask_objs = boost::json::array{};
   std::transform(
       asks().begin(), asks().end(), std::back_inserter(ask_objs),
-      [this](const auto& kv) {
-        const boost::json::object quote{
-            {kv.first.str(price_precision()), kv.second.str(qty_precision())}};
+      [](const auto& kv) {
+        const boost::json::object quote{{kv.first.str(), kv.second.str()}};
         return quote;
       });
 

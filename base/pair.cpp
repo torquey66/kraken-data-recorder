@@ -36,17 +36,17 @@ const std::unordered_map<pair_t::status_t, std::string>
 
 pair_t::pair_t(std::string base,
                decimal_t cost_min,
-               integer_t cost_precision,
+               precision_t cost_precision,
                bool has_index,
                std::optional<double_t> margin_initial,
                bool marginable,
                std::optional<integer_t> position_limit_long,
                std::optional<integer_t> position_limit_short,
                decimal_t price_increment,
-               integer_t price_precision,
+               precision_t price_precision,
                decimal_t qty_increment,
                decimal_t qty_min,
-               integer_t qty_precision,
+               precision_t qty_precision,
                std::string quote,
                status_t status,
                std::string symbol)
@@ -73,8 +73,19 @@ pair_t pair_t::from_json_obj(const boost::json::object& pair_obj) {
   try {
     result.m_base = pair_obj.at(c_pair_base).as_string();
 
-    result.m_cost_min = extract_decimal(pair_obj.at(c_pair_cost_min));
-    result.m_cost_precision = pair_obj.at(c_pair_cost_precision).as_int64();
+    result.m_cost_precision =
+        extract_precision(pair_obj.at(c_pair_cost_precision));
+    //        pair_obj.at(c_pair_cost_precision).as_int64() & 0xffff;
+    result.m_price_precision =
+        extract_precision(pair_obj.at(c_pair_price_precision));
+    //        pair_obj.at(c_pair_price_precision).as_int64() & 0xffff;
+    result.m_qty_precision =
+        extract_precision(pair_obj.at(c_pair_qty_precision));
+    //        pair_obj.at(c_pair_qty_precision).as_int64() & 0xffff;
+
+    result.m_cost_min =
+        extract_decimal(pair_obj.at(c_pair_cost_min), result.m_cost_precision);
+
     result.m_has_index = pair_obj.at(c_pair_has_index).as_bool();
 
     if (pair_obj.contains(c_pair_margin_initial)) {
@@ -94,12 +105,12 @@ pair_t pair_t::from_json_obj(const boost::json::object& pair_obj) {
           pair_obj.at(c_pair_position_limit_long).as_int64();
     }
 
-    result.m_price_increment =
-        extract_decimal(pair_obj.at(c_pair_price_increment));
-    result.m_price_precision = pair_obj.at(c_pair_price_precision).as_int64();
-    result.m_qty_increment = extract_decimal(pair_obj.at(c_pair_qty_increment));
-    result.m_qty_min = extract_decimal(pair_obj.at(c_pair_qty_min));
-    result.m_qty_precision = pair_obj.at(c_pair_qty_precision).as_int64();
+    result.m_price_increment = extract_decimal(
+        pair_obj.at(c_pair_price_increment), result.m_price_precision);
+    result.m_qty_increment = extract_decimal(pair_obj.at(c_pair_qty_increment),
+                                             result.m_qty_precision);
+    result.m_qty_min =
+        extract_decimal(pair_obj.at(c_pair_qty_min), result.m_qty_precision);
 
     result.m_quote = pair_obj.at(c_pair_quote).as_string();
 
@@ -122,13 +133,13 @@ pair_t pair_t::from_json_obj(const boost::json::object& pair_obj) {
 boost::json::object pair_t::to_json_obj() const {
   boost::json::object result{
       {c_pair_base, m_base},
-      {c_pair_cost_min, m_cost_min.str(m_cost_precision)},
+      {c_pair_cost_min, m_cost_min.str()},
       {c_pair_cost_precision, m_cost_precision},
       {c_pair_has_index, m_has_index},
-      {c_pair_price_increment, m_price_increment.str(m_price_precision)},
+      {c_pair_price_increment, m_price_increment.str()},
       {c_pair_price_precision, m_price_precision},
-      {c_pair_qty_increment, m_qty_increment.str(m_qty_precision)},
-      {c_pair_qty_min, m_qty_min.str(m_qty_precision)},
+      {c_pair_qty_increment, m_qty_increment.str()},
+      {c_pair_qty_min, m_qty_min.str()},
       {c_pair_qty_precision, m_qty_precision},
       {c_pair_quote, m_quote},
       {c_pair_symbol, m_symbol},

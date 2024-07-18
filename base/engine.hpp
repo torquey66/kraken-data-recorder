@@ -28,12 +28,12 @@ struct engine_t final {
  private:
   using doc_t = simdjson::ondemand::document;
 
-  bool handle_instrument_msg(std::string_view);
+  bool handle_instrument_msg(msg_t);
   bool handle_instrument_snapshot(const response::instrument_t&);
   bool handle_instrument_update(const response::instrument_t&);
 
-  bool handle_book_msg(doc_t&);
-  bool handle_trade_msg(doc_t&);
+  bool handle_book_msg(msg_t);
+  bool handle_trade_msg(msg_t&);
 
   bool handle_heartbeat_msg(doc_t&);
   bool handle_pong_msg(doc_t&);
@@ -41,7 +41,9 @@ struct engine_t final {
   session_t& m_session;
   config_t m_config;
 
-  simdjson::ondemand::parser m_parser;
+  model::refdata_t m_refdata;
+
+  simdjson::ondemand::parser m_parser;  // !@# TODO: delete
 
   bool m_subscribed = false;
 

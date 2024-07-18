@@ -24,7 +24,6 @@ using msg_t = std::string_view;
 
 using integer_t = int64_t;
 using double_t = double;
-
 using req_id_t = int64_t;
 using price_t = decimal_t;
 using qty_t = decimal_t;

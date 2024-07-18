@@ -12,6 +12,17 @@ void refdata_t::accept(const response::instrument_t& instrument) {
   }
 }
 
+std::optional<refdata_t::pair_ref_t> refdata_t::pair(
+    const std::string& symbol) const {
+  std::optional<pair_ref_t> result;
+  const auto it = m_pairs.find(symbol);
+  if (it != m_pairs.end()) {
+    const response::pair_t& pair{it->second};
+    return std::make_optional(std::cref(pair));
+  }
+  return result;
+}
+
 std::optional<refdata_t::pair_precision_t> refdata_t::pair_precision(
     const std::string& symbol) const {
   std::optional<pair_precision_t> result;

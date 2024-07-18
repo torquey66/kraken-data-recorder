@@ -91,13 +91,11 @@ struct book_t final {
   const std::string& symbol() const { return m_symbol; }
   timestamp_t timestamp() const { return m_timestamp; }
 
-  static book_t from_json(simdjson::ondemand::document&);
+  static book_t from_json_obj(const boost::json::object&, const pair_t&);
+  //  static book_t from_json(simdjson::ondemand::document&);
 
-  boost::json::object to_json_obj(integer_t price_precision,
-                                  integer_t qty_precision) const;
-  std::string str(integer_t price_precision, integer_t qty_precision) const {
-    return boost::json::serialize(to_json_obj(price_precision, qty_precision));
-  }
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
  private:
   header_t m_header;
@@ -126,13 +124,11 @@ struct trades_t final {
 
   const header_t& header() const { return m_header; }
 
-  static trades_t from_json(simdjson::ondemand::document&);
+  static trades_t from_json_obj(const boost::json::object&, const pair_t&);
+  //  static trades_t from_json(simdjson::ondemand::document&);
 
-  boost::json::object to_json_obj(integer_t price_precision,
-                                  integer_t qty_precision) const;
-  std::string str(integer_t price_precision, integer_t qty_precision) const {
-    return boost::json::serialize(to_json_obj(price_precision, qty_precision));
-  }
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
   auto begin() const { return m_trades.begin(); }
   auto end() const { return m_trades.end(); }

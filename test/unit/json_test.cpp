@@ -54,28 +54,28 @@ TEST_CASE("asset_t obj roundtrip") {
 
 /******************************************************************************/
 
-const auto pair = response::pair_t{"EUR",
-                                   krakpot::decimal_t{0.5},
-                                   5,
-                                   true,
-                                   std::optional<double_t>{},
-                                   false,
-                                   std::optional<integer_t>{},
-                                   std::optional<integer_t>{},
-                                   krakpot::decimal_t{0.00001},
-                                   5,
-                                   krakpot::decimal_t{1E-8},
-                                   krakpot::decimal_t{0.5},
-                                   8,
-                                   "USD",
-                                   response::pair_t::status_t{4},
-                                   "EUR/USD"};
+const auto pair =
+    response::pair_t{"EUR",
+                     krakpot::decimal_t{0.5, krakpot::precision_t{5}},
+                     5,
+                     true,
+                     std::optional<double_t>{},
+                     false,
+                     std::optional<integer_t>{},
+                     std::optional<integer_t>{},
+                     krakpot::decimal_t{0.00001, krakpot::precision_t{5}},
+                     5,
+                     krakpot::decimal_t{1E-8, krakpot::precision_t{8}},
+                     krakpot::decimal_t{0.5, krakpot::precision_t{8}},
+                     8,
+                     "USD",
+                     response::pair_t::status_t{4},
+                     "EUR/USD"};
 
 TEST_CASE("pair_t obj roundtrip") {
   const auto pair_json_obj = pair.to_json_obj();
+  MESSAGE(boost::json::serialize(pair_json_obj));
   const auto rt_pair = response::pair_t::from_json_obj(pair_json_obj);
-
-  MESSAGE(pair.price_increment());
 
   CHECK(pair.base() == rt_pair.base());
   CHECK(pair.cost_min() == rt_pair.cost_min());
@@ -119,7 +119,7 @@ TEST_CASE("pair_t double parsing") {
   for (const auto& input : inputs) {
     const boost::json::object json_obj = boost::json::parse(input).as_object();
     const auto pair = response::pair_t::from_json_obj(json_obj);
-    CHECK(pair.cost_min() == decimal_t{"50"});
+    CHECK(pair.cost_min() == decimal_t{"50", pair.cost_precision()});
   }
 }
 

@@ -90,8 +90,8 @@ boost::crc_32_type sides_t::update_checksum(boost::crc_32_type crc32,
     }
     const auto& price = kv.first;
     const auto& qty = kv.second;
-    price.process(crc32, price_precision());
-    qty.process(crc32, qty_precision());
+    price.process(crc32);
+    qty.process(crc32);
   }
   return result;
 }

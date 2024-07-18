@@ -13,15 +13,12 @@
 
 namespace krakpot {
 
-// TODO: remove redundant definition with types.hpp
-using integer_t = int64_t;
-
 using wide_float_t =
-    boost::multiprecision::number<boost::multiprecision::cpp_dec_float<72>>;
+    boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64>>;
+
+using precision_t = uint8_t;
 
 struct decimal_t final {
-  static constexpr integer_t c_max_precision = 20;
-
   // Note: The value 72 is chosen such that sizeof(decimal_t) is 64 on
   // my machine, which is not coincidentally its L1 cache size.
   //
@@ -29,49 +26,45 @@ struct decimal_t final {
   // verify this at compile time.
   decimal_t() = default;
 
-  explicit decimal_t(int64_t value) : m_value{value} {}
-  explicit decimal_t(uint64_t value) : m_value{value} {}
-  explicit decimal_t(double value) : m_value{value} {}
-  explicit decimal_t(wide_float_t value) : m_value{value} {}
+  explicit decimal_t(int64_t value, precision_t precision)
+      : m_value{value}, m_precision{precision} {}
+  explicit decimal_t(uint64_t value, precision_t precision)
+      : m_value{value}, m_precision{precision} {}
+  explicit decimal_t(double value, precision_t precision)
+      : m_value{value}, m_precision{precision} {}
+  explicit decimal_t(wide_float_t value, precision_t precision)
+      : m_value{value}, m_precision{precision} {}
 
-  // template <typename S>
-  // decimal_t(S str) : m_value{str} {}
-  decimal_t(const char* str) : m_value{std::string{str}} {}
-  decimal_t(const std::string str) : m_value{str} {}
-  decimal_t(const std::string_view str) : m_value{str} {}
+  decimal_t(const char* str, precision_t precision)
+      : m_value{std::string{str}}, m_precision{precision} {}
+  decimal_t(const std::string str, precision_t precision)
+      : m_value{str}, m_precision{precision} {}
+  decimal_t(const std::string_view str, precision_t precision)
+      : m_value{str}, m_precision{precision} {}
 
-  bool operator==(const decimal_t& rhs) const {
-    return str(c_max_precision) == rhs.str(c_max_precision);
-  }
-
-  bool operator!=(const decimal_t& rhs) const {
-    return str(c_max_precision) != rhs.str(c_max_precision);
-  }
+  // !@# TODO - see if we can eliminate the string conversion junk
+  bool operator==(const decimal_t& rhs) const { return str() == rhs.str(); }
+  bool operator!=(const decimal_t& rhs) const { return str() != rhs.str(); }
 
   bool operator<(const decimal_t& rhs) const { return m_value < rhs.m_value; }
   bool operator>(const decimal_t& rhs) const { return m_value > rhs.m_value; }
-  //  bool operator==(const decimal_t& rhs) const { return m_value ==
-  //  rhs.m_value; }
-  // bool operator!=(const decimal_t& rhs) const { return m_value !=
-  // rhs.m_value; }
 
   wide_float_t value() const { return m_value; }
+  precision_t precision() const { return m_precision; }
 
-  double double_value(integer_t precision) const {
-    return std::strtod(str(precision).c_str(), nullptr);
-  }
+  double double_value() const { return std::strtod(str().c_str(), nullptr); }
 
-  std::string str(integer_t precision) const;
+  std::string str() const;
 
-  void process(boost::crc_32_type& crc32, integer_t precision) const;
+  void process(boost::crc_32_type& crc32) const;
 
  private:
   wide_float_t m_value = 0.0;
+  precision_t m_precision = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const decimal_t& dt) {
-  os << dt.value() << " " << dt.double_value(decimal_t::c_max_precision) << " "
-     << dt.str(decimal_t::c_max_precision);
+  os << dt.value() << " " << dt.double_value() << " " << dt.str();
   return os;
 }
 

@@ -2,7 +2,9 @@
 #pragma once
 
 #include "responses.hpp"
+#include "types.hpp"
 
+#include <functional>
 #include <optional>
 #include <unordered_map>
 
@@ -11,11 +13,14 @@ namespace model {
 
 struct refdata_t final {
   struct pair_precision_t final {
-    integer_t price_precision = 0;
-    integer_t qty_precision = 0;
+    precision_t price_precision = 0;
+    precision_t qty_precision = 0;
   };
 
   void accept(const response::instrument_t&);
+
+  using pair_ref_t = std::reference_wrapper<const response::pair_t>;
+  std::optional<pair_ref_t> pair(const std::string&) const;
 
   std::optional<pair_precision_t> pair_precision(const std::string&) const;
 

@@ -31,10 +31,10 @@ bool engine_t::handle_msg(msg_t msg) {
         return handle_instrument_msg(msg);
       }
       if (buffer == c_channel_book) {
-        return handle_book_msg(doc);
+        return handle_book_msg(msg);
       }
       if (buffer == c_channel_trade) {
-        return handle_trade_msg(doc);
+        return handle_trade_msg(msg);
       }
       if (buffer == c_channel_heartbeat) {
         return handle_heartbeat_msg(doc);
@@ -62,7 +62,7 @@ bool engine_t::handle_msg(msg_t msg) {
   return true;
 }
 
-bool engine_t::handle_instrument_msg(std::string_view msg) {
+bool engine_t::handle_instrument_msg(msg_t msg) {
   try {
     const boost::json::object doc = boost::json::parse(msg).as_object();
     const auto instrument = response::instrument_t::from_json_obj(doc);
@@ -74,7 +74,6 @@ bool engine_t::handle_instrument_msg(std::string_view msg) {
     }
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__ << ": unknown 'type' " << instrument.header().type();
-    ;
     return false;
   } catch (const std::exception& ex) {
     BOOST_LOG_TRIVIAL(error)
@@ -86,6 +85,7 @@ bool engine_t::handle_instrument_msg(std::string_view msg) {
 
 bool engine_t::handle_instrument_snapshot(
     const response::instrument_t& instrument) {
+  m_refdata.accept(instrument);
   m_sink.accept(instrument);
 
   const auto& pairs = instrument.pairs();
@@ -120,31 +120,45 @@ bool engine_t::handle_instrument_snapshot(
 
 bool engine_t::handle_instrument_update(
     const response::instrument_t& instrument) {
+  m_refdata.accept(instrument);
   m_sink.accept(instrument);
   return true;
 }
 
-bool engine_t::handle_book_msg(doc_t &doc) {
-  auto buffer = std::string_view{};
-  if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
+bool engine_t::handle_book_msg(std::string_view msg) {
+  try {
+    const boost::json::object doc = boost::json::parse(msg).as_object();
+    const auto symbol = std::string{doc.at(c_book_symbol).as_string()};
+    const auto pair = m_refdata.pair(symbol);
+    if (!pair) {
+      throw std::runtime_error{"missing refdata for symbol" + symbol};
+    }
+    const auto book = response::book_t::from_json_obj(doc, *pair);
+    m_sink.accept(book);
+  } catch (const std::exception& ex) {
     BOOST_LOG_TRIVIAL(error)
-        << __FUNCTION__ << ": missing 'type' " << simdjson::to_json_string(doc);
+        << __FUNCTION__ << ": " << ex.what() << " msg: " << msg;
     return false;
   }
-
-  if (buffer != c_book_type_snapshot && buffer != c_book_type_update) {
-    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": unknown 'type' " << buffer;
-    return false;
-  }
-
-  const auto response = response::book_t::from_json(doc);
-  m_sink.accept(response);
   return true;
 }
 
-bool engine_t::handle_trade_msg(doc_t &doc) {
-  const auto response = response::trades_t::from_json(doc);
-  m_sink.accept(response);
+bool engine_t::handle_trade_msg(msg_t& msg) {
+  try {
+    const boost::json::object doc = boost::json::parse(msg).as_object();
+    // !@# TODO: remove duplication with handle_book_msg
+    const auto symbol = std::string{doc.at(c_book_symbol).as_string()};
+    const auto pair = m_refdata.pair(symbol);
+    if (!pair) {
+      throw std::runtime_error{"missing refdata for symbol" + symbol};
+    }
+    const auto response = response::trades_t::from_json_obj(doc, *pair);
+    m_sink.accept(response);
+  } catch (const std::exception& ex) {
+    BOOST_LOG_TRIVIAL(error)
+        << __FUNCTION__ << ": " << ex.what() << " msg: " << msg;
+    return false;
+  }
   return true;
 }
 

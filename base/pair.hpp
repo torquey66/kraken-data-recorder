@@ -36,17 +36,17 @@ struct pair_t final {
   pair_t() {}
   pair_t(std::string base,
          decimal_t cost_min,
-         integer_t cost_precision,
+         precision_t cost_precision,
          bool has_index,
          std::optional<double_t> margin_initial,
          bool marginable,
          std::optional<integer_t> position_limit_long,
          std::optional<integer_t> position_limit_short,
          decimal_t price_increment,
-         integer_t price_precision,
+         precision_t price_precision,
          decimal_t qty_increment,
          decimal_t qty_min,
-         integer_t qty_precision,
+         precision_t qty_precision,
          std::string quote,
          status_t status,
          std::string symbol);
@@ -60,7 +60,7 @@ struct pair_t final {
 
   std::string base() const { return m_base; }
   decimal_t cost_min() const { return m_cost_min; }
-  integer_t cost_precision() const { return m_cost_precision; }
+  precision_t cost_precision() const { return m_cost_precision; }
   bool has_index() const { return m_has_index; }
   std::optional<double_t> margin_initial() const { return m_margin_initial; }
   bool marginable() const { return m_marginable; }
@@ -71,10 +71,10 @@ struct pair_t final {
     return m_position_limit_short;
   }
   decimal_t price_increment() const { return m_price_increment; }
-  integer_t price_precision() const { return m_price_precision; }
+  precision_t price_precision() const { return m_price_precision; }
   decimal_t qty_increment() const { return m_qty_increment; }
   decimal_t qty_min() const { return m_qty_min; }
-  integer_t qty_precision() const { return m_qty_precision; }
+  precision_t qty_precision() const { return m_qty_precision; }
   std::string quote() const { return m_quote; }
   status_t status() const { return m_status; }
   std::string symbol() const { return m_symbol; }
@@ -85,17 +85,17 @@ struct pair_t final {
 
   std::string m_base;
   decimal_t m_cost_min;
-  integer_t m_cost_precision = 0;
+  precision_t m_cost_precision = 0;
   bool m_has_index = false;
   std::optional<double_t> m_margin_initial;
   bool m_marginable = false;
   std::optional<integer_t> m_position_limit_long;
   std::optional<integer_t> m_position_limit_short;
   decimal_t m_price_increment;
-  integer_t m_price_precision = 0;
+  precision_t m_price_precision = 0;
   decimal_t m_qty_increment;
   decimal_t m_qty_min;
-  integer_t m_qty_precision = 0;
+  precision_t m_qty_precision = 0;
   std::string m_quote;
   status_t m_status = e_invalid;
   std::string m_symbol;

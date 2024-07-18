@@ -8,23 +8,25 @@
 #include <tuple>
 #include <vector>
 
+static constexpr krakpot::precision_t c_test_precision = 12;
+
 TEST_CASE("sanity check - zero my hero") {
-  auto precision_to_str = std::map<uint16_t, std::string>{
+  auto precision_to_str = std::map<krakpot::precision_t, std::string>{
       {1, "0.0"},
       {2, "0.00"},
       {7, "0.0000000"},
       {17, "0.00000000000000000"},
   };
   for (const auto& kv : precision_to_str) {
-    const auto decimal = krakpot::decimal_t{0.0};
+    const auto decimal = krakpot::decimal_t{0.0, kv.first};
     CHECK(decimal.value() == 0.0);
-    CHECK(decimal.str(kv.first) == kv.second);
+    CHECK(decimal.str() == kv.second);
   }
 }
 
 TEST_CASE("sanity check - comparison") {
-  const auto d1 = krakpot::decimal_t{18.82};
-  const auto d2 = krakpot::decimal_t{19.82};
+  const auto d1 = krakpot::decimal_t{18.82, c_test_precision};
+  const auto d2 = krakpot::decimal_t{19.82, c_test_precision};
   CHECK(d1 != d2);
   CHECK(d1 < d2);
   CHECK(d2 > d1);
@@ -32,7 +34,7 @@ TEST_CASE("sanity check - comparison") {
 
 TEST_CASE("crc32") {
   using row_t =
-      std::tuple<double, std::string, krakpot::integer_t, krakpot::integer_t>;
+      std::tuple<double, std::string, krakpot::precision_t, krakpot::integer_t>;
   std::vector<row_t> rows = {
       {94510.50669693, "94510.50669693", 8, 3977769420},
       {232489.98702916, "232489.98702916", 8, 2038959249},
@@ -57,12 +59,12 @@ TEST_CASE("crc32") {
   };
   for (const auto& row : rows) {
     const auto [value, token, precision, expected] = row;
-    const krakpot::decimal_t decimal{token};
-    CHECK(decimal.str(precision) == token);
+    const krakpot::decimal_t decimal{token, precision};
+    CHECK(decimal.str() == token);
 
     const boost::crc_32_type in_crc;
     auto actual_crc = in_crc;
-    decimal.process(actual_crc, precision);
+    decimal.process(actual_crc);
     CHECK(actual_crc() == expected);
   }
 }
