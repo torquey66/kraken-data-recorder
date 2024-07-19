@@ -41,7 +41,6 @@ void session_t::start_processing(const recv_cb_t& handle_recv) {
 }
 
 void session_t::send(msg_t msg) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
   const auto num_bytes_written =
       m_ws.write(asio::buffer(std::string(msg.data(), msg.size())));
@@ -51,8 +50,6 @@ void session_t::send(msg_t msg) {
                                 " actual: " + std::to_string(num_bytes_written);
     throw std::runtime_error(message);
   }
-
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " returning";
 }
 
 void session_t::on_resolve(error_code ec, resolver::results_type results) {
