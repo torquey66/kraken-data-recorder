@@ -17,6 +17,8 @@ struct refdata_t final {
     precision_t qty_precision = 0;
   };
 
+  void accept(const response::asset_t&);
+  void accept(const response::pair_t&);
   void accept(const response::instrument_t&);
 
   using pair_ref_t = std::reference_wrapper<const response::pair_t>;

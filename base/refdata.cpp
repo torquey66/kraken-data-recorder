@@ -5,11 +5,19 @@ namespace model {
 
 void refdata_t::accept(const response::instrument_t& instrument) {
   for (const auto& asset : instrument.assets()) {
-    m_assets[asset.id()] = asset;
+    accept(asset);
   }
   for (const auto& pair : instrument.pairs()) {
-    m_pairs[pair.symbol()] = pair;
+    accept(pair);
   }
+}
+
+void refdata_t::accept(const response::asset_t& asset) {
+  m_assets[asset.id()] = asset;
+}
+
+void refdata_t::accept(const response::pair_t& pair) {
+  m_pairs[pair.symbol()] = pair;
 }
 
 std::optional<refdata_t::pair_ref_t> refdata_t::pair(

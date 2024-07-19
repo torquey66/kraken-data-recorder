@@ -1,6 +1,7 @@
 #include "constants.hpp"
 #include "io.hpp"
 #include "level_book.hpp"
+#include "refdata.hpp"
 #include "responses.hpp"
 #include "types.hpp"
 
@@ -18,7 +19,8 @@
 using namespace krakpot;
 
 std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
-                             int64_t idx) {
+                             int64_t idx,
+                             const response::pair_t& pair) {
   auto result = std::vector<quote_t>{};
   const auto slice = std::dynamic_pointer_cast<arrow::StructArray>(
       quotes_array.value_slice(idx));
@@ -30,7 +32,8 @@ std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
     const auto price_view = price_array->Value(sidx);
     const auto qty_view = qty_array->Value(sidx);
     const auto quote =
-        std::make_pair(decimal_t{price_view}, decimal_t{qty_view});
+        std::make_pair(decimal_t{price_view, pair.price_precision()},
+                       decimal_t{qty_view, pair.qty_precision()});
     result.push_back(quote);
   }
   return result;
@@ -42,14 +45,10 @@ void dump_sides(const model::sides_t& sides, const size_t max_depth = 10) {
   auto bid_it = bids.begin();
   auto ask_it = asks.begin();
   for (size_t depth = 0; depth < max_depth; ++depth) {
-    const auto bid_px =
-        bid_it != bids.end() ? bid_it->first.str(sides.price_precision()) : "";
-    const auto bid_qty =
-        bid_it != bids.end() ? bid_it->second.str(sides.qty_precision()) : "";
-    const auto ask_px =
-        ask_it != asks.end() ? ask_it->first.str(sides.price_precision()) : "";
-    const auto ask_qty =
-        ask_it != asks.end() ? ask_it->second.str(sides.qty_precision()) : "";
+    const auto bid_px = bid_it != bids.end() ? bid_it->first.str() : "";
+    const auto bid_qty = bid_it != bids.end() ? bid_it->second.str() : "";
+    const auto ask_px = ask_it != asks.end() ? ask_it->first.str() : "";
+    const auto ask_qty = ask_it != asks.end() ? ask_it->second.str() : "";
     std::cerr << std::right << std::setw(30) << bid_qty << " @ " << bid_px
               << "     " << std::right << std::setw(30) << ask_qty << " @ "
               << ask_px << std::endl;
@@ -59,6 +58,7 @@ void dump_sides(const model::sides_t& sides, const size_t max_depth = 10) {
 }
 
 void process_pairs(std::string pairs_filename,
+                   model::refdata_t& refdata,
                    model::level_book_t& level_book) {
   pq::reader_t reader{pairs_filename};
 
@@ -75,7 +75,7 @@ void process_pairs(std::string pairs_filename,
 
     const auto base_array = std::dynamic_pointer_cast<arrow::StringArray>(
         batch.GetColumnByName(c_pair_base));
-    const auto cost_min_array = std::dynamic_pointer_cast<arrow::DoubleArray>(
+    const auto cost_min_array = std::dynamic_pointer_cast<arrow::StringArray>(
         batch.GetColumnByName(c_pair_cost_min));
     const auto cost_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
@@ -95,15 +95,15 @@ void process_pairs(std::string pairs_filename,
         std::dynamic_pointer_cast<arrow::Int64Array>(
             batch.GetColumnByName(c_pair_position_limit_short));
     const auto price_increment_array =
-        std::dynamic_pointer_cast<arrow::DoubleArray>(
+        std::dynamic_pointer_cast<arrow::StringArray>(
             batch.GetColumnByName(c_pair_price_increment));
     const auto price_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
             batch.GetColumnByName(c_pair_price_precision));
     const auto qty_increment_array =
-        std::dynamic_pointer_cast<arrow::DoubleArray>(
+        std::dynamic_pointer_cast<arrow::StringArray>(
             batch.GetColumnByName(c_pair_qty_increment));
-    const auto qty_min_array = std::dynamic_pointer_cast<arrow::DoubleArray>(
+    const auto qty_min_array = std::dynamic_pointer_cast<arrow::StringArray>(
         batch.GetColumnByName(c_pair_qty_min));
     const auto qty_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
@@ -116,46 +116,53 @@ void process_pairs(std::string pairs_filename,
         batch.GetColumnByName(c_pair_symbol));
 
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
+      const auto cost_precision =
+          static_cast<precision_t>(cost_precision_array->Value(idx));
+      const auto price_precision =
+          static_cast<precision_t>(price_precision_array->Value(idx));
+      const auto qty_precision =
+          static_cast<precision_t>(qty_precision_array->Value(idx));
+
       const auto base = base_array->Value(idx);
       const auto cost_min = cost_min_array->Value(idx);
-      const auto cost_precision = cost_precision_array->Value(idx);
       const auto has_index = has_index_array->Value(idx);
       const auto margin_initial = margin_initial_array->Value(idx);
       const auto marginable = marginable_array->Value(idx);
       const auto position_limit_long = position_limit_long_array->Value(idx);
       const auto position_limit_short = position_limit_short_array->Value(idx);
       const auto price_increment = price_increment_array->Value(idx);
-      const auto price_precision = price_precision_array->Value(idx);
       const auto qty_increment = qty_increment_array->Value(idx);
       const auto qty_min = qty_min_array->Value(idx);
-      const auto qty_precision = qty_precision_array->Value(idx);
       const auto quote = quote_array->Value(idx);
       const auto status = status_array->Value(idx);
       const auto symbol = symbol_array->Value(idx);
 
       const auto pair =
           response::pair_t{std::string{base.begin(), base.end()},
-                           decimal_t{cost_min},
+                           decimal_t{cost_min, cost_precision},
                            cost_precision,
                            has_index,
                            margin_initial,
                            marginable,
                            position_limit_long,
                            position_limit_short,
-                           decimal_t{price_increment},
+                           decimal_t{price_increment, price_precision},
                            price_precision,
-                           decimal_t{qty_increment},
-                           decimal_t{qty_min},
+                           decimal_t{qty_increment, qty_precision},
+                           decimal_t{qty_min, qty_precision},
                            qty_precision,
                            std::string{quote.begin(), quote.end()},
                            response::pair_t::status_t{status},
                            std::string{symbol.begin(), symbol.end()}};
+      refdata.accept(pair);
       level_book.accept(pair);
     }
   }
 }
 
-void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
+void process_book(pq::reader_t& reader,
+                  const model::refdata_t& refdata,
+                  model::level_book_t& level_book) {
   std::shared_ptr<::arrow::RecordBatchReader> rb_reader{
       reader.record_batch_reader()};
 
@@ -183,14 +190,18 @@ void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
       const auto recv_tm = recv_tm_array->Value(idx);
       const auto type = type_array->Value(idx);
-      const auto bids = extract(*bids_array, idx);
-      const auto asks = extract(*asks_array, idx);
-      const auto crc32 = crc32_array->Value(idx);
       const auto symbol = symbol_array->Value(idx);
+      const auto symbol_str = std::string{symbol.begin(), symbol.end()};
+      const auto pair = refdata.pair(symbol_str);
+      if (!pair) {
+        throw std::runtime_error{"missing refdata for symbol: " + symbol_str};
+      }
+      const auto bids = extract(*bids_array, idx, *pair);
+      const auto asks = extract(*asks_array, idx, *pair);
+      const auto crc32 = crc32_array->Value(idx);
       const auto timestamp = timestamp_array->Value(idx);
       const auto header = response::header_t{
           recv_tm, "book", std::string{type.begin(), type.end()}};
-      const auto symbol_str = std::string{symbol.begin(), symbol.end()};
       const auto response =
           response::book_t{header, asks, bids, crc32, symbol_str, timestamp};
       try {
@@ -234,8 +245,9 @@ int main(int argc, char* argv[]) {
     std::cout << "book_depth: " << book_depth << std::endl;
 
     auto level_book = model::level_book_t{book_depth};
-    process_pairs(pairs_filename, level_book);
-    process_book(book_reader, level_book);
+    auto refdata = model::refdata_t{};
+    process_pairs(pairs_filename, refdata, level_book);
+    process_book(book_reader, refdata, level_book);
   } catch (const std::exception& ex) {
     std::cerr << ex.what() << std::endl;
     return 1;
