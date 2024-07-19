@@ -190,28 +190,16 @@ TEST_CASE("book_t doc example snapshot") {
   const auto pair = krakpot::response::pair_t::from_json_obj(pair_obj);
   book.accept(pair);
 
-  /*
-  simdjson::ondemand::parser parser;
-  simdjson::padded_string snap_response{snapshot_str};
-  simdjson::ondemand::document snap_doc = parser.iterate(snap_response);
-  const auto old_snap = krakpot::response::book_t::from_json(snap_doc);
-  */
-
   const auto snap_obj = boost::json::parse(snapshot_str).as_object();
   const auto snap = krakpot::response::book_t::from_json_obj(snap_obj, pair);
 
-  //  CHECK(old_snap.header() == snap.header());
-  /*
-  CHECK(old_snap.bids() == snap.bids());
-  CHECK(old_snap.bids().size() == snap.bids().size());
-  CHECK(old_snap.bids().at(0).first == snap.bids().at(0).first);
-  CHECK(old_snap.bids().at(0).second == snap.bids().at(0).second);
-  CHECK(old_snap.asks() == snap.asks());
-  CHECK(old_snap.asks().size() == snap.asks().size());
-  CHECK(old_snap.crc32() == snap.crc32());
-  CHECK(old_snap.symbol() == snap.symbol());
-  CHECK(old_snap.timestamp() == snap.timestamp());
-  */
-
-  book.accept(snap);
+  try {
+    book.accept(snap);
+  } catch (const std::exception& ex) {
+    std::ostringstream os;
+    os << ex.what();
+    MESSAGE(os.str());
+    MESSAGE(book.str(pair.symbol()));
+    throw ex;
+  }
 }

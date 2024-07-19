@@ -10,8 +10,9 @@
 
 static constexpr krakpot::precision_t c_test_precision = 12;
 
-TEST_CASE("sanity check - zero my hero") {
+TEST_CASE("decimal_test - sanity check - zero my hero") {
   auto precision_to_str = std::map<krakpot::precision_t, std::string>{
+      {0, "0"},
       {1, "0.0"},
       {2, "0.00"},
       {7, "0.0000000"},
@@ -24,7 +25,12 @@ TEST_CASE("sanity check - zero my hero") {
   }
 }
 
-TEST_CASE("sanity check - comparison") {
+TEST_CASE("decimal_test - zero precision bug") {
+  const auto value = krakpot::decimal_t{1., 0};
+  CHECK(value.str() == "1.0");
+}
+
+TEST_CASE("decimal_test - sanity check - comparison") {
   const auto d1 = krakpot::decimal_t{18.82, c_test_precision};
   const auto d2 = krakpot::decimal_t{19.82, c_test_precision};
   CHECK(d1 != d2);
@@ -32,7 +38,7 @@ TEST_CASE("sanity check - comparison") {
   CHECK(d2 > d1);
 }
 
-TEST_CASE("crc32") {
+TEST_CASE("decimal_test - crc32") {
   using row_t =
       std::tuple<double, std::string, krakpot::precision_t, krakpot::integer_t>;
   std::vector<row_t> rows = {
@@ -66,5 +72,19 @@ TEST_CASE("crc32") {
     auto actual_crc = in_crc;
     decimal.process(actual_crc);
     CHECK(actual_crc() == expected);
+  }
+}
+
+TEST_CASE("decimal_test - str") {
+  using row_t = std::tuple<double, std::string, krakpot::precision_t>;
+  const std::vector<row_t> rows = {
+      {94510.50669693, "94510.50669693", 8},
+  };
+
+  for (const auto& row : rows) {
+    const auto [value, token, precision] = row;
+    const auto decimal = krakpot::decimal_t(value, precision);
+    //    const auto decimal = krakpot::decimal_t(token, precision);
+    CHECK(decimal.str() == token);
   }
 }

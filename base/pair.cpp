@@ -75,13 +75,10 @@ pair_t pair_t::from_json_obj(const boost::json::object& pair_obj) {
 
     result.m_cost_precision =
         extract_precision(pair_obj.at(c_pair_cost_precision));
-    //        pair_obj.at(c_pair_cost_precision).as_int64() & 0xffff;
     result.m_price_precision =
         extract_precision(pair_obj.at(c_pair_price_precision));
-    //        pair_obj.at(c_pair_price_precision).as_int64() & 0xffff;
     result.m_qty_precision =
         extract_precision(pair_obj.at(c_pair_qty_precision));
-    //        pair_obj.at(c_pair_qty_precision).as_int64() & 0xffff;
 
     result.m_cost_min =
         extract_decimal(pair_obj.at(c_pair_cost_min), result.m_cost_precision);

@@ -6,10 +6,9 @@
 #include <boost/crc.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
+#include <limits>
 #include <ostream>
 #include <string>
-
-#include <iostream>
 
 namespace krakpot {
 
@@ -17,6 +16,8 @@ using wide_float_t =
     boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64>>;
 
 using precision_t = uint8_t;
+static constexpr precision_t c_max_precision =
+    std::numeric_limits<precision_t>::max();
 
 struct decimal_t final {
   // Note: The value 72 is chosen such that sizeof(decimal_t) is 64 on

@@ -1,5 +1,7 @@
 #include "assets_sink.hpp"
 
+#include <boost/log/trivial.hpp>
+
 namespace krakpot {
 namespace pq {
 
@@ -11,20 +13,27 @@ assets_sink_t::assets_sink_t(std::string parquet_dir, sink_id_t id)
 void assets_sink_t::accept(const response::header_t& header,
                            const std::vector<response::asset_t>& assets) {
   for (const auto& asset : assets) {
-    PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
-    PARQUET_THROW_NOT_OK(m_borrowable_builder.Append(asset.borrowable()));
-    PARQUET_THROW_NOT_OK(
-        m_collateral_value_builder.Append(asset.collateral_value()));
-    PARQUET_THROW_NOT_OK(m_id_builder.Append(asset.id()));
-    if (asset.margin_rate()) {
-      PARQUET_THROW_NOT_OK(m_margin_rate_builder.Append(*asset.margin_rate()));
-    } else {
-      PARQUET_THROW_NOT_OK(m_margin_rate_builder.AppendNull());
+    try {
+      PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
+      PARQUET_THROW_NOT_OK(m_borrowable_builder.Append(asset.borrowable()));
+      PARQUET_THROW_NOT_OK(
+          m_collateral_value_builder.Append(asset.collateral_value()));
+      PARQUET_THROW_NOT_OK(m_id_builder.Append(asset.id()));
+      if (asset.margin_rate()) {
+        PARQUET_THROW_NOT_OK(
+            m_margin_rate_builder.Append(*asset.margin_rate()));
+      } else {
+        PARQUET_THROW_NOT_OK(m_margin_rate_builder.AppendNull());
+      }
+      PARQUET_THROW_NOT_OK(m_precision_builder.Append(asset.precision()));
+      PARQUET_THROW_NOT_OK(
+          m_precision_display_builder.Append(asset.precision_display()));
+      PARQUET_THROW_NOT_OK(m_status_builder.Append(asset.status()));
+    } catch (const std::exception& ex) {
+      BOOST_LOG_TRIVIAL(error)
+          << "what: " << ex.what() << " asset: " << asset.str();
+      throw ex;
     }
-    PARQUET_THROW_NOT_OK(m_precision_builder.Append(asset.precision()));
-    PARQUET_THROW_NOT_OK(
-        m_precision_display_builder.Append(asset.precision_display()));
-    PARQUET_THROW_NOT_OK(m_status_builder.Append(asset.status()));
   }
 
   std::shared_ptr<arrow::Array> recv_tm_array;
@@ -63,7 +72,7 @@ std::shared_ptr<arrow::Schema> assets_sink_t::schema() {
 
   auto field_vector = arrow::FieldVector{
       arrow::field(c_header_recv_tm, arrow::int64(),
-                   false), // TODO: replace with timestamp type
+                   false),  // TODO: replace with timestamp type
       arrow::field(c_asset_borrowable, arrow::boolean(), false),
       arrow::field(c_asset_collateral_value, arrow::float64(), false),
       arrow::field(c_asset_id, arrow::utf8(), false),
@@ -75,5 +84,5 @@ std::shared_ptr<arrow::Schema> assets_sink_t::schema() {
   return arrow::schema(field_vector);
 }
 
-} // namespace pq
-} // namespace krakpot
+}  // namespace pq
+}  // namespace krakpot

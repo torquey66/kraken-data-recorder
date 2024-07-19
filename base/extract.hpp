@@ -12,8 +12,7 @@ inline decimal_t extract_decimal(const boost::json::value& value,
     return decimal_t{std::string_view{value.as_string()}, precision};
   }
   if (value.is_double()) {
-    const auto double_str = std::to_string(value.as_double());
-    return decimal_t{double_str, precision};
+    return decimal_t{value.as_double(), precision};
   }
   if (value.is_int64()) {
     const auto double_str = std::to_string(value.as_int64());
@@ -30,12 +29,6 @@ inline double_t extract_double(const boost::json::value& value) {
   if (value.is_double()) {
     return value.as_double();
   }
-  // if (value.is_int64()) {
-  //   return double_t{value.as_int64()};
-  // }
-  // if (value.is_uint64()) {
-  //   return double_t{value.as_uint64()};
-  // }
   throw std::runtime_error("cannot convert value to double_t");
 }
 

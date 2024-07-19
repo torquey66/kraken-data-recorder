@@ -95,7 +95,7 @@ add_executable(tests
   test/unit/json_test.cpp
   test/unit/level_book_test.cpp
   test/unit/parquet_test.cpp
-  test/unit/response_test.cpp
+  test/unit/timestamp_test.cpp
   test/unit/test_main.cpp
 )
 target_link_libraries(tests krakpot_base doctest::doctest)

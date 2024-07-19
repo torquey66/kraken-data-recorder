@@ -6,9 +6,12 @@ std::string format_frac_part(wide_float_t frac_part, precision_t precision) {
   std::string result;
   for (auto counter = 0; counter < precision; ++counter) {
     frac_part *= 10;
-    const auto int_part = frac_part.convert_to<uint64_t>();
-    result += std::to_string(int_part);
-    frac_part -= int_part;
+  }
+  frac_part = boost::multiprecision::round(frac_part);
+  result = std::to_string(frac_part.convert_to<uint64_t>());
+  if (size_t{precision} > result.size()) {
+    const size_t num_leading_zeroes = size_t{precision} - result.size();
+    result.insert(0, num_leading_zeroes, '0');
   }
   return result;
 }

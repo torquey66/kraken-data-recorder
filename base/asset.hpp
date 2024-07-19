@@ -6,6 +6,7 @@
 #include <boost/json.hpp>
 
 #include <optional>
+#include <ostream>
 #include <string>
 #include <unordered_map>
 
@@ -66,6 +67,11 @@ struct asset_t final {
   integer_t m_precision_display = 0;
   status_t m_status = e_invalid;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const asset_t& asset) {
+  os << asset.str();
+  return os;
+}
 
 }  // namespace response
 }  // namespace krakpot

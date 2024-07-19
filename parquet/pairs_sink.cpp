@@ -1,5 +1,7 @@
 #include "pairs_sink.hpp"
 
+#include <boost/log/trivial.hpp>
+
 namespace krakpot {
 namespace pq {
 
@@ -11,44 +13,52 @@ pairs_sink_t::pairs_sink_t(std::string parquet_dir, sink_id_t id)
 void pairs_sink_t::accept(const response::header_t& header,
                           const std::vector<response::pair_t>& pairs) {
   for (const auto& pair : pairs) {
-    PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
-    PARQUET_THROW_NOT_OK(m_base_builder.Append(pair.base()));
-    PARQUET_THROW_NOT_OK(
-        m_cost_min_builder.Append(pair.cost_min().str(pair.cost_precision())));
-    PARQUET_THROW_NOT_OK(
-        m_cost_precision_builder.Append(pair.cost_precision()));
-    PARQUET_THROW_NOT_OK(m_has_index_builder.Append(pair.has_index()));
-    if (pair.margin_initial()) {
-      PARQUET_THROW_NOT_OK(
-          m_margin_initial_builder.Append(*pair.margin_initial()));
-    } else {
-      PARQUET_THROW_NOT_OK(m_margin_initial_builder.AppendNull());
+    if (pair.symbol() == "BTC/JPY") {
+      BOOST_LOG_TRIVIAL(debug) << " I'm so special...";
     }
-    PARQUET_THROW_NOT_OK(m_marginable_builder.Append(pair.marginable()));
-    if (pair.position_limit_long()) {
+    try {
+      PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
+      PARQUET_THROW_NOT_OK(m_base_builder.Append(pair.base()));
+      PARQUET_THROW_NOT_OK(m_cost_min_builder.Append(pair.cost_min().str()));
       PARQUET_THROW_NOT_OK(
-          m_position_limit_long_builder.Append(*pair.position_limit_long()));
-    } else {
-      PARQUET_THROW_NOT_OK(m_position_limit_long_builder.AppendNull());
-    }
-    if (pair.position_limit_short()) {
+          m_cost_precision_builder.Append(pair.cost_precision()));
+      PARQUET_THROW_NOT_OK(m_has_index_builder.Append(pair.has_index()));
+      if (pair.margin_initial()) {
+        PARQUET_THROW_NOT_OK(
+            m_margin_initial_builder.Append(*pair.margin_initial()));
+      } else {
+        PARQUET_THROW_NOT_OK(m_margin_initial_builder.AppendNull());
+      }
+      PARQUET_THROW_NOT_OK(m_marginable_builder.Append(pair.marginable()));
+      if (pair.position_limit_long()) {
+        PARQUET_THROW_NOT_OK(
+            m_position_limit_long_builder.Append(*pair.position_limit_long()));
+      } else {
+        PARQUET_THROW_NOT_OK(m_position_limit_long_builder.AppendNull());
+      }
+      if (pair.position_limit_short()) {
+        PARQUET_THROW_NOT_OK(m_position_limit_short_builder.Append(
+            *pair.position_limit_short()));
+      } else {
+        PARQUET_THROW_NOT_OK(m_position_limit_short_builder.AppendNull());
+      }
       PARQUET_THROW_NOT_OK(
-          m_position_limit_short_builder.Append(*pair.position_limit_short()));
-    } else {
-      PARQUET_THROW_NOT_OK(m_position_limit_short_builder.AppendNull());
+          m_price_increment_builder.Append(pair.price_increment().str()));
+      PARQUET_THROW_NOT_OK(
+          m_price_precision_builder.Append(pair.price_precision()));
+      PARQUET_THROW_NOT_OK(
+          m_qty_increment_builder.Append(pair.qty_increment().str()));
+      PARQUET_THROW_NOT_OK(m_qty_min_builder.Append(pair.qty_min().str()));
+      PARQUET_THROW_NOT_OK(
+          m_qty_precision_builder.Append(pair.qty_precision()));
+      PARQUET_THROW_NOT_OK(m_quote_builder.Append(pair.quote()));
+      PARQUET_THROW_NOT_OK(m_status_builder.Append(pair.status()));
+      PARQUET_THROW_NOT_OK(m_symbol_builder.Append(pair.symbol()));
+    } catch (const std::exception& ex) {
+      BOOST_LOG_TRIVIAL(error)
+          << "what: " << ex.what() << " pair: " << pair.str();
+      throw ex;
     }
-    PARQUET_THROW_NOT_OK(m_price_increment_builder.Append(
-        pair.price_increment().str(pair.price_precision())));
-    PARQUET_THROW_NOT_OK(
-        m_price_precision_builder.Append(pair.price_precision()));
-    PARQUET_THROW_NOT_OK(m_qty_increment_builder.Append(
-        pair.qty_increment().str(pair.qty_precision())));
-    PARQUET_THROW_NOT_OK(
-        m_qty_min_builder.Append(pair.qty_min().str(pair.qty_precision())));
-    PARQUET_THROW_NOT_OK(m_qty_precision_builder.Append(pair.qty_precision()));
-    PARQUET_THROW_NOT_OK(m_quote_builder.Append(pair.quote()));
-    PARQUET_THROW_NOT_OK(m_status_builder.Append(pair.status()));
-    PARQUET_THROW_NOT_OK(m_symbol_builder.Append(pair.symbol()));
   }
 
   std::shared_ptr<arrow::Array> recv_tm_array;

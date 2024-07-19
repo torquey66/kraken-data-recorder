@@ -4,6 +4,7 @@
 #include <asset.hpp>
 #include <config.hpp>
 #include <pair.hpp>
+#include <responses.hpp>
 
 using namespace krakpot;
 
@@ -74,7 +75,6 @@ const auto pair =
 
 TEST_CASE("pair_t obj roundtrip") {
   const auto pair_json_obj = pair.to_json_obj();
-  MESSAGE(boost::json::serialize(pair_json_obj));
   const auto rt_pair = response::pair_t::from_json_obj(pair_json_obj);
 
   CHECK(pair.base() == rt_pair.base());
@@ -124,3 +124,24 @@ TEST_CASE("pair_t double parsing") {
 }
 
 /******************************************************************************/
+
+TEST_CASE("book_t parse") {
+  static const std::string pair_str = R"RESPONSE(
+{"recv_tm":1721400663780544,"base":"BTC","cost_min":"0.50000","cost_precision":5,"has_index":true,"margin_initial":0.2,"marginable":true,"position_limit_long":300,"position_limit_short":300,"price_increment":"0.1","price_precision":1,"qty_increment":"0.00000001","qty_min":"0.00010000","qty_precision":8,"quote":"USD","status":"online","symbol":"BTC/USD"}
+  )RESPONSE";
+
+  const boost::json::object pair_obj = boost::json::parse(pair_str).as_object();
+  const auto pair = krakpot::response::pair_t::from_json_obj(pair_obj);
+
+  static const std::string book_str = R"RESPONSE(
+{"channel":"book","data":[{"asks":[{"price":34726.4,"qty":0E0},{"price":34739.7,"qty":2.1541}],"bids":[],"checksum":4022926185,"symbol":"BTC/USD","timestamp":"2022-06-13T08:09:10.123456Z"}],"type":"update"}
+  )RESPONSE";
+
+  const boost::json::object book_obj = boost::json::parse(book_str).as_object();
+  const auto book = krakpot::response::book_t::from_json_obj(book_obj, pair);
+
+  const auto result_str = book.str();
+  const auto result_json = boost::json::parse(result_str);
+  const auto test_json = boost::json::parse(book_str);
+  CHECK(test_json == result_json);
+}

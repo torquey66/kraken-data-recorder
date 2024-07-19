@@ -70,10 +70,8 @@ void book_sink_t::accept(const response::book_t& book,
   PARQUET_THROW_NOT_OK(m_bids_builder->Append(book.bids().size()));
   for (const auto& bid : book.bids()) {
     PARQUET_THROW_NOT_OK(m_bid_builder->Append());
-    PARQUET_THROW_NOT_OK(
-        m_bid_price_builder->Append(bid.first.str(precision->price_precision)));
-    PARQUET_THROW_NOT_OK(
-        m_bid_qty_builder->Append(bid.second.str(precision->qty_precision)));
+    PARQUET_THROW_NOT_OK(m_bid_price_builder->Append(bid.first.str()));
+    PARQUET_THROW_NOT_OK(m_bid_qty_builder->Append(bid.second.str()));
   }
 
   PARQUET_THROW_NOT_OK(m_ask_price_builder->Reserve(book.asks().size()));
@@ -84,10 +82,8 @@ void book_sink_t::accept(const response::book_t& book,
   PARQUET_THROW_NOT_OK(m_asks_builder->Append(book.asks().size()));
   for (const auto& ask : book.asks()) {
     PARQUET_THROW_NOT_OK(m_ask_builder->Append());
-    PARQUET_THROW_NOT_OK(
-        m_ask_price_builder->Append(ask.first.str(precision->price_precision)));
-    PARQUET_THROW_NOT_OK(
-        m_ask_qty_builder->Append(ask.second.str(precision->qty_precision)));
+    PARQUET_THROW_NOT_OK(m_ask_price_builder->Append(ask.first.str()));
+    PARQUET_THROW_NOT_OK(m_ask_qty_builder->Append(ask.second.str()));
   }
 
   PARQUET_THROW_NOT_OK(m_symbol_builder->Append(book.symbol()));
@@ -154,5 +150,5 @@ std::shared_ptr<arrow::Schema> book_sink_t::schema(integer_t book_depth) {
   ;
 }
 
-} // namespace pq
-} // namespace krakpot
+}  // namespace pq
+}  // namespace krakpot

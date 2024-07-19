@@ -4,9 +4,9 @@
 #include "asset.hpp"
 #include "pair.hpp"
 
-#include <simdjson.h>
 #include <boost/json.hpp>
 
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -41,6 +41,11 @@ struct header_t final {
   std::string m_channel;
   std::string m_type;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const header_t& header) {
+  os << header.str();
+  return os;
+}
 
 /**
  * See https://docs.kraken.com/websockets-v2/#instrument
@@ -92,7 +97,6 @@ struct book_t final {
   timestamp_t timestamp() const { return m_timestamp; }
 
   static book_t from_json_obj(const boost::json::object&, const pair_t&);
-  //  static book_t from_json(simdjson::ondemand::document&);
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
@@ -105,6 +109,11 @@ struct book_t final {
   std::string m_symbol;
   timestamp_t m_timestamp;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const book_t& book) {
+  os << book.str();
+  return os;
+}
 
 /**
  * https://docs.kraken.com/websockets-v2/#trade
@@ -125,7 +134,6 @@ struct trades_t final {
   const header_t& header() const { return m_header; }
 
   static trades_t from_json_obj(const boost::json::object&, const pair_t&);
-  //  static trades_t from_json(simdjson::ondemand::document&);
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }

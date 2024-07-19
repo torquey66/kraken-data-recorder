@@ -35,10 +35,8 @@ void trades_sink_t::accept(const response::trades_t& trades,
         m_recv_tm_builder.Append(trades.header().recv_tm().micros()));
     PARQUET_THROW_NOT_OK(
         m_ord_type_builder.Append(std::string(1, trade.ord_type)));
-    PARQUET_THROW_NOT_OK(
-        m_price_builder.Append(trade.price.str(precision->price_precision)));
-    PARQUET_THROW_NOT_OK(
-        m_qty_builder.Append(trade.qty.str(precision->qty_precision)));
+    PARQUET_THROW_NOT_OK(m_price_builder.Append(trade.price.str()));
+    PARQUET_THROW_NOT_OK(m_qty_builder.Append(trade.qty.str()));
     PARQUET_THROW_NOT_OK(m_side_builder.Append(std::string(1, trade.side)));
     PARQUET_THROW_NOT_OK(m_symbol_builder.Append(trade.symbol));
     PARQUET_THROW_NOT_OK(m_timestamp_builder.Append(trade.timestamp.micros()));
