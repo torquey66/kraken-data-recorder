@@ -13,9 +13,6 @@ pairs_sink_t::pairs_sink_t(std::string parquet_dir, sink_id_t id)
 void pairs_sink_t::accept(const response::header_t& header,
                           const std::vector<response::pair_t>& pairs) {
   for (const auto& pair : pairs) {
-    if (pair.symbol() == "BTC/JPY") {
-      BOOST_LOG_TRIVIAL(debug) << " I'm so special...";
-    }
     try {
       PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
       PARQUET_THROW_NOT_OK(m_base_builder.Append(pair.base()));
