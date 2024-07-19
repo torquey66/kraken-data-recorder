@@ -147,7 +147,7 @@ bool engine_t::handle_trade_msg(msg_t& msg) {
   try {
     const boost::json::object doc = boost::json::parse(msg).as_object();
     // !@# TODO: remove duplication with handle_book_msg
-    const auto symbol = std::string{doc.at(c_book_symbol).as_string()};
+    const auto symbol = std::string{doc.at(c_trade_symbol).as_string()};
     const auto pair = m_refdata.pair(symbol);
     if (!pair) {
       throw std::runtime_error{"missing refdata for symbol" + symbol};
