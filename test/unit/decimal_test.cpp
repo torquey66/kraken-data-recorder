@@ -79,12 +79,14 @@ TEST_CASE("decimal_test - str") {
   using row_t = std::tuple<double, std::string, krakpot::precision_t>;
   const std::vector<row_t> rows = {
       {94510.50669693, "94510.50669693", 8},
+      {0.00009204, "0.00009204", 8},
+      {117218485.35700187, "117218485.35700187", 8},
+      {117218485.35700189, "117218485.35700189", 8},
   };
 
   for (const auto& row : rows) {
     const auto [value, token, precision] = row;
     const auto decimal = krakpot::decimal_t(value, precision);
-    //    const auto decimal = krakpot::decimal_t(token, precision);
     CHECK(decimal.str() == token);
   }
 }

@@ -145,3 +145,31 @@ TEST_CASE("book_t parse") {
   const auto test_json = boost::json::parse(book_str);
   CHECK(test_json == result_json);
 }
+
+TEST_CASE("book_t double parsing") {
+  static const std::string pair_str = R"RESPONSE(
+{"recv_tm":1721422121075613,"base":"LUNA","cost_min":"0.50000","cost_precision":5,"has_index":false,"marginable":false,"price_increment":"0.00000001","price_precision":8,"qty_increment":"0.00000001","qty_min":"45000.00000000","qty_precision":8,"quote":"USD","status":"online","symbol":"LUNA/USD"}
+  )RESPONSE";
+
+  const boost::json::object pair_obj = boost::json::parse(pair_str).as_object();
+  const auto pair = krakpot::response::pair_t::from_json_obj(pair_obj);
+
+  static const std::string book_str = R"RESPONSE(
+{"channel":"book","type":"snapshot","data":[{"symbol":"LUNA/USD","bids":[{"price":0.00009208,"qty":189199.70059805},{"price":0.00009207,"qty":1080000.00000000},{"price":0.00009205,"qty":32590983.16132537},{"price":0.00009204,"qty":23935926.19056932},{"price":0.00009137,"qty":38776166.69502590},{"price":0.00009136,"qty":4932179.44164000},{"price":0.00009132,"qty":7240859.18028000},{"price":0.00009116,"qty":49100.13613783},{"price":0.00009106,"qty":87282.35395073},{"price":0.00009103,"qty":117218485.35700187}],"asks":[{"price":0.00009310,"qty":173066.50010456},{"price":0.00009355,"qty":1080000.00000000},{"price":0.00009364,"qty":35033.06230468},{"price":0.00009366,"qty":237807.20195099},{"price":0.00009400,"qty":450000.00000000},{"price":0.00009478,"qty":48825.64031974},{"price":0.00009491,"qty":56284.43346312},{"price":0.00009492,"qty":307613.15034360},{"price":0.00009495,"qty":7445079.90885100},{"price":0.00009496,"qty":10930605.26462782}],"checksum":2095654264}]}
+  )RESPONSE";
+
+  const boost::json::object book_obj = boost::json::parse(book_str).as_object();
+  const auto book = krakpot::response::book_t::from_json_obj(book_obj, pair);
+
+  const auto result_str = book.str();
+  const auto result_json = boost::json::parse(result_str);
+  const auto test_json = boost::json::parse(book_str);
+
+  const auto b1 =
+      krakpot::response::book_t::from_json_obj(result_json.as_object(), pair);
+  const auto b2 =
+      krakpot::response::book_t::from_json_obj(test_json.as_object(), pair);
+  CHECK(b1 == b2);
+
+  //  CHECK(test_json == result_json);
+}

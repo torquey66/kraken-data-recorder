@@ -24,6 +24,8 @@ struct sides_t final {
           const bid_side_t&,
           const ask_side_t&);
 
+  bool operator==(const sides_t&) const = default;
+
   depth_t book_depth() const { return m_book_depth; }
   integer_t price_precision() const { return m_price_precision; }
   integer_t qty_precision() const { return m_qty_precision; }
@@ -66,6 +68,8 @@ struct level_book_t final {
   const sides_t& sides(symbol_t) const;
 
   level_book_t(depth_t book_depth) : m_book_depth{book_depth} {};
+
+  bool operator==(const level_book_t&) const = default;
 
   void accept(const response::pair_t&);
   void accept(const response::book_t&);

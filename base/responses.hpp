@@ -89,6 +89,8 @@ struct book_t final {
          std::string,
          timestamp_t);
 
+  bool operator==(const book_t&) const = default;
+
   const header_t& header() const { return m_header; }
   const bids_t& bids() const { return m_bids; }
   const asks_t& asks() const { return m_asks; }

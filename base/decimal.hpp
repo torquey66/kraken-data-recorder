@@ -43,12 +43,22 @@ struct decimal_t final {
   decimal_t(const std::string_view str, precision_t precision)
       : m_value{str}, m_precision{precision} {}
 
-  // !@# TODO - see if we can eliminate the string conversion junk
-  bool operator==(const decimal_t& rhs) const { return str() == rhs.str(); }
-  bool operator!=(const decimal_t& rhs) const { return str() != rhs.str(); }
-
-  bool operator<(const decimal_t& rhs) const { return m_value < rhs.m_value; }
-  bool operator>(const decimal_t& rhs) const { return m_value > rhs.m_value; }
+  bool operator==(const decimal_t& rhs) const {
+    validate_precision(rhs);
+    return m_value == rhs.m_value;
+  }
+  bool operator!=(const decimal_t& rhs) const {
+    validate_precision(rhs);
+    return m_value != rhs.m_value;
+  }
+  bool operator<(const decimal_t& rhs) const {
+    validate_precision(rhs);
+    return m_value < rhs.m_value;
+  }
+  bool operator>(const decimal_t& rhs) const {
+    validate_precision(rhs);
+    return m_value > rhs.m_value;
+  }
 
   wide_float_t value() const { return m_value; }
   precision_t precision() const { return m_precision; }
@@ -60,6 +70,15 @@ struct decimal_t final {
   void process(boost::crc_32_type& crc32) const;
 
  private:
+  void validate_precision(const decimal_t& rhs) const {
+    if (m_precision != rhs.m_precision) {
+      throw std::runtime_error(
+          "cannot compare decimals with different precisions m_precision: " +
+          std::to_string(m_precision) +
+          " rhs.m_precision: " + std::to_string(rhs.m_precision));
+    }
+  }
+
   wide_float_t m_value = 0.0;
   precision_t m_precision = 0;
 };

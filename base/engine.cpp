@@ -128,13 +128,17 @@ bool engine_t::handle_instrument_update(
 bool engine_t::handle_book_msg(std::string_view msg) {
   try {
     const boost::json::object doc = boost::json::parse(msg).as_object();
-    const auto symbol = std::string{doc.at(c_book_symbol).as_string()};
-    const auto pair = m_refdata.pair(symbol);
-    if (!pair) {
-      throw std::runtime_error{"missing refdata for symbol" + symbol};
+    const auto& data = doc.at(c_response_data).as_array();
+    for (const auto& datum : data) {
+      const auto& obj = datum.as_object();
+      const auto symbol = std::string{obj.at(c_book_symbol).as_string()};
+      const auto pair = m_refdata.pair(symbol);
+      if (!pair) {
+        throw std::runtime_error{"missing refdata for symbol" + symbol};
+      }
+      const auto book = response::book_t::from_json_obj(doc, *pair);
+      m_sink.accept(book);
     }
-    const auto book = response::book_t::from_json_obj(doc, *pair);
-    m_sink.accept(book);
   } catch (const std::exception& ex) {
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__ << ": " << ex.what() << " msg: " << msg;
