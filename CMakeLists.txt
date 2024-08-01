@@ -87,6 +87,7 @@ target_link_libraries(check_book krakpot_base)
 enable_testing()
 
 add_executable(tests
+  test/unit/asset_test.cpp
   test/unit/decimal_test.cpp
   test/unit/level_book_test.cpp
   test/unit/parquet_test.cpp
