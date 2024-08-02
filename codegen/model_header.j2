@@ -1,0 +1,31 @@
+{% import "types.j2" as types -%}
+#pragma once
+
+namespace krakpot {
+namespace model {
+
+struct {{ class }}_t final {
+
+{{ class }}_t() {}
+
+bool operator==(const {{ class }}_t&) const = default;
+bool operator!=(const {{ class }}_t&) const = default;
+
+{% for member in members -%}
+  {{ types.cpp_access_types[member.type] }} {{ member.name }}() const { return m_{{ member.name }} };
+{% endfor -%}
+
+private:
+{% for member in members -%}
+  {% if member.optional == true -%}
+    std::optional<{{ types.cpp_decl_types[member.type] }}> m_{{ member.name }};
+  {% else -%}
+    {{ types.cpp_decl_types[member.type] }} m_{{ member.name }}{% if types.type_defaults.get(member['type']) is not none -%} = {{ types.type_defaults[member['type']] }} {% endif -%};
+  {% endif -%}
+{% endfor -%}
+
+};
+
+} // model
+} // krakpot
+
