@@ -1,0 +1,17 @@
+{% set cpp_decl_types = {
+    "bool": "bool",
+    "double": "double_t",
+    "integer": "integer_t",
+    "string": "std::string",
+} -%}
+{% set cpp_access_types = {
+    "bool": "bool",
+    "double": "double_t",
+    "integer": "integer_t",
+    "string": "const std::string&",
+} -%}
+{% set type_defaults = {
+    "bool": "false",
+    "double_t": "0.0",
+    "integer_t": "0"
+} -%}
