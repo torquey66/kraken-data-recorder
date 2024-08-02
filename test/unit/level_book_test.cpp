@@ -1,5 +1,4 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
 #include <level_book.hpp>

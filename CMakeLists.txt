@@ -81,15 +81,18 @@ target_link_libraries(parse_instrument_snapshot krakpot_base)
 add_executable(check_book test/check_book.cpp)
 target_link_libraries(check_book krakpot_base)
 
-add_executable(decimal_test test/unit/decimal_test.cpp)
-target_link_libraries(decimal_test krakpot_base doctest::doctest)
+##
+# Unit tests
+#
+enable_testing()
 
-add_executable(level_book_test test/unit/level_book_test.cpp)
-target_link_libraries(level_book_test krakpot_base doctest::doctest)
+add_executable(tests
+  test/unit/asset_test.cpp
+  test/unit/decimal_test.cpp
+  test/unit/level_book_test.cpp
+  test/unit/parquet_test.cpp
+  test/unit/test_main.cpp
+)
+target_link_libraries(tests krakpot_base doctest::doctest)
 
-add_executable(parquet_test test/unit/parquet_test.cpp)
-target_link_libraries(parquet_test krakpot_base krakpot_parquet doctest::doctest)
-
-add_executable(response_test test/unit/response_test.cpp)
-target_link_libraries(response_test krakpot_base doctest::doctest)
-
+add_test(NAME unit_test COMMAND tests)

@@ -26,32 +26,49 @@ const std::unordered_map<asset_t::status_t, std::string>
         {e_workinprogress, c_asset_status_workinprogress},
 };
 
-asset_t asset_t::from_json(simdjson::ondemand::object &asset_obj) {
-  auto result = asset_t{};
-  auto buffer = std::string_view{};
+asset_t::asset_t(bool borrowable,
+                 double_t collateral_value,
+                 std::string id,
+                 std::optional<double_t> margin_rate,
+                 integer_t precision,
+                 integer_t precision_display,
+                 status_t status)
+    : m_borrowable{borrowable},
+      m_collateral_value{collateral_value},
+      m_id{id},
+      m_margin_rate{margin_rate},
+      m_precision{precision},
+      m_precision_display{precision_display},
+      m_status{status} {}
+
+asset_t asset_t::from_json(simdjson::ondemand::object& asset_obj) {
+  const bool borrowable{asset_obj[c_asset_borrowable].get_bool()};
+  const double collateral_value{
+      asset_obj[c_asset_collateral_value].get_double()};
+
+  const std::string_view id_view{asset_obj[c_asset_id].get_string()};
+  const std::string id{id_view.data(), id_view.size()};
+
+  std::optional<double_t> margin_rate;
   simdjson::ondemand::value optional_val{};
-
-  result.m_borrowable = asset_obj[c_asset_borrowable].get_bool();
-  result.m_collateral_value = asset_obj[c_asset_collateral_value].get_double();
-
-  buffer = asset_obj[c_asset_id].get_string();
-  result.m_id = std::string{buffer.begin(), buffer.end()};
-
   if (asset_obj[c_asset_margin_rate].get(optional_val) == simdjson::SUCCESS) {
-    result.m_margin_rate = optional_val.get_double();
+    margin_rate = optional_val.get_double();
   }
 
-  result.m_precision = asset_obj[c_asset_precision].get_int64();
-  result.m_precision_display = asset_obj[c_asset_precision_display].get_int64();
+  const integer_t precision{asset_obj[c_asset_precision].get_int64()};
+  const integer_t precision_display{
+      asset_obj[c_asset_precision_display].get_int64()};
 
-  buffer = asset_obj[c_asset_status].get_string();
-  const auto status = std::string(buffer.begin(), buffer.end());
-  const auto it = c_str_to_status.find(status);
-  if (it != c_str_to_status.end()) {
-    result.m_status = it->second;
+  const std::string_view status_view{asset_obj[c_asset_status].get_string()};
+  const std::string status_str{status_view.data(), status_view.size()};
+  const auto it = c_str_to_status.find(status_str);
+  if (it == c_str_to_status.end()) {
+    throw std::runtime_error("invalid status: '" + status_str + "'");
   }
+  const status_t status{it->second};
 
-  return result;
+  return asset_t{borrowable, collateral_value,  id,    margin_rate,
+                 precision,  precision_display, status};
 }
 
 boost::json::object asset_t::to_json_obj() const {
@@ -74,5 +91,5 @@ boost::json::object asset_t::to_json_obj() const {
   return result;
 }
 
-} // namespace response
-} // namespace krakpot
+}  // namespace response
+}  // namespace krakpot
