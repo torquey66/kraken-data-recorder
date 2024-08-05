@@ -9,10 +9,10 @@
 namespace krakpot {
 namespace model {
 
-{% set classname = class ~ '_t' %}
+{% set classname = class ~ '_t' -%}
 
 {% for enum_value in  enum_values -%}
-static constexpr char c_{{ class }}_{{ enum_value.name }} = "{{ enum_value.name }}";
+static constexpr char c_{{ class }}_{{ enum_value.name }}[] = "{{ enum_value.name }}";
 {% endfor %}
 
 enum {{ classname }} : {{ type }} {

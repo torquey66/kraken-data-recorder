@@ -1,6 +1,8 @@
 {
     "class" : "asset",
 
+    "dependencies" : [ "asset_status" ],
+
     "members" : [
         { "name" : "borrowable",        "type" : "bool" },
         { "name" : "collateral_value",  "type" : "double" },

@@ -3,6 +3,10 @@
 
 #include "types.hpp"
 
+{% for dependency in dependencies -%}
+#include "{{ dependency }}.hpp"
+{% endfor -%}
+
 #include <simdjson.h>
 #include <boost/json.hpp>
 
@@ -27,7 +31,11 @@ bool operator==(const {{ class }}_t&) const = default;
 bool operator!=(const {{ class }}_t&) const = default;
 
 {% for member in members -%}
-  {{ types.cpp_access_types[member.type] }} {{ member.name }}() const { return m_{{ member.name }} };
+  {% if member.optional == true -%}
+    std::optional<{{ types.cpp_access_types[member.type] }}> {{ member.name }}() const { return m_{{ member.name }}; };
+  {% else -%}
+    {{ types.cpp_access_types[member.type] }} {{ member.name }}() const { return m_{{ member.name }}; };
+  {% endif -%}
 {% endfor %}
 
 static {{ class }}_t from_json(simdjson::ondemand::object&);
