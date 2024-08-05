@@ -1,0 +1,28 @@
+{% import "types.j2" as types -%}
+#pragma once
+
+#include "types.hpp"
+
+#include <string>
+#include <unordered_map>
+
+namespace krakpot {
+namespace model {
+
+{% set classname = class ~ '_t' %}
+
+{% for enum_value in  enum_values -%}
+static constexpr char c_{{ class }}_{{ enum_value.name }} = "{{ enum_value.name }}";
+{% endfor %}
+
+enum {{ classname }} : {{ type }} {
+{% for enum_value in  enum_values -%}
+  e_{{ enum_value.name }} = {{ enum_value.value }},
+{% endfor -%}
+};
+
+{{ classname }} str_to_{{ class }}(std::string);
+std::string {{ class }}_to_str({{ classname }});
+
+} // model
+} // krakpot
