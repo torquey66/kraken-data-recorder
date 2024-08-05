@@ -1,0 +1,15 @@
+{
+    "class" : "asset_status",
+
+    "type" : "int8_t",
+
+    "enum_values" : [
+        { "name" : "invalid",                    "value" : -1 },
+        { "name" : "depositonly",                "value" : 0 },
+        { "name" : "disabled",                   "value" : 1 },
+        { "name" : "enabled",                    "value" : 2 },
+        { "name" : "fundingtemporarilydisabled", "value" : 3 },
+        { "name" : "withdrawalonly",             "value" : 4 },
+        { "name" : "workinprogress",             "value" : 5 }
+    ]
+}

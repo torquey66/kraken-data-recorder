@@ -8,6 +8,6 @@
         { "name" : "margin_rate",       "type" : "double", "optional" : true },
         { "name" : "precision",         "type" : "integer" },
         { "name" : "precision_display", "type" : "integer" },
-        { "name" : "status",            "type" : "status_t" }
+        { "name" : "status",            "type" : "asset_status" }
     ]
 }

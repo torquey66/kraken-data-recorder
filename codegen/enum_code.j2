@@ -1,0 +1,40 @@
+#include "{{ class }}.hpp"
+
+namespace krakpot {
+namespace model {
+
+{% set classname = class ~ '_t' %}
+
+static const std::unordered_map<std::string, {{ classname }} >
+   c_str_to_{{ class }} = {
+{% for enum_value in  enum_values -%}
+   { c_{{ class }}_{{ enum_value.name }}, e_{{ enum_value.name }} },
+{% endfor -%}
+};
+
+static const std::unordered_map<{{ classname }}, std::string>
+   c_{{ class }}_to_str = {
+{% for enum_value in  enum_values -%}
+   { e_{{ enum_value.name }}, c_{{ class }}_{{ enum_value.name }} },
+{% endfor -%}
+};
+
+{{ classname }} str_to_{{ class }}(std::string str) {
+const auto it = c_str_to_{{ class }}.find(str);
+if (it == c_str_to_{{ class }}.end()) {
+   return e_invalid;
+}
+return it->second;
+}
+
+std::string {{ class }}_to_str({{ classname }} value) {
+const auto it = c_{{ class }}_to_str.find(value);
+if (it == c_{{ class }}_to_str.end()) {
+   return c_{{ class }}_invalid;
+}
+return it->second;
+}
+
+} // model
+} // krakpot
+
