@@ -1,7 +1,93 @@
+{% import "types.j2" as types -%}
+
+/**
+ * DO NOT EDIT BY HAND! This is generated code.
+ */
+
 #include "{{ class }}.hpp"
 
 namespace krakpot {
 namespace model {
+
+{% set classname = class ~ '_t' %}
+
+{{ classname }}::{{ classname }}(
+{% for member in members -%}
+  {{ types.cpp_access_types[member.type] }} {{ member.name }}{% if not loop.last %},{% endif %}
+{% endfor -%}
+) :
+{% for member in members -%}
+  m_{{ member.name }}({{ member.name }}){% if not loop.last %},{% endif %}
+{% endfor -%}
+{}
+
+{{ classname }} {{ classname }}::from_json(simdjson::ondemand::object& obj) {
+  {% for member in members -%}
+
+    {% set cpp_decl_type = types.cpp_decl_types[member.type] -%}
+    {% set name_constant = 'c_' ~ class ~ '_' ~ member.name -%}
+
+    {% if not member.optional == true and not member.enum == true -%}
+      {% if not member.type == "string" -%}
+        const {{ cpp_decl_type }} {{ member.name }}{ obj[{{ name_constant}}].get_{{ types.simdjson_types[member.type] }}()};
+      {% else -%}
+        const std::string_view {{ member.name }}_view{  obj[{{ name_constant}}].get_{{ types.simdjson_types[member.type]}}()};
+        const {{ cpp_decl_type }} {{ member.name }}{ {{ member.name }}_view.data(), {{ member.name }}_view.size() };
+      {% endif -%}
+    {% endif -%}
+
+    {% if not member.optional == true and member.enum == true -%}
+        const std::string_view {{ member.name }}_view{  obj[{{ name_constant}}].get_string()};
+        const std::string {{ member.name }}_str{ {{ member.name }}_view.data(), {{ member.name }}_view.size() };
+        const {{ cpp_decl_type }} {{ member.name }} = str_to_{{ cpp_decl_type }}({{ member.name }}_str);
+    {% endif -%}
+
+    {% if member.optional == true -%}
+      std::optional<{{ cpp_decl_type }}> {{ member.name }};
+      simdjson::ondemand::value optional_{{ member.name }}{};
+      if (obj[{{ name_constant }}].get(optional_{{ member.name }}) == simdjson::SUCCESS) {
+         {{ member.name }} = optional_{{ member.name }}.get_{{ types.simdjson_types[member.type] }}();
+      }
+    {% endif -%}
+
+  {% endfor -%}
+   
+  return {{ classname }}{
+    {% for member in members -%}
+      {% if member.optional == true -%}
+        *{{ member.name }} {% if not loop.last %},{% endif %}
+      {% else %}
+        {{ member.name }} {% if not loop.last %},{% endif %}
+      {% endif -%}
+    {% endfor -%}
+  };
+}
+
+boost::json::object {{ classname }}::to_json_obj() const {
+  boost::json::object result = {
+    {% for member in members -%}
+      {% if not member.optional == true and not member.enum == true -%}
+        { c_{{ class}}_{{ member.name }}, m_{{ member.name }} },
+      {% endif -%}
+    {% endfor -%}
+  };
+
+  {% for member in members -%}
+    {% if member.optional == true -%}
+      if (m_{{ member.name }}) {
+         result[c_{{ class}}_{{ member.name }}] = *m_{{ member.name }};
+      }
+    {% endif -%}
+  {% endfor %}
+
+  {% for member in members -%}
+    {% if member.enum == true -%}
+      result[c_{{ class}}_{{ member.name }}] = {{ types.cpp_access_types[member.type] }}_to_str(m_{{ member.name }});
+    {% endif -%}
+  {% endfor %}
+
+  return result;
+}
 
 } // model
 } // krakpot

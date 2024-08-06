@@ -12,6 +12,13 @@
     "string": "const std::string&",
     "asset_status": "asset_status_t",
 } -%}
+{% set simdjson_types = {
+    "bool": "bool",
+    "double": "double",
+    "integer": "int64",
+    "string": "string",
+    "asset_status": "int8",
+} -%}
 {% set type_defaults = {
     "bool": "false",
     "double_t": "0.0",

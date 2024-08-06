@@ -1,4 +1,7 @@
 {% import "types.j2" as types -%}
+/**
+ * DO NOT EDIT BY HAND! This is generated code.
+ */
 #pragma once
 
 #include "types.hpp"
@@ -16,19 +19,21 @@
 namespace krakpot {
 namespace model {
 
-struct {{ class }}_t final {
+{% set classname = class ~ '_t' -%}
 
-{{ class }}_t() {}
+struct {{ classname }} final {
 
-{{ class }}_t(
+{{ classname }}() {}
+
+{{ classname }}(
 {% for member in members -%}
   {{ types.cpp_access_types[member.type] }} {{ member.name }}{% if not loop.last %},{% endif %}
 {% endfor -%}
 );
 
 
-bool operator==(const {{ class }}_t&) const = default;
-bool operator!=(const {{ class }}_t&) const = default;
+bool operator==(const {{ classname }}&) const = default;
+bool operator!=(const {{ classname }}&) const = default;
 
 {% for member in members -%}
   {% if member.optional == true -%}
@@ -38,7 +43,7 @@ bool operator!=(const {{ class }}_t&) const = default;
   {% endif -%}
 {% endfor %}
 
-static {{ class }}_t from_json(simdjson::ondemand::object&);
+static {{ classname }} from_json(simdjson::ondemand::object&);
 boost::json::object to_json_obj() const;
 
 std::string str() const { return boost::json::serialize(to_json_obj()); }

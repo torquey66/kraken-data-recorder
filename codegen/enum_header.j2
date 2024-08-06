@@ -1,4 +1,7 @@
 {% import "types.j2" as types -%}
+/**
+ * DO NOT EDIT BY HAND! This is generated code.
+ */
 #pragma once
 
 #include "types.hpp"
@@ -21,8 +24,8 @@ enum {{ classname }} : {{ type }} {
 {% endfor -%}
 };
 
-{{ classname }} str_to_{{ class }}(std::string);
-std::string {{ class }}_to_str({{ classname }});
+{{ classname }} str_to_{{ classname }}(std::string);
+std::string {{ classname }}_to_str({{ classname }});
 
 } // model
 } // krakpot
