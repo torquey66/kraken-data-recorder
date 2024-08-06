@@ -13,7 +13,11 @@ namespace model {
 
 {{ classname }}::{{ classname }}(
 {% for member in members -%}
-  {{ types.cpp_access_types[member.type] }} {{ member.name }}{% if not loop.last %},{% endif %}
+  {% if member.optional == true -%}
+    std::optional<{{ types.cpp_access_types[member.type] }}> {{ member.name }}{% if not loop.last %},{% endif %}
+  {% else -%}
+    {{ types.cpp_access_types[member.type] }} {{ member.name }}{% if not loop.last %},{% endif %}
+  {% endif -%}
 {% endfor -%}
 ) :
 {% for member in members -%}
@@ -25,13 +29,14 @@ namespace model {
   {% for member in members -%}
 
     {% set cpp_decl_type = types.cpp_decl_types[member.type] -%}
+    {% set simdjson_type = types.simdjson_types[member.type] -%}
     {% set name_constant = 'c_' ~ class ~ '_' ~ member.name -%}
 
     {% if not member.optional == true and not member.enum == true -%}
       {% if not member.type == "string" -%}
-        const {{ cpp_decl_type }} {{ member.name }}{ obj[{{ name_constant}}].get_{{ types.simdjson_types[member.type] }}()};
+        const {{ cpp_decl_type }} {{ member.name }}{ obj[{{ name_constant}}].get_{{ simdjson_type }}()};
       {% else -%}
-        const std::string_view {{ member.name }}_view{  obj[{{ name_constant}}].get_{{ types.simdjson_types[member.type]}}()};
+        const std::string_view {{ member.name }}_view{  obj[{{ name_constant}}].get_{{ simdjson_type }}()};
         const {{ cpp_decl_type }} {{ member.name }}{ {{ member.name }}_view.data(), {{ member.name }}_view.size() };
       {% endif -%}
     {% endif -%}
@@ -46,7 +51,7 @@ namespace model {
       std::optional<{{ cpp_decl_type }}> {{ member.name }};
       simdjson::ondemand::value optional_{{ member.name }}{};
       if (obj[{{ name_constant }}].get(optional_{{ member.name }}) == simdjson::SUCCESS) {
-         {{ member.name }} = optional_{{ member.name }}.get_{{ types.simdjson_types[member.type] }}();
+         {{ member.name }} = optional_{{ member.name }}.get_{{ simdjson_type }}();
       }
     {% endif -%}
 
@@ -55,9 +60,9 @@ namespace model {
   return {{ classname }}{
     {% for member in members -%}
       {% if member.optional == true -%}
-        *{{ member.name }} {% if not loop.last %},{% endif %}
-      {% else %}
-        {{ member.name }} {% if not loop.last %},{% endif %}
+        *{{ member.name }} {% if not loop.last %},{% endif -%}
+      {% else -%}
+        {{ member.name }} {% if not loop.last %},{% endif -%}
       {% endif -%}
     {% endfor -%}
   };
@@ -81,8 +86,9 @@ boost::json::object {{ classname }}::to_json_obj() const {
   {% endfor %}
 
   {% for member in members -%}
+    {% set cpp_access_type = types.cpp_access_types[member.type] -%}
     {% if member.enum == true -%}
-      result[c_{{ class}}_{{ member.name }}] = {{ types.cpp_access_types[member.type] }}_to_str(m_{{ member.name }});
+      result[c_{{ class}}_{{ member.name }}] = {{ cpp_access_type }}_to_str(m_{{ member.name }});
     {% endif -%}
   {% endfor %}
 

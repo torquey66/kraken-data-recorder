@@ -13,6 +13,7 @@ namespace krakpot {
 namespace model {
 
 {% set classname = class ~ '_t' -%}
+{% set cpp_access_type = types.cpp_access_types[class] -%}
 
 {% for enum_value in  enum_values -%}
 static constexpr char c_{{ class }}_{{ enum_value.name }}[] = "{{ enum_value.name }}";
@@ -24,8 +25,8 @@ enum {{ classname }} : {{ type }} {
 {% endfor -%}
 };
 
-{{ classname }} str_to_{{ classname }}(std::string);
-std::string {{ classname }}_to_str({{ classname }});
+{{ classname }} str_to_{{ cpp_access_type }}(std::string);
+std::string {{ cpp_access_type }}_to_str({{ classname }});
 
 } // model
 } // krakpot

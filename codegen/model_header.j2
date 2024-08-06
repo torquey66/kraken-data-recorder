@@ -27,7 +27,11 @@ struct {{ classname }} final {
 
 {{ classname }}(
 {% for member in members -%}
-  {{ types.cpp_access_types[member.type] }} {{ member.name }}{% if not loop.last %},{% endif %}
+  {% if member.optional == true -%}
+    std::optional<{{ types.cpp_access_types[member.type] }}> {{ member.name }}{% if not loop.last %},{% endif %}
+  {% else -%}
+    {{ types.cpp_access_types[member.type] }} {{ member.name }}{% if not loop.last %},{% endif %}
+  {% endif -%}
 {% endfor -%}
 );
 
