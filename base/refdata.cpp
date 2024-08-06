@@ -17,7 +17,7 @@ std::optional<refdata_t::pair_precision_t> refdata_t::pair_precision(
   std::optional<pair_precision_t> result;
   const auto it = m_pairs.find(symbol);
   if (it != m_pairs.end()) {
-    const response::pair_t& pair{it->second};
+    const model::pair_t& pair{it->second};
     const pair_precision_t precision{pair.price_precision(),
                                      pair.qty_precision()};
     result = std::make_optional(precision);

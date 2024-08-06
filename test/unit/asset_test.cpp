@@ -2,10 +2,10 @@
 #include <doctest/doctest.h>
 
 #include <simdjson.h>
-#include <asset.hpp>
 #include <constants.hpp>
+#include "../generated/asset.hpp"  // !@# temporary for testing
 
-using namespace krakpot::response;
+using namespace krakpot::model;
 
 TEST_CASE("asset_t equality") {
   const asset_t thing1;
@@ -20,36 +20,44 @@ TEST_CASE("asset_t - inequality") {
   std::optional<double_t> margin_rate_1 = std::make_optional<double>(1.1);
   std::optional<double_t> margin_rate_2 = std::make_optional<double>(1.2);
 
-  CHECK(
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled} !=
-      asset_t{false, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled});
+  CHECK(asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3,
+                asset_status_enabled} != asset_t{false, 0.1, "thing1",
+                                                 no_margin_rate, 8, 3,
+                                                 asset_status_enabled});
+
+  CHECK(asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3,
+                asset_status_enabled} != asset_t{true, 0.2, "thing1",
+                                                 no_margin_rate, 8, 3,
+                                                 asset_status_enabled});
+
+  CHECK(asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3,
+                asset_status_enabled} != asset_t{true, 0.1, "thing2",
+                                                 no_margin_rate, 8, 3,
+                                                 asset_status_enabled});
+
+  CHECK(asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3,
+                asset_status_enabled} != asset_t{true, 0.1, "thing1",
+                                                 margin_rate_1, 8, 3,
+                                                 asset_status_enabled});
 
   CHECK(
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled} !=
-      asset_t{true, 0.2, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled});
+      asset_t{true, 0.1, "thing1", margin_rate_1, 8, 3, asset_status_enabled} !=
+      asset_t{true, 0.1, "thing1", margin_rate_2, 8, 3, asset_status_enabled});
 
-  CHECK(
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled} !=
-      asset_t{true, 0.1, "thing2", no_margin_rate, 8, 3, asset_t::e_enabled});
+  CHECK(asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3,
+                asset_status_enabled} != asset_t{true, 0.1, "thing1",
+                                                 no_margin_rate, 6, 3,
+                                                 asset_status_enabled});
 
-  CHECK(
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled} !=
-      asset_t{true, 0.1, "thing1", margin_rate_1, 8, 3, asset_t::e_enabled});
+  CHECK(asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3,
+                asset_status_enabled} != asset_t{true, 0.1, "thing1",
+                                                 no_margin_rate, 8, 7,
+                                                 asset_status_enabled});
 
-  CHECK(asset_t{true, 0.1, "thing1", margin_rate_1, 8, 3, asset_t::e_enabled} !=
-        asset_t{true, 0.1, "thing1", margin_rate_2, 8, 3, asset_t::e_enabled});
-
-  CHECK(
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled} !=
-      asset_t{true, 0.1, "thing1", no_margin_rate, 6, 3, asset_t::e_enabled});
-
-  CHECK(
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled} !=
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 7, asset_t::e_enabled});
-
-  CHECK(
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_enabled} !=
-      asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3, asset_t::e_disabled});
+  CHECK(asset_t{true, 0.1, "thing1", no_margin_rate, 8, 3,
+                asset_status_enabled} != asset_t{true, 0.1, "thing1",
+                                                 no_margin_rate, 8, 3,
+                                                 asset_status_disabled});
 }
 
 TEST_CASE("asset_t from_json") {
@@ -63,7 +71,7 @@ TEST_CASE("asset_t from_json") {
                          std::make_optional<double>(0.025),
                          4,
                          2,
-                         asset_t::e_enabled};
+                         asset_status_enabled};
 
   simdjson::ondemand::parser parser;
   simdjson::padded_string padded{test_str};

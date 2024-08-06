@@ -21,7 +21,7 @@ static constexpr char c_{{ class }}_{{ enum_value.name }}[] = "{{ enum_value.nam
 
 enum {{ classname }} : {{ type }} {
 {% for enum_value in  enum_values -%}
-  e_{{ enum_value.name }} = {{ enum_value.value }},
+  {{ class }}_{{ enum_value.name }} = {{ enum_value.value }},
 {% endfor -%}
 };
 

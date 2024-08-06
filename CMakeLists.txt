@@ -23,10 +23,12 @@ find_package(simdjson)
 
 set(MODEL_FILES
   ${CMAKE_SOURCE_DIR}/codegen/asset.json
+  ${CMAKE_SOURCE_DIR}/codegen/pair.json
 )
 
 set(ENUM_FILES
   ${CMAKE_SOURCE_DIR}/codegen/asset_status.json
+  ${CMAKE_SOURCE_DIR}/codegen/pair_status.json
 )
 
 set(GENERATED_FILES
@@ -34,6 +36,10 @@ set(GENERATED_FILES
   ${CMAKE_SOURCE_DIR}/generated/asset.cpp
   ${CMAKE_SOURCE_DIR}/generated/asset_status.hpp
   ${CMAKE_SOURCE_DIR}/generated/asset_status.cpp
+  ${CMAKE_SOURCE_DIR}/generated/pair.hpp
+  ${CMAKE_SOURCE_DIR}/generated/pair.cpp
+  ${CMAKE_SOURCE_DIR}/generated/pair_status.hpp
+  ${CMAKE_SOURCE_DIR}/generated/pair_status.cpp
 )
 
 set(JINJA2_FILES
@@ -80,8 +86,14 @@ add_custom_target(generate_all
 # TODO: split these into 'src' and 'include' directories or the like
 include_directories(${CMAKE_SOURCE_DIR}/base)
 add_library(krakpot_base
-#  base/asset.cpp
   generated/asset.cpp
+  generated/asset.hpp
+  generated/asset_status.cpp
+  generated/asset_status.hpp
+  generated/pair.cpp
+  generated/pair.hpp
+  generated/pair_status.cpp
+  generated/pair_status.hpp
   base/config.cpp
   base/constants.hpp
   base/decimal.cpp
@@ -89,7 +101,6 @@ add_library(krakpot_base
   base/engine.cpp
   base/level_book.cpp
   base/metrics.cpp
-  base/pair.cpp
   base/refdata.cpp
   base/refdata.hpp
   base/requests.cpp
