@@ -48,7 +48,7 @@ namespace model {
     {% endif -%}
 
     {% if member.optional == true -%}
-      std::optional<{{ cpp_decl_type }}> {{ member.name }};
+      std::optional<{{ cpp_decl_type }}> {{ member.name }}{};
       simdjson::ondemand::value optional_{{ member.name }}{};
       if (obj[{{ name_constant }}].get(optional_{{ member.name }}) == simdjson::SUCCESS) {
          {{ member.name }} = optional_{{ member.name }}.get_{{ simdjson_type }}();
@@ -59,11 +59,7 @@ namespace model {
    
   return {{ classname }}{
     {% for member in members -%}
-      {% if member.optional == true -%}
-        *{{ member.name }} {% if not loop.last %},{% endif -%}
-      {% else -%}
-        {{ member.name }} {% if not loop.last %},{% endif -%}
-      {% endif -%}
+      {{ member.name }} {% if not loop.last %},{% endif -%}
     {% endfor -%}
   };
 }

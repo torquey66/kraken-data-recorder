@@ -1,8 +1,8 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
-#include "asset.hpp"
-#include "pair.hpp"
+#include "../generated/asset.hpp"  // !@# temporary testing path
+#include "../generated/pair.hpp"   // !@# temporary testing path
 
 #include <simdjson.h>
 #include <boost/json.hpp>
@@ -50,16 +50,16 @@ struct instrument_t final {
   static instrument_t from_json(simdjson::ondemand::document&);
 
   const header_t& header() const { return m_header; }
-  const std::vector<asset_t>& assets() const { return m_assets; }
-  const std::vector<pair_t>& pairs() const { return m_pairs; }
+  const std::vector<model::asset_t>& assets() const { return m_assets; }
+  const std::vector<model::pair_t>& pairs() const { return m_pairs; }
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
  private:
   header_t m_header;
-  std::vector<asset_t> m_assets;
-  std::vector<pair_t> m_pairs;
+  std::vector<model::asset_t> m_assets;
+  std::vector<model::pair_t> m_pairs;
 };
 
 /**

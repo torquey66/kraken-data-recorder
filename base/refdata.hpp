@@ -20,8 +20,8 @@ struct refdata_t final {
   std::optional<pair_precision_t> pair_precision(const std::string&) const;
 
  private:
-  std::unordered_map<std::string, response::asset_t> m_assets;
-  std::unordered_map<std::string, response::pair_t> m_pairs;
+  std::unordered_map<std::string, asset_t> m_assets;
+  std::unordered_map<std::string, pair_t> m_pairs;
 };
 
 }  // namespace model

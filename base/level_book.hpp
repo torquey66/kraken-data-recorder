@@ -67,7 +67,7 @@ struct level_book_t final {
 
   level_book_t(depth_t book_depth) : m_book_depth{book_depth} {};
 
-  void accept(const response::pair_t&);
+  void accept(const model::pair_t&);
   void accept(const response::book_t&);
 
   uint64_t crc32(symbol_t symbol) const;

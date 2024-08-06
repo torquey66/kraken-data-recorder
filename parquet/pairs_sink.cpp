@@ -9,7 +9,7 @@ pairs_sink_t::pairs_sink_t(std::string parquet_dir, sink_id_t id)
       m_writer{m_sink_filename, m_schema} {}
 
 void pairs_sink_t::accept(const response::header_t& header,
-                          const std::vector<response::pair_t>& pairs) {
+                          const std::vector<model::pair_t>& pairs) {
   for (const auto& pair : pairs) {
     PARQUET_THROW_NOT_OK(m_recv_tm_builder.Append(header.recv_tm().micros()));
     PARQUET_THROW_NOT_OK(m_base_builder.Append(pair.base()));

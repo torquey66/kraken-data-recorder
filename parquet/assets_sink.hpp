@@ -17,7 +17,7 @@ struct assets_sink_t final {
 
   assets_sink_t(std::string parquet_dir, sink_id_t);
 
-  void accept(const response::header_t&, const std::vector<response::asset_t>&);
+  void accept(const response::header_t&, const std::vector<model::asset_t>&);
 
  private:
   static std::shared_ptr<arrow::Schema> schema();

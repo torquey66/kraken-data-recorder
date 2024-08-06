@@ -1,0 +1,24 @@
+{
+    "class" : "pair",
+
+    "dependencies" : [ "pair_status" ],
+
+    "members" : [
+        { "name" : "base",                 "type" : "string" },
+        { "name" : "cost_min",             "type" : "double" },
+        { "name" : "cost_precision",       "type" : "integer" },
+        { "name" : "has_index",            "type" : "bool" },
+        { "name" : "margin_initial",       "type" : "double",      "optional" : true },
+        { "name" : "marginable",           "type" : "bool" },
+        { "name" : "position_limit_long",  "type" : "integer",     "optional" : true  },
+        { "name" : "position_limit_short", "type" : "integer",     "optional" : true  },
+        { "name" : "price_increment",      "type" : "double" },
+        { "name" : "price_precision",      "type" : "integer" },
+        { "name" : "qty_increment",        "type" : "double" },
+        { "name" : "qty_min",              "type" : "double" },
+        { "name" : "qty_precision",        "type" : "integer" },
+        { "name" : "quote",                "type" : "string" },
+        { "name" : "status",               "type" : "pair_status", "enum" : true },
+        { "name" : "symbol",               "type" : "string" }
+    ]
+}

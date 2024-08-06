@@ -17,7 +17,7 @@ struct pairs_sink_t final {
 
   pairs_sink_t(std::string parquet_dir, sink_id_t);
 
-  void accept(const response::header_t&, const std::vector<response::pair_t>&);
+  void accept(const response::header_t&, const std::vector<model::pair_t>&);
 
  private:
   static std::shared_ptr<arrow::Schema> schema();
