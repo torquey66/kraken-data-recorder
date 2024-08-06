@@ -36,16 +36,23 @@ set(GENERATED_FILES
   ${CMAKE_SOURCE_DIR}/generated/asset_status.cpp
 )
 
+set(JINJA2_FILES
+  ${CMAKE_SOURCE_DIR}/codegen/enum_code.j2
+  ${CMAKE_SOURCE_DIR}/codegen/enum_header.j2
+  ${CMAKE_SOURCE_DIR}/codegen/model_code.j2
+  ${CMAKE_SOURCE_DIR}/codegen/model_header.j2
+  ${CMAKE_SOURCE_DIR}/codegen/types.j2
+)
+
 foreach(model_file ${MODEL_FILES})
     get_filename_component(filename ${model_file} NAME_WE)
     set(header_file ${CMAKE_SOURCE_DIR}/generated/${filename}.hpp)
     set(code_file ${CMAKE_SOURCE_DIR}/generated/${filename}.cpp)
-    # define template files and DEPEND on them below
     add_custom_command(
         OUTPUT ${header_file} ${code_file}
         COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/model_header.j2 ${model_file} | clang-format > ${header_file}
         COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/model_code.j2   ${model_file} | clang-format > ${code_file}
-        DEPENDS ${model_file}
+        DEPENDS ${model_file} ${JINJA2_FILES}
         COMMENT "Generating ${header_file} from ${model_file}"
         COMMENT "Generating ${code_file} from ${model_file}"
     )
@@ -55,12 +62,11 @@ foreach(enum_file ${ENUM_FILES})
     get_filename_component(filename ${enum_file} NAME_WE)
     set(header_file ${CMAKE_SOURCE_DIR}/generated/${filename}.hpp)
     set(code_file ${CMAKE_SOURCE_DIR}/generated/${filename}.cpp)
-    # define template files and DEPEND on them below
     add_custom_command(
         OUTPUT ${header_file} ${code_file}
         COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/enum_header.j2 ${enum_file} | clang-format > ${header_file}
         COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/enum_code.j2   ${enum_file} | clang-format > ${code_file}
-        DEPENDS ${enum_file}
+        DEPENDS ${enum_file} ${JINJA2_FILES}
         COMMENT "Generating ${header_file} from ${enum_file}"
         COMMENT "Generating ${code_file} from ${enum_file}"
     )
@@ -71,17 +77,11 @@ add_custom_target(generate_all
     DEPENDS ${GENERATED_FILES}
 )
 
-include_directories(${CMAKE_SOURCE_DIR}/genreated)
-add_library(krakpot_generated
-  ${GENERATED_FILES}
-)
-add_dependencies(krakpot_generated generate_all)
-
-
 # TODO: split these into 'src' and 'include' directories or the like
 include_directories(${CMAKE_SOURCE_DIR}/base)
 add_library(krakpot_base
-  base/asset.cpp
+#  base/asset.cpp
+  generated/asset.cpp
   base/config.cpp
   base/constants.hpp
   base/decimal.cpp
@@ -99,6 +99,7 @@ add_library(krakpot_base
   base/sink.hpp
   base/types.cpp
 )
+add_dependencies(krakpot_base generate_all)
 
 # TODO: split these into 'src' and 'include' directories or the like
 include_directories(${CMAKE_SOURCE_DIR}/parquet)
@@ -112,12 +113,6 @@ add_library(krakpot_parquet
   parquet/pairs_sink.hpp
   parquet/trade_sink.cpp
   parquet/trade_sink.hpp
-)
-
-target_link_libraries(krakpot_generated
-  PUBLIC
-  boost::boost
-  simdjson::simdjson
 )
 
 target_link_libraries(krakpot_base
