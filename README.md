@@ -1,57 +1,76 @@
-# krakpot - Kraken PrOTotype
+# Kraken Data Recorder
 
-This is an exploratory prototype I'm building to better understand the
-behavior of the Kraken crypto exchange, in particular its market data
-feed. I hope to answer questions along the lines of:
+**Caveat emptor** *This is a work in progress - your mileage may vary.*
 
- - How much resource is required to process the complete feed? Is this
-   easily accomplished on a single machine or is some sort of
-   distributed approach required? (So far looks like Krakpot 
-   
- - Can one derive a level book from the Executions channel that
-   matches the Book channel? And if so, are there latency
-   discrepencies between the two?
-   
-Ultimately, I hope to evolve this into something that can be used for
-capturing data for model training and simulation purposes as well as
-live trading.
+Kraken Data Recorder (*kdr*) is a tool for recording market data from
+the Kraken crypto exchange (https://www.kraken.com/). It subscribes to
+the *book* channel on the websocket v2 endpointand stores the content
+in a series of parquet files which can later be used for analysis,
+simulation, etc.
+
+A distinguishing property of *kdr* is that it can perform this capture
+with relatively little compute and memory overhead. For example, on my
+modest Mac desktop it (3.1 GHz Intel Core i5) it can record the entire
+*book* channel (aka all pairs) at full depth (1000) using under 30% of
+a single core and less than 100MB memory. This includes performing the
+[CRC32 checksum](https://docs.kraken.com/websockets-v2/#calculate-book-checksum)
+for each book update.
 
 See https://docs.kraken.com/websockets-v2/#introduction
 
-## Current status
+## Running *kdr_record*
 
-'krakpot' can currently connect to Kraken, download security reference
-data and subscribe to all listed instrument pairs. It leverages
-`simdjson` to parse messages into internal data structures. As things
-stand now it can:
-
-- keep internal level books based on updates
-- validating those via the CRC32 check described here:  https://docs.kraken.com/websockets-v2/#maintaining-the-book
-- persist level books and trades to Parquet files via Apache Arrow
-
-## Future plans
-
-- add config options for symbol filtering, level book depth, etc.
-- build with *emscripten* and see if it can run inside a browser (without parquet serialization)
-- embed or integrate with Godot in some fashion and create visualizations
-- keep complete books using *execution* channel
-- provide a Python wrapper probably based on boost's python integration
-
-## Building and running
-
-In theory, building this should be simple given Conan (v2) and a
-reasonably up to date CMake. On MacOS Ventura, I am able to to this by running:
-
+*kdr_record* supports these options.
+```
+bash-3.2$ ./kdr_record --help
+Subscribe to Kraken and serialize book/trade data:
+  --help                             display program options
+  --ping_interval_secs arg (=30)     ping/pong delay
+  --kraken_host arg (=ws.kraken.com) Kraken websocket host
+  --kraken_port arg (=443)           Kraken websocket port
+  --pair_filter arg (=[])            explicit list of pairs to subscribe to as 
+                                     json string
+  --parquet_dir arg (=/tmp)          directory in which to write parquet output
+  --book_depth arg (=1000)           one of {10, 25, 100, 500, 1000}
+  --capture_book arg (=1)            subscribe to and record level book
+  --capture_trades arg (=1)          subscribe to and record trades
 ```
 
-conan install . --profile=default --build=missing --output-folder=build -sbuild_type=Debug
-cd ./build
-cmake -DLIBCXX_ENABLE_INCOMPLETE_FEATURES=ON --preset conan-debug ..
+You can find prebuilt copies of *kdr_record* for Ubuntu in [releases](https://github.com/torquey66/kraken-data-recorder/releases).
+
+## Building
+
+### Prerequisites:
+
+This project is currently built and tested with the following
+tooling. These are by no means hard requirements (see for example the
+CI pipeline for this project).
+
+ - Conan version 2.5.0
+ - cmake version 3.30.1
+ - clang version 15.0.0
+ - Python 3.12.4
+ - jinja2-cli v0.8.2
+ - Jinja2 v3.1.4
+
+### Conan profile
+```
+[settings]
+arch=x86_64
+build_type=RelWithDebInfo
+compiler=apple-clang
+compiler.cppstd=gnu23
+compiler.libcxx=libc++
+compiler.version=15
+os=Macos
+```
+
+### Command line build
+```
+mkdir build
+conan install . --profile=release --build=missing --output-folder=build -sbuild_type=RelWithDebInfo
+cd build
+cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo  ..
 make -j
-```
-
-To run:
-```
-mkdir -p /tmp/krakpot_parquet
-./build/Kraken
+ctest
 ```
