@@ -34,6 +34,7 @@
 # Misc
 CMakeUserPresets.json
 build
-generated
+generated/*.hpp
+generated/*.cpp
 *~
 
