@@ -1,0 +1,17 @@
+{
+    "class" : "pair_status",
+
+    "type" : "int8_t",
+
+    "enum_values" : [
+        { "name" : "invalid",          "value" : -1 },
+        { "name" : "cancel_only",      "value" : 0 },
+        { "name" : "delisted",         "value" : 1 },
+        { "name" : "limit_only",       "value" : 2 },
+        { "name" : "maintenance",      "value" : 3 },
+        { "name" : "online",           "value" : 4 },
+        { "name" : "post_only",        "value" : 5 },
+        { "name" : "reduce_only",      "value" : 6 },
+        { "name" : "work_in_progress", "value" : 7 }
+    ]
+}

@@ -3,6 +3,8 @@
 
 #include "types.hpp"
 
+#include "../generated/depth.hpp"
+
 #include <simdjson.h>
 #include <boost/json.hpp>
 
@@ -31,7 +33,7 @@ struct config_t final {
            std::string kraken_port,
            symbol_filter_t pair_filter,
            std::string parquet_dir,
-           depth_t book_depth,
+           model::depth_t book_depth,
            bool capture_book,
            bool capture_trades)
       : m_ping_interval_secs{ping_interval_secs},
@@ -55,7 +57,7 @@ struct config_t final {
   std::string kraken_port() const { return m_kraken_port; }
   const symbol_filter_t& pair_filter() const { return m_pair_filter; }
   std::string parquet_dir() const { return m_parquet_dir; }
-  depth_t book_depth() const { return m_book_depth; }
+  model::depth_t book_depth() const { return m_book_depth; }
   bool capture_book() const { return m_capture_book; }
   bool capture_trades() const { return m_capture_trades; }
 
@@ -65,7 +67,7 @@ struct config_t final {
   std::string m_kraken_port = "443";
   symbol_filter_t m_pair_filter;
   std::string m_parquet_dir = "/tmp";
-  depth_t m_book_depth = e_1000;
+  model::depth_t m_book_depth = model::depth_1000;
   bool m_capture_book = true;
   bool m_capture_trades = true;
 };

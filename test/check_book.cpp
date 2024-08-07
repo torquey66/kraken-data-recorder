@@ -134,22 +134,22 @@ void process_pairs(std::string pairs_filename,
       const auto symbol = symbol_array->Value(idx);
 
       const auto pair =
-          response::pair_t{std::string{base.begin(), base.end()},
-                           cost_min,
-                           cost_precision,
-                           has_index,
-                           margin_initial,
-                           marginable,
-                           position_limit_long,
-                           position_limit_short,
-                           price_increment,
-                           price_precision,
-                           qty_increment,
-                           qty_min,
-                           qty_precision,
-                           std::string{quote.begin(), quote.end()},
-                           response::pair_t::status_t{status},
-                           std::string{symbol.begin(), symbol.end()}};
+          model::pair_t{std::string{base.begin(), base.end()},
+                        cost_min,
+                        cost_precision,
+                        has_index,
+                        margin_initial,
+                        marginable,
+                        position_limit_long,
+                        position_limit_short,
+                        price_increment,
+                        price_precision,
+                        qty_increment,
+                        qty_min,
+                        qty_precision,
+                        std::string{quote.begin(), quote.end()},
+                        model::pair_status_t{status},
+                        std::string{symbol.begin(), symbol.end()}};
       level_book.accept(pair);
     }
   }
@@ -230,7 +230,7 @@ int main(int argc, char* argv[]) {
       throw std::runtime_error(
           "missing 'book_depth' metadata in book parquet file");
     }
-    const depth_t book_depth{atol(depth_result.ValueOrDie().c_str())};
+    const model::depth_t book_depth{atol(depth_result.ValueOrDie().c_str())};
     std::cout << "book_depth: " << book_depth << std::endl;
 
     auto level_book = model::level_book_t{book_depth};

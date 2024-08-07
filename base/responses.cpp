@@ -26,7 +26,7 @@ boost::json::object header_t::to_json_obj() const {
   return result;
 }
 
-instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
+instrument_t instrument_t::from_json(simdjson::ondemand::document& response) {
   auto result = instrument_t{};
   auto buffer = std::string_view{};
 
@@ -36,13 +36,15 @@ instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
   const auto type = std::string{buffer.begin(), buffer.end()};
   result.m_header = header_t{timestamp_t::now(), channel, type};
 
-  for (simdjson::fallback::ondemand::object obj : response[c_response_data][c_instrument_assets]) {
-    const auto asset = asset_t::from_json(obj);
+  for (simdjson::fallback::ondemand::object obj :
+       response[c_response_data][c_instrument_assets]) {
+    const auto asset = model::asset_t::from_json(obj);
     result.m_assets.push_back(asset);
   }
 
-  for (simdjson::fallback::ondemand::object obj : response[c_response_data][c_instrument_pairs]) {
-    const auto pair = pair_t::from_json(obj);
+  for (simdjson::fallback::ondemand::object obj :
+       response[c_response_data][c_instrument_pairs]) {
+    const auto pair = model::pair_t::from_json(obj);
     result.m_pairs.push_back(pair);
   }
 
@@ -51,12 +53,13 @@ instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
 
 boost::json::object instrument_t::to_json_obj() const {
   auto assets = boost::json::array{};
-  std::transform(m_assets.begin(), m_assets.end(), std::back_inserter(assets),
-                 [](const asset_t& asset) { return asset.to_json_obj(); });
+  std::transform(
+      m_assets.begin(), m_assets.end(), std::back_inserter(assets),
+      [](const model::asset_t& asset) { return asset.to_json_obj(); });
 
   auto pairs = boost::json::array{};
   std::transform(m_pairs.begin(), m_pairs.end(), std::back_inserter(pairs),
-                 [](const pair_t& pair) { return pair.to_json_obj(); });
+                 [](const model::pair_t& pair) { return pair.to_json_obj(); });
 
   auto data = boost::json::object{};
   data[c_instrument_pairs] = pairs;
@@ -162,29 +165,7 @@ boost::json::object book_t::to_json_obj(integer_t price_precision,
   return result;
 }
 
-ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
-  if (ord_type == c_trade_market) {
-    return e_market;
-  }
-  if (ord_type == c_trade_limit) {
-    return e_limit;
-  }
-  throw std::runtime_error{"unsupported ord_type: " +
-                           std::string{ord_type.data(), ord_type.size()}};
-}
-
-side_t trades_t::parse_side(std::string_view side) {
-  if (side == c_trade_buy) {
-    return e_buy;
-  }
-  if (side == c_trade_sell) {
-    return e_sell;
-  }
-  throw std::runtime_error{"unsupported side: " +
-                           std::string{side.data(), side.size()}};
-}
-
-trades_t trades_t::from_json(simdjson::ondemand::document &response) {
+trades_t trades_t::from_json(simdjson::ondemand::document& response) {
   auto result = trades_t{};
   auto buffer = std::string_view{};
 
@@ -197,11 +178,11 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   for (auto obj : response[c_response_data]) {
     auto trade = trade_t{};
     buffer = obj[c_trade_ord_type].get_string();
-    trade.ord_type = parse_ord_type(buffer);
+    trade.ord_type = model::str_view_to_ord_type_t(buffer);
     trade.price = extract_decimal(obj, c_trade_price);
     trade.qty = extract_decimal(obj, c_trade_qty);
     buffer = obj[c_trade_side].get_string();
-    trade.side = parse_side(buffer);
+    trade.side = model::str_view_to_side_t(buffer);
     buffer = obj[c_trade_symbol].get_string();
     trade.symbol = std::string(buffer.begin(), buffer.end());
     buffer = obj[c_trade_timestamp].get_string();

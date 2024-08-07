@@ -1,0 +1,36 @@
+{% import "types.j2" as types -%}
+/**
+ * DO NOT EDIT BY HAND! This is generated code.
+ */
+#pragma once
+
+#include "types.hpp"
+
+#include <string>
+#include <unordered_map>
+
+namespace krakpot {
+namespace model {
+
+{% set classname = class ~ '_t' -%}
+{% set cpp_access_type = types.cpp_access_types[class] -%}
+
+{% for enum_value in  enum_values -%}
+static constexpr char c_{{ class }}_{{ enum_value.name }}[] = "{{ enum_value.name }}";
+{% endfor %}
+
+/**
+ * {{ doc }}
+ */
+enum {{ classname }} : {{ type }} {
+{% for enum_value in  enum_values -%}
+  {{ class }}_{{ enum_value.name }} = {{ enum_value.value }},
+{% endfor -%}
+};
+
+{{ classname }} str_to_{{ cpp_access_type }}(std::string);
+{{ classname }} str_view_to_{{ cpp_access_type }}(std::string_view);
+std::string {{ cpp_access_type }}_to_str({{ classname }});
+
+} // model
+} // krakpot

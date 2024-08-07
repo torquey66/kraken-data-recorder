@@ -1,0 +1,51 @@
+{# Tells us how to declare a c++ member. #}
+{% set cpp_decl_types = {
+ "asset_status": "asset_status_t",
+ "bool":         "bool",
+ "depth":        "depth_t",
+ "double":       "double_t",
+ "integer":      "integer_t",
+ "ord_type":     "ord_type_t",
+ "pair_status":  "pair_status_t",
+ "side":         "side_t",
+ "string":       "std::string",
+} -%}
+
+{# Tells us how to expose a c++ member. #}
+{% set cpp_access_types = {
+ "asset_status": "asset_status_t",
+ "bool":         "bool",
+ "depth":        "depth_t",
+ "double":       "double_t",
+ "integer":      "integer_t",
+ "ord_type":     "ord_type_t",
+ "pair_status":  "pair_status_t",
+ "side":         "side_t",
+ "string":       "const std::string&",
+} -%}
+{
+
+{# Tells us which simdjson accessor to use. #}
+{% set simdjson_types = {
+ "asset_status": "string", 
+ "bool":         "bool",
+ "depth":        "int64",
+ "double":       "double",
+ "integer":      "int64",
+ "ord_type":     "string", 
+ "pair_status":  "string", 
+ "side":         "string", 
+ "string":       "string",
+} -%}
+
+{# Default values for c++ member declarations. #}
+{% set type_defaults = {
+ "asset_status": "asset_status_invalid",
+ "bool":         "false",
+ "depth":        "depth_invalid",
+ "double":       "0.0",
+ "integer":      "0",
+ "ord_type":     "ord_type_invalid",
+ "pair_status":  "pair_status_invalid",
+ "side":         "side_invalid",
+} -%}

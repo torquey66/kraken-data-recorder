@@ -88,7 +88,7 @@ const sides_t &level_book_t::sides(symbol_t symbol) const {
   return it->second;
 }
 
-void level_book_t::accept(const response::pair_t& pair) {
+void level_book_t::accept(const model::pair_t& pair) {
   auto it = m_sides.find(pair.symbol());
   if (it == m_sides.end()) {
     // The expected case: we receive a pair for which we have not

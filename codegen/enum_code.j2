@@ -1,0 +1,50 @@
+{% import "types.j2" as types -%}
+/**
+ * DO NOT EDIT BY HAND! This is generated code.
+ */
+#include "{{ class }}.hpp"
+
+namespace krakpot {
+namespace model {
+
+{% set classname = class ~ '_t' %}
+{% set cpp_access_type = types.cpp_access_types[class] -%}
+
+static const std::unordered_map<std::string, {{ classname }} >
+   c_str_to_{{ class }} = {
+{% for enum_value in  enum_values -%}
+   { c_{{ class }}_{{ enum_value.name }}, {{ class }}_{{ enum_value.name }} },
+{% endfor -%}
+};
+
+static const std::unordered_map<{{ classname }}, std::string>
+   c_{{ class }}_to_str = {
+{% for enum_value in  enum_values -%}
+   { {{ class }}_{{ enum_value.name }}, c_{{ class }}_{{ enum_value.name }} },
+{% endfor -%}
+};
+
+{{ classname }} str_to_{{ cpp_access_type }}(std::string str) {
+const auto it = c_str_to_{{ class }}.find(str);
+if (it == c_str_to_{{ class }}.end()) {
+   return {{ class }}_invalid;
+}
+return it->second;
+}
+
+{{ classname }} str_view_to_{{ cpp_access_type }}(std::string_view str_view) {
+const std::string str{str_view.data(), str_view.size()};
+return str_to_{{ cpp_access_type }}(str);
+}
+
+std::string {{ cpp_access_type }}_to_str({{ classname }} value) {
+const auto it = c_{{ class }}_to_str.find(value);
+if (it == c_{{ class }}_to_str.end()) {
+   return c_{{ class }}_invalid;
+}
+return it->second;
+}
+
+} // model
+} // krakpot
+

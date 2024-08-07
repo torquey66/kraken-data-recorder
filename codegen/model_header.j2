@@ -1,0 +1,68 @@
+{% import "types.j2" as types -%}
+/**
+ * DO NOT EDIT BY HAND! This is generated code.
+ */
+#pragma once
+
+#include "types.hpp"
+
+{% for dependency in dependencies -%}
+#include "{{ dependency }}.hpp"
+{% endfor -%}
+
+#include <simdjson.h>
+#include <boost/json.hpp>
+
+#include <optional>
+#include <string>
+
+namespace krakpot {
+namespace model {
+
+{% set classname = class ~ '_t' -%}
+
+struct {{ classname }} final {
+
+{{ classname }}() {}
+
+{{ classname }}(
+{% for member in members -%}
+  {% if member.optional == true -%}
+    std::optional<{{ types.cpp_access_types[member.type] }}> {{ member.name }}{% if not loop.last %},{% endif %}
+  {% else -%}
+    {{ types.cpp_access_types[member.type] }} {{ member.name }}{% if not loop.last %},{% endif %}
+  {% endif -%}
+{% endfor -%}
+);
+
+
+bool operator==(const {{ classname }}&) const = default;
+bool operator!=(const {{ classname }}&) const = default;
+
+{% for member in members -%}
+  {% if member.optional == true -%}
+    std::optional<{{ types.cpp_access_types[member.type] }}> {{ member.name }}() const { return m_{{ member.name }}; };
+  {% else -%}
+    {{ types.cpp_access_types[member.type] }} {{ member.name }}() const { return m_{{ member.name }}; };
+  {% endif -%}
+{% endfor %}
+
+static {{ classname }} from_json(simdjson::ondemand::object&);
+boost::json::object to_json_obj() const;
+
+std::string str() const { return boost::json::serialize(to_json_obj()); }
+
+private:
+{% for member in members -%}
+  {% if member.optional == true -%}
+    std::optional<{{ types.cpp_decl_types[member.type] }}> m_{{ member.name }};
+  {% else -%}
+    {{ types.cpp_decl_types[member.type] }} m_{{ member.name }}{% if types.type_defaults.get(member['type']) is not none -%} = {{ types.type_defaults[member['type']] }} {% endif -%};
+  {% endif -%}
+{% endfor -%}
+
+};
+
+} // model
+} // krakpot
+

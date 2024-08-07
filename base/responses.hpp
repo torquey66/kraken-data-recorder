@@ -1,8 +1,10 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
-#include "asset.hpp"
-#include "pair.hpp"
+#include "../generated/asset.hpp"     // !@# temporary testing path
+#include "../generated/ord_type.hpp"  // !@# temporary testing path
+#include "../generated/pair.hpp"      // !@# temporary testing path
+#include "../generated/side.hpp"      // !@# temporary testing path
 
 #include <simdjson.h>
 #include <boost/json.hpp>
@@ -50,16 +52,16 @@ struct instrument_t final {
   static instrument_t from_json(simdjson::ondemand::document&);
 
   const header_t& header() const { return m_header; }
-  const std::vector<asset_t>& assets() const { return m_assets; }
-  const std::vector<pair_t>& pairs() const { return m_pairs; }
+  const std::vector<model::asset_t>& assets() const { return m_assets; }
+  const std::vector<model::pair_t>& pairs() const { return m_pairs; }
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
  private:
   header_t m_header;
-  std::vector<asset_t> m_assets;
-  std::vector<pair_t> m_pairs;
+  std::vector<model::asset_t> m_assets;
+  std::vector<model::pair_t> m_pairs;
 };
 
 /**
@@ -106,10 +108,10 @@ struct book_t final {
  */
 struct trades_t final {
   struct trade_t final {
-    ord_type_t ord_type;
+    model::ord_type_t ord_type;
     price_t price;
     qty_t qty;
-    side_t side;
+    model::side_t side;
     std::string symbol;
     timestamp_t timestamp;
     integer_t trade_id;
@@ -132,9 +134,6 @@ struct trades_t final {
   auto size() const { return m_trades.size(); }
 
  private:
-  static ord_type_t parse_ord_type(std::string_view);
-  static side_t parse_side(std::string_view);
-
   header_t m_header;
   std::vector<trade_t> m_trades;
 };

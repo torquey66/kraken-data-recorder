@@ -1,0 +1,15 @@
+{
+    "class" : "asset",
+
+    "dependencies" : [ "asset_status" ],
+
+    "members" : [
+        { "name" : "borrowable",        "type" : "bool" },
+        { "name" : "collateral_value",  "type" : "double" },
+        { "name" : "id",                "type" : "string" },
+        { "name" : "margin_rate",       "type" : "double", "optional" : true },
+        { "name" : "precision",         "type" : "integer" },
+        { "name" : "precision_display", "type" : "integer" },
+        { "name" : "status",            "type" : "asset_status", "enum" : true }
+    ]
+}

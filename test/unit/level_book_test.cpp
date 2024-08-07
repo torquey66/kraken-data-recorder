@@ -188,14 +188,14 @@ static const std::string snapshot_str = R"RESPONSE(
 )RESPONSE";
 
 TEST_CASE("book_t doc example snapshot") {
-  auto book = krakpot::model::level_book_t{krakpot::e_10};
+  auto book = krakpot::model::level_book_t{krakpot::model::depth_10};
 
   simdjson::ondemand::parser parser;
 
   simdjson::padded_string pair_response{pair_str};
   simdjson::ondemand::document pair_doc = parser.iterate(pair_response);
   for (simdjson::fallback::ondemand::object pair_obj : pair_doc) {
-    const auto pair = krakpot::response::pair_t::from_json(pair_obj);
+    const auto pair = krakpot::model::pair_t::from_json(pair_obj);
     book.accept(pair);
   }
 
