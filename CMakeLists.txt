@@ -66,8 +66,8 @@ foreach(model_file ${MODEL_FILES})
     set(code_file ${CMAKE_SOURCE_DIR}/generated/${filename}.cpp)
     add_custom_command(
         OUTPUT ${header_file} ${code_file}
-        COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/model_header.j2 ${model_file} | clang-format > ${header_file}
-        COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/model_code.j2   ${model_file} | clang-format > ${code_file}
+        COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/model_header.j2 ${model_file} | clang-format --style=chromium > ${header_file}
+        COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/model_code.j2   ${model_file} | clang-format --style=chromium > ${code_file}
         DEPENDS ${model_file} ${JINJA2_FILES}
         COMMENT "Generating ${header_file} from ${model_file}"
         COMMENT "Generating ${code_file} from ${model_file}"
@@ -80,8 +80,8 @@ foreach(enum_file ${ENUM_FILES})
     set(code_file ${CMAKE_SOURCE_DIR}/generated/${filename}.cpp)
     add_custom_command(
         OUTPUT ${header_file} ${code_file}
-        COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/enum_header.j2 ${enum_file} | clang-format > ${header_file}
-        COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/enum_code.j2   ${enum_file} | clang-format > ${code_file}
+        COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/enum_header.j2 ${enum_file} | clang-format --style=chromium > ${header_file}
+        COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/enum_code.j2   ${enum_file} | clang-format --style=chromium > ${code_file}
         DEPENDS ${enum_file} ${JINJA2_FILES}
         COMMENT "Generating ${header_file} from ${enum_file}"
         COMMENT "Generating ${code_file} from ${enum_file}"
