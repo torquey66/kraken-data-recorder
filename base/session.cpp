@@ -14,17 +14,20 @@ namespace asio = boost::asio;
 namespace bst = boost::beast;
 namespace ws = bst::websocket;
 
-namespace krakpot {
+namespace kdr {
 
-session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context,
-                     const config_t &config)
-    : m_ioc{ioc}, m_resolver{m_ioc}, m_ws{ioc, ssl_context},
-      m_ping_timer{m_ioc}, m_config{config} {
-
+session_t::session_t(ioc_t& ioc,
+                     ssl_context_t& ssl_context,
+                     const config_t& config)
+    : m_ioc{ioc},
+      m_resolver{m_ioc},
+      m_ws{ioc, ssl_context},
+      m_ping_timer{m_ioc},
+      m_config{config} {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
 }
 
-void session_t::fail(bst::error_code ec, char const *what) {
+void session_t::fail(bst::error_code ec, char const* what) {
   BOOST_LOG_TRIVIAL(error) << what << ": " << ec.message();
   m_keep_processing = false;
 }
@@ -61,7 +64,7 @@ void session_t::on_resolve(error_code ec, resolver::results_type results) {
     fail(ec, __FUNCTION__);
   }
   boost::beast::get_lowest_layer(m_ws).expires_after(
-      std::chrono::seconds(30)); // TODO: constants
+      std::chrono::seconds(30));  // TODO: constants
   boost::beast::get_lowest_layer(m_ws).async_connect(
       results,
       [this](error_code ec, resolver::results_type::endpoint_type endpoint) {
@@ -73,7 +76,6 @@ void session_t::on_resolve(error_code ec, resolver::results_type results) {
 
 void session_t::on_connect(error_code ec,
                            resolver::results_type::endpoint_type endpoint) {
-
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   if (ec) {
     fail(ec, __FUNCTION__);
@@ -108,7 +110,7 @@ void session_t::on_ssl_handshake(error_code ec) {
   m_ws.set_option(
       ws::stream_base::timeout::suggested(boost::beast::role_type::client));
 
-  m_ws.set_option(ws::stream_base::decorator([](ws::request_type &req) {
+  m_ws.set_option(ws::stream_base::decorator([](ws::request_type& req) {
     req.set(boost::beast::http::field::user_agent,
             std::string(BOOST_BEAST_VERSION_STRING) +
                 " websocket-client-async-ssl");
@@ -221,4 +223,4 @@ void session_t::on_close(error_code ec) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded";
 }
 
-} // namespace krakpot
+}  // namespace kdr

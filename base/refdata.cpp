@@ -1,6 +1,6 @@
 #include "refdata.hpp"
 
-namespace krakpot {
+namespace kdr {
 namespace model {
 
 void refdata_t::accept(const response::instrument_t& instrument) {
@@ -26,4 +26,4 @@ std::optional<refdata_t::pair_precision_t> refdata_t::pair_precision(
 }
 
 }  // namespace model
-}  // namespace krakpot
+}  // namespace kdr

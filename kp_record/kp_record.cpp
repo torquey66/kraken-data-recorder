@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     po::options_description desc(
         "Subscribe to Kraken and serialize book/trade data");
 
-    using krakpot::config_t;
+    using kdr::config_t;
 
     // clang-format off
     desc.add_options()
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
         vm[config_t::c_kraken_port].as<std::string>(), pair_filter,
         //                 pair_filter_json.get<config_t::symbol_filter_t>(),
         vm[config_t::c_parquet_dir].as<std::string>(),
-        krakpot::model::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
+        kdr::model::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
         vm[config_t::c_capture_book].as<bool>(),
         vm[config_t::c_capture_trades].as<bool>()};
 
@@ -92,20 +92,20 @@ int main(int argc, char* argv[]) {
     boost::asio::signal_set signals(ioc, SIGINT);
     signals.async_wait(signal_handler);
 
-    const auto now = krakpot::timestamp_t::now().micros();
+    const auto now = kdr::timestamp_t::now().micros();
 
-    krakpot::pq::assets_sink_t assets_sink{config.parquet_dir(), now};
-    krakpot::pq::pairs_sink_t pairs_sink{config.parquet_dir(), now};
-    krakpot::pq::book_sink_t book_sink{config.parquet_dir(), now,
-                                       config.book_depth()};
-    krakpot::pq::trades_sink_t trades_sink{config.parquet_dir(), now};
+    kdr::pq::assets_sink_t assets_sink{config.parquet_dir(), now};
+    kdr::pq::pairs_sink_t pairs_sink{config.parquet_dir(), now};
+    kdr::pq::book_sink_t book_sink{config.parquet_dir(), now,
+                                   config.book_depth()};
+    kdr::pq::trades_sink_t trades_sink{config.parquet_dir(), now};
 
-    krakpot::model::level_book_t level_book{config.book_depth()};
-    krakpot::model::refdata_t refdata;
+    kdr::model::level_book_t level_book{config.book_depth()};
+    kdr::model::refdata_t refdata;
 
     const auto accept_instrument =
         [&level_book, &assets_sink, &pairs_sink,
-         &refdata](const krakpot::response::instrument_t& response) {
+         &refdata](const kdr::response::instrument_t& response) {
           assets_sink.accept(response.header(), response.assets());
           pairs_sink.accept(response.header(), response.pairs());
           refdata.accept(response);
@@ -117,31 +117,30 @@ int main(int argc, char* argv[]) {
         };
 
     // !@# TODO: replace use of level book with refdata
-    const auto noop_accept_book = [](const krakpot::response::book_t&) {};
-    const auto accept_book = [&book_sink, &level_book, &refdata](
-                                 const krakpot::response::book_t& response) {
+    const auto noop_accept_book = [](const kdr::response::book_t&) {};
+    const auto accept_book = [&book_sink, &level_book,
+                              &refdata](const kdr::response::book_t& response) {
       book_sink.accept(response, refdata);
       level_book.accept(response);
     };
 
-    const auto noop_accept_trades = [](const krakpot::response::trades_t&) {};
+    const auto noop_accept_trades = [](const kdr::response::trades_t&) {};
     const auto accept_trades =
-        [&trades_sink, &refdata](const krakpot::response::trades_t& response) {
+        [&trades_sink, &refdata](const kdr::response::trades_t& response) {
           trades_sink.accept(response, refdata);
         };
-    const krakpot::sink_t sink{
+    const kdr::sink_t sink{
         accept_instrument,
-        config.capture_book()
-            ? krakpot::sink_t::accept_book_t{accept_book}
-            : krakpot::sink_t::accept_book_t{noop_accept_book},
+        config.capture_book() ? kdr::sink_t::accept_book_t{accept_book}
+                              : kdr::sink_t::accept_book_t{noop_accept_book},
         config.capture_trades()
-            ? krakpot::sink_t::accept_trades_t{accept_trades}
-            : krakpot::sink_t::accept_trades_t{noop_accept_trades}};
+            ? kdr::sink_t::accept_trades_t{accept_trades}
+            : kdr::sink_t::accept_trades_t{noop_accept_trades}};
 
-    auto session = krakpot::session_t(ioc, ctx, config);
-    auto engine = krakpot::engine_t(session, config, sink);
+    auto session = kdr::session_t(ioc, ctx, config);
+    auto engine = kdr::engine_t(session, config, sink);
 
-    const auto handle_recv = [&engine](krakpot::msg_t msg) {
+    const auto handle_recv = [&engine](kdr::msg_t msg) {
       try {
         return engine.handle_msg(msg);
       } catch (const std::exception& ex) {

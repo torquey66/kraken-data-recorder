@@ -17,7 +17,7 @@
  *
  * As functionality expands, this will be broken into submodules.
  */
-namespace krakpot {
+namespace kdr {
 
 struct engine_t final {
   engine_t(session_t&, const config_t&, const sink_t&);
@@ -54,4 +54,4 @@ struct engine_t final {
   metrics_t m_metrics;
 };
 
-}  // namespace krakpot
+}  // namespace kdr

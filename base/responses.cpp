@@ -8,15 +8,15 @@
 namespace {
 
 template <typename O>
-krakpot::decimal_t extract_decimal(O& obj, std::string field) {
+kdr::decimal_t extract_decimal(O& obj, std::string field) {
   const auto token = std::string_view{obj[field].raw_json_token()};
-  const auto result = krakpot::decimal_t{token};
+  const auto result = kdr::decimal_t{token};
   return result;
 }
 
 }  // namespace
 
-namespace krakpot {
+namespace kdr {
 namespace response {
 
 boost::json::object header_t::to_json_obj() const {
@@ -72,12 +72,20 @@ boost::json::object instrument_t::to_json_obj() const {
   return result;
 }
 
-book_t::book_t(const header_t &header, const asks_t &asks, const bids_t &bids,
-               uint64_t crc32, std::string symbol, timestamp_t timestamp)
-    : m_header(header), m_asks(asks), m_bids(bids), m_crc32(crc32),
-      m_symbol(symbol), m_timestamp(timestamp) {}
+book_t::book_t(const header_t& header,
+               const asks_t& asks,
+               const bids_t& bids,
+               uint64_t crc32,
+               std::string symbol,
+               timestamp_t timestamp)
+    : m_header(header),
+      m_asks(asks),
+      m_bids(bids),
+      m_crc32(crc32),
+      m_symbol(symbol),
+      m_timestamp(timestamp) {}
 
-book_t book_t::from_json(simdjson::ondemand::document &response) {
+book_t book_t::from_json(simdjson::ondemand::document& response) {
   auto result = book_t{};
   auto buffer = std::string_view{};
 
@@ -219,5 +227,5 @@ boost::json::object trades_t::to_json_obj(integer_t price_precision,
   return result;
 }
 
-} // namespace response
-} // namespace krakpot
+}  // namespace response
+}  // namespace kdr

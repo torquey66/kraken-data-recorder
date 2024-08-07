@@ -16,23 +16,22 @@ TEST_CASE("sanity check - zero my hero") {
       {17, "0.00000000000000000"},
   };
   for (const auto& kv : precision_to_str) {
-    const auto decimal = krakpot::decimal_t{0.0};
+    const auto decimal = kdr::decimal_t{0.0};
     CHECK(decimal.value() == 0.0);
     CHECK(decimal.str(kv.first) == kv.second);
   }
 }
 
 TEST_CASE("sanity check - comparison") {
-  const auto d1 = krakpot::decimal_t{18.82};
-  const auto d2 = krakpot::decimal_t{19.82};
+  const auto d1 = kdr::decimal_t{18.82};
+  const auto d2 = kdr::decimal_t{19.82};
   CHECK(d1 != d2);
   CHECK(d1 < d2);
   CHECK(d2 > d1);
 }
 
 TEST_CASE("crc32") {
-  using row_t =
-      std::tuple<double, std::string, krakpot::integer_t, krakpot::integer_t>;
+  using row_t = std::tuple<double, std::string, kdr::integer_t, kdr::integer_t>;
   std::vector<row_t> rows = {
       {94510.50669693, "94510.50669693", 8, 3977769420},
       {232489.98702916, "232489.98702916", 8, 2038959249},
@@ -57,7 +56,7 @@ TEST_CASE("crc32") {
   };
   for (const auto& row : rows) {
     const auto [value, token, precision, expected] = row;
-    const krakpot::decimal_t decimal{token};
+    const kdr::decimal_t decimal{token};
     CHECK(decimal.str(precision) == token);
 
     const boost::crc_32_type in_crc;

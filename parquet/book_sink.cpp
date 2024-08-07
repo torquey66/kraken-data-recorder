@@ -4,7 +4,7 @@
 #include <arrow/scalar.h>
 #include <boost/log/trivial.hpp>
 
-namespace krakpot {
+namespace kdr {
 namespace pq {
 
 book_sink_t::book_sink_t(std::string parquet_dir,
@@ -154,5 +154,5 @@ std::shared_ptr<arrow::Schema> book_sink_t::schema(integer_t book_depth) {
   ;
 }
 
-} // namespace pq
-} // namespace krakpot
+}  // namespace pq
+}  // namespace kdr

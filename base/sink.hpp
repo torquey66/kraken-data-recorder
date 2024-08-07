@@ -4,7 +4,7 @@
 
 #include <functional>
 
-namespace krakpot {
+namespace kdr {
 
 struct sink_t final {
   using accept_instrument_t =
@@ -37,4 +37,4 @@ struct sink_t final {
   accept_trades_t m_accept_trades;
 };
 
-} // namespace krakpot
+}  // namespace kdr

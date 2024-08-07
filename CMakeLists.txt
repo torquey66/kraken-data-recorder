@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.29.2)
 
-project(KrakpotProject)
+project(KrakenDataRecorder)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-#set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version")
+else()
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
+endif()
 
 #add_compile_options(-fsanitize=address)
 #add_link_options(-fsanitize=address)
@@ -95,7 +98,7 @@ add_custom_target(generate_all
 
 # TODO: split these into 'src' and 'include' directories or the like
 include_directories(${CMAKE_SOURCE_DIR}/base)
-add_library(krakpot_base
+add_library(kdr_base
   generated/asset.cpp
   generated/asset.hpp
   generated/asset_status.cpp
@@ -126,11 +129,11 @@ add_library(krakpot_base
   base/sink.hpp
   base/types.cpp
 )
-add_dependencies(krakpot_base generate_all)
+add_dependencies(kdr_base generate_all)
 
 # TODO: split these into 'src' and 'include' directories or the like
 include_directories(${CMAKE_SOURCE_DIR}/parquet)
-add_library(krakpot_parquet
+add_library(kdr_parquet
   parquet/assets_sink.cpp
   parquet/assets_sink.hpp
   parquet/book_sink.cpp
@@ -142,7 +145,7 @@ add_library(krakpot_parquet
   parquet/trade_sink.hpp
 )
 
-target_link_libraries(krakpot_base
+target_link_libraries(kdr_base
   PUBLIC
   arrow::arrow
   boost::boost
@@ -151,20 +154,20 @@ target_link_libraries(krakpot_base
   simdjson::simdjson
 )
 
-target_link_libraries(krakpot_parquet
+target_link_libraries(kdr_parquet
   PUBLIC
   arrow::arrow
-  krakpot_base
+  kdr_base
 )
 
 add_executable(kp_record kp_record/kp_record.cpp)
-target_link_libraries(kp_record krakpot_parquet)
+target_link_libraries(kp_record kdr_parquet)
 
 add_executable(parse_instrument_snapshot test/parse_instrument_snapshot.cpp)
-target_link_libraries(parse_instrument_snapshot krakpot_base)
+target_link_libraries(parse_instrument_snapshot kdr_base)
 
 add_executable(check_book test/check_book.cpp)
-target_link_libraries(check_book krakpot_base)
+target_link_libraries(check_book kdr_base)
 
 ##
 # Unit tests
@@ -178,6 +181,6 @@ add_executable(tests
   test/unit/parquet_test.cpp
   test/unit/test_main.cpp
 )
-target_link_libraries(tests krakpot_base doctest::doctest)
+target_link_libraries(tests kdr_base doctest::doctest)
 
 add_test(NAME unit_test COMMAND tests)

@@ -1,6 +1,6 @@
 #include "pairs_sink.hpp"
 
-namespace krakpot {
+namespace kdr {
 namespace pq {
 
 pairs_sink_t::pairs_sink_t(std::string parquet_dir, sink_id_t id)
@@ -140,4 +140,4 @@ std::shared_ptr<arrow::Schema> pairs_sink_t::schema() {
 }
 
 }  // namespace pq
-}  // namespace krakpot
+}  // namespace kdr

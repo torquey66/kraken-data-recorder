@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <string_view>
 
-namespace krakpot {
+namespace kdr {
 namespace model {
 
 sides_t::sides_t(depth_t book_depth,
@@ -20,14 +20,14 @@ sides_t::sides_t(depth_t book_depth,
       m_bids{bids},
       m_asks{asks} {}
 
-void sides_t::accept_snapshot(const response::book_t &snapshot) {
+void sides_t::accept_snapshot(const response::book_t& snapshot) {
   clear();
   m_bids.insert(snapshot.bids().begin(), snapshot.bids().end());
   m_asks.insert(snapshot.asks().begin(), snapshot.asks().end());
   verify_checksum(snapshot.crc32());
 }
 
-void sides_t::accept_update(const response::book_t &update) {
+void sides_t::accept_update(const response::book_t& update) {
   apply_update(update.bids(), m_bids);
   apply_update(update.asks(), m_asks);
   verify_checksum(update.crc32());
@@ -79,7 +79,7 @@ boost::json::object sides_t::to_json_obj() const {
   return result;
 }
 
-const sides_t &level_book_t::sides(symbol_t symbol) const {
+const sides_t& level_book_t::sides(symbol_t symbol) const {
   const auto it = m_sides.find(symbol);
   if (it == m_sides.end()) {
     const auto message = "unknown symbol: " + symbol;
@@ -145,4 +145,4 @@ std::string level_book_t::str(std::string symbol) const {
 }
 
 }  // namespace model
-}  // namespace krakpot
+}  // namespace kdr

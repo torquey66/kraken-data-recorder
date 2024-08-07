@@ -18,7 +18,7 @@
  * but I have not found a definitive answer to that. More research is
  * in order.
  */
-namespace krakpot {
+namespace kdr {
 
 using msg_t = std::string_view;
 
@@ -55,4 +55,4 @@ struct timestamp_t final {
   int64_t m_micros = 0;
 };
 
-}  // namespace krakpot
+}  // namespace kdr

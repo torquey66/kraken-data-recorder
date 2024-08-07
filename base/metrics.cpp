@@ -4,7 +4,7 @@
 
 #include "constants.hpp"
 
-namespace krakpot {
+namespace kdr {
 
 void metrics_t::accept(msg_t msg) {
   ++m_num_msgs;
@@ -19,4 +19,4 @@ boost::json::object metrics_t::to_json_obj() const {
   return result;
 }
 
-}  // namespace krakpot
+}  // namespace kdr

@@ -6,7 +6,7 @@
 #include <optional>
 #include <unordered_map>
 
-namespace krakpot {
+namespace kdr {
 namespace model {
 
 struct refdata_t final {
@@ -25,4 +25,4 @@ struct refdata_t final {
 };
 
 }  // namespace model
-}  // namespace krakpot
+}  // namespace kdr

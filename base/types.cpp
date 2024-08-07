@@ -7,9 +7,9 @@
 #include <iomanip>
 #include <sstream>
 
-namespace krakpot {
+namespace kdr {
 
-int64_t timestamp_t::from_iso_8601(const std::string &buffer) {
+int64_t timestamp_t::from_iso_8601(const std::string& buffer) {
   std::istringstream in{buffer};
   date::sys_time<std::chrono::microseconds> tp;
   in >> date::parse("%FT%TZ", tp);
@@ -39,4 +39,4 @@ timestamp_t timestamp_t::now() {
   return timestamp_t{micros};
 }
 
-} // namespace krakpot
+}  // namespace kdr
