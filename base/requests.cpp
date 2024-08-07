@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-namespace krakpot {
+namespace kdr {
 namespace request {
 
 boost::json::object ping_t::to_json_obj() const {
@@ -53,4 +53,4 @@ boost::json::object subscribe_trade_t::to_json_obj() const {
 }
 
 }  // namespace request
-}  // namespace krakpot
+}  // namespace kdr

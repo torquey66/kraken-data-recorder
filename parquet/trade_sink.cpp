@@ -4,7 +4,7 @@
 #include <arrow/scalar.h>
 #include <boost/log/trivial.hpp>
 
-namespace krakpot {
+namespace kdr {
 namespace pq {
 
 trades_sink_t::trades_sink_t(std::string parquet_dir, sink_id_t id)
@@ -101,5 +101,5 @@ std::shared_ptr<arrow::Schema> trades_sink_t::schema() {
   return arrow::schema(field_vector);
 }
 
-} // namespace pq
-} // namespace krakpot
+}  // namespace pq
+}  // namespace kdr

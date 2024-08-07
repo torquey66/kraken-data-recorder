@@ -10,20 +10,20 @@
 
 TEST_CASE("timestamp_t from_iso_8691") {
   const auto tp_str = "2024-04-13T18:10:04.220677Z";
-  const auto micros = krakpot::timestamp_t::from_iso_8601(tp_str);
+  const auto micros = kdr::timestamp_t::from_iso_8601(tp_str);
   CHECK(micros == 1713031804220677);
 }
 
 TEST_CASE("timestamp_t to_iso_8601") {
   const auto micros = 1713031804220677;
-  const auto tp_str = krakpot::timestamp_t::to_iso_8601(micros);
+  const auto tp_str = kdr::timestamp_t::to_iso_8601(micros);
   CHECK(tp_str == "2024-04-13T18:10:04.220677Z");
 }
 
 TEST_CASE("timestamp_t roundtrip iso8601") {
   const auto orig_str = std::string{"2024-04-04T22:01:57.362980Z"};
-  const auto micros = krakpot::timestamp_t::from_iso_8601(orig_str);
-  const auto tstamp = krakpot::timestamp_t{micros};
+  const auto micros = kdr::timestamp_t::from_iso_8601(orig_str);
+  const auto tstamp = kdr::timestamp_t{micros};
   const auto rt_str = tstamp.str();
   CHECK(rt_str == orig_str);
 }
@@ -36,7 +36,7 @@ TEST_CASE("book_t parse") {
   simdjson::ondemand::parser parser;
   simdjson::padded_string test_response{test_str};
   simdjson::ondemand::document doc = parser.iterate(test_response);
-  const auto book = krakpot::response::book_t::from_json(doc);
+  const auto book = kdr::response::book_t::from_json(doc);
 
   const auto result_str = book.str(3, 8);
   const auto result_json = boost::json::parse(result_str);

@@ -11,7 +11,7 @@
 #include <memory>
 #include <string>
 
-namespace krakpot {
+namespace kdr {
 namespace pq {
 
 using sink_id_t = int64_t;
@@ -107,4 +107,4 @@ inline writer_t::writer_t(std::string parquet_filename,
               .ValueOrDie()} {}
 
 }  // namespace pq
-}  // namespace krakpot
+}  // namespace kdr

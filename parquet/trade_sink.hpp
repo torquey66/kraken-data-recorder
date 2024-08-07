@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-namespace krakpot {
+namespace kdr {
 namespace pq {
 
 struct trades_sink_t final {
@@ -45,4 +45,4 @@ struct trades_sink_t final {
 };
 
 }  // namespace pq
-}  // namespace krakpot
+}  // namespace kdr

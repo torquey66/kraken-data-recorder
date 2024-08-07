@@ -15,7 +15,7 @@
 #include <iostream>
 #include <string>
 
-using namespace krakpot;
+using namespace kdr;
 
 std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
                              int64_t idx) {

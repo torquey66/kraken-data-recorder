@@ -12,7 +12,7 @@
 #include <string>
 #include <unordered_set>
 
-namespace krakpot {
+namespace kdr {
 
 struct config_t final {
   using symbol_filter_t = std::unordered_set<std::string>;
@@ -72,4 +72,4 @@ struct config_t final {
   bool m_capture_trades = true;
 };
 
-}  // namespace krakpot
+}  // namespace kdr

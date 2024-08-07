@@ -17,7 +17,7 @@
  * according to ChatGPT, Kraken has not released an OpenAPI spec for
  * its websocket interface.
  */
-namespace krakpot {
+namespace kdr {
 namespace request {
 
 /**
@@ -90,4 +90,4 @@ struct subscribe_trade_t final {
 };
 
 }  // namespace request
-}  // namespace krakpot
+}  // namespace kdr

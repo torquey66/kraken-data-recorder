@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-namespace krakpot {
+namespace kdr {
 namespace pq {
 
 struct pairs_sink_t final {
@@ -46,4 +46,4 @@ struct pairs_sink_t final {
 };
 
 }  // namespace pq
-}  // namespace krakpot
+}  // namespace kdr

@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace krakpot {
+namespace kdr {
 
 // TODO: remove redundant definition with types.hpp
 using integer_t = int64_t;
@@ -46,4 +46,4 @@ struct decimal_t final {
   wide_float_t m_value = 0.0;
 };
 
-}  // namespace krakpot
+}  // namespace kdr

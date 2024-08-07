@@ -5,7 +5,7 @@
 #include <constants.hpp>
 #include "../generated/asset.hpp"  // !@# temporary for testing
 
-using namespace krakpot::model;
+using namespace kdr::model;
 
 TEST_CASE("asset_t equality") {
   const asset_t thing1;

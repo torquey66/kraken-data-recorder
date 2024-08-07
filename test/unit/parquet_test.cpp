@@ -48,10 +48,10 @@ private:
 };
 
 struct mock_writer_t final {
-  mock_writer_t(const arrow::Schema &schema)
+  mock_writer_t(const arrow::Schema& schema)
       : m_writer_props{parquet::WriterProperties::Builder()
                            .max_row_group_length(64 * 1024)
-                           ->created_by("Krakpot test")
+                           ->created_by("KDR test")
                            ->version(parquet::ParquetVersion::PARQUET_2_6)
                            ->data_page_version(
                                parquet::ParquetDataPageVersion::V2)
@@ -59,9 +59,11 @@ struct mock_writer_t final {
                            ->build()},
         m_arrow_props{
             parquet::ArrowWriterProperties::Builder().store_schema()->build()},
-        m_writer{parquet::arrow::FileWriter::Open(
-                     schema, arrow::default_memory_pool(), m_tos(),
-                     m_writer_props, m_arrow_props)
+        m_writer{parquet::arrow::FileWriter::Open(schema,
+                                                  arrow::default_memory_pool(),
+                                                  m_tos(),
+                                                  m_writer_props,
+                                                  m_arrow_props)
                      .ValueOrDie()} {}
 
   const parquet::arrow::FileWriter &writer() const { return *m_writer; }

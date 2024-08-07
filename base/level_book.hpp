@@ -13,7 +13,7 @@
 #include <map>
 #include <unordered_map>
 
-namespace krakpot {
+namespace kdr {
 namespace model {
 
 using bid_side_t = std::map<price_t, qty_t, std::greater<price_t>>;
@@ -121,4 +121,4 @@ void sides_t::apply_update(const Q& quotes, S& side) {
 }
 
 }  // namespace model
-}  // namespace krakpot
+}  // namespace kdr

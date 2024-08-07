@@ -10,9 +10,9 @@
  * Some of these constants are candidates for future configurability,
  * but for now we require a rebuild to change them.
  */
-namespace krakpot {
+namespace kdr {
 
-static constexpr char c_app_name[] = "krakpot";
+static constexpr char c_app_name[] = "kdr";
 
 static constexpr double c_NaN = std::numeric_limits<double>::signaling_NaN();
 static constexpr char c_NaN_str[] = "NaN";
@@ -104,4 +104,4 @@ static constexpr char c_trade_trade_id[] = "trade_id";
 static constexpr char c_metrics_num_bytes[] = "num_bytes";
 static constexpr char c_metrics_num_msgs[] = "num_msgs";
 
-}  // namespace krakpot
+}  // namespace kdr

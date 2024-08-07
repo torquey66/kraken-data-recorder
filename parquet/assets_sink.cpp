@@ -1,6 +1,6 @@
 #include "assets_sink.hpp"
 
-namespace krakpot {
+namespace kdr {
 namespace pq {
 
 assets_sink_t::assets_sink_t(std::string parquet_dir, sink_id_t id)
@@ -63,7 +63,7 @@ std::shared_ptr<arrow::Schema> assets_sink_t::schema() {
 
   auto field_vector = arrow::FieldVector{
       arrow::field(c_header_recv_tm, arrow::int64(),
-                   false), // TODO: replace with timestamp type
+                   false),  // TODO: replace with timestamp type
       arrow::field(c_asset_borrowable, arrow::boolean(), false),
       arrow::field(c_asset_collateral_value, arrow::float64(), false),
       arrow::field(c_asset_id, arrow::utf8(), false),
@@ -75,5 +75,5 @@ std::shared_ptr<arrow::Schema> assets_sink_t::schema() {
   return arrow::schema(field_vector);
 }
 
-} // namespace pq
-} // namespace krakpot
+}  // namespace pq
+}  // namespace kdr

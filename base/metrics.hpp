@@ -8,7 +8,7 @@
 
 #include <cstddef>
 
-namespace krakpot {
+namespace kdr {
 
 struct metrics_t final {
   void accept(msg_t);
@@ -23,4 +23,4 @@ struct metrics_t final {
   size_t m_num_bytes = 0;
 };
 
-}  // namespace krakpot
+}  // namespace kdr

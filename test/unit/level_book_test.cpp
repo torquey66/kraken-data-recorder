@@ -130,38 +130,6 @@ static const std::string example_update_str = R"RESPONSE(
   }
   )RESPONSE";
 
-/*
-  45285210000045286415457195345286615457110945289615456091145290215890660452918154553491452947445474945296135380000452975994554245299518772827
-*/
-
-/*
-  TEST_CASE("book_t doc example snapshot") {
-  simdjson::ondemand::parser parser;
-  simdjson::padded_string snap_response{example_snapshot_str};
-  simdjson::ondemand::document snap_doc = parser.iterate(snap_response);
-  const auto snap = krakpot::response::book_t::from_json(snap_doc);
-  CHECK(snap.crc32() == 3310070434);
-
-  auto book = krakpot::model::level_book_t{krakpot::e_100};
-  book.accept(snap);
-  CHECK(book.crc32("BTC/USD") == snap.crc32());
-  }
-*/
-
-/*
-  TEST_CASE("book_t doc example update") {
-  simdjson::ondemand::parser parser;
-  simdjson::padded_string snap_response{example_snapshot_str};
-  simdjson::ondemand::document snap_doc = parser.iterate(snap_response);
-  auto snap = krakpot::response::book_t::from_json(snap_doc);
-
-  simdjson::padded_string update_response{example_update_str};
-  simdjson::ondemand::document update_doc = parser.iterate(update_response);
-
-  CHECK(book.crc32() == 2439117997);
-  }
-*/
-
 static const std::string pair_str = R"RESPONSE(
 [
   {
@@ -188,19 +156,19 @@ static const std::string snapshot_str = R"RESPONSE(
 )RESPONSE";
 
 TEST_CASE("book_t doc example snapshot") {
-  auto book = krakpot::model::level_book_t{krakpot::model::depth_10};
+  auto book = kdr::model::level_book_t{kdr::model::depth_10};
 
   simdjson::ondemand::parser parser;
 
   simdjson::padded_string pair_response{pair_str};
   simdjson::ondemand::document pair_doc = parser.iterate(pair_response);
   for (simdjson::fallback::ondemand::object pair_obj : pair_doc) {
-    const auto pair = krakpot::model::pair_t::from_json(pair_obj);
+    const auto pair = kdr::model::pair_t::from_json(pair_obj);
     book.accept(pair);
   }
 
   simdjson::padded_string snap_response{snapshot_str};
   simdjson::ondemand::document snap_doc = parser.iterate(snap_response);
-  const auto snap = krakpot::response::book_t::from_json(snap_doc);
+  const auto snap = kdr::response::book_t::from_json(snap_doc);
   book.accept(snap);
 }

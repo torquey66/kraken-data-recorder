@@ -1,6 +1,6 @@
 #include "decimal.hpp"
 
-namespace krakpot {
+namespace kdr {
 
 std::string format_frac_part(wide_float_t frac_part, integer_t precision) {
   std::string result;
@@ -61,4 +61,4 @@ void decimal_t::process(boost::crc_32_type& crc32, int64_t precision) const {
   return;
 }
 
-}  // namespace krakpot
+}  // namespace kdr
