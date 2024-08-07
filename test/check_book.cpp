@@ -230,7 +230,7 @@ int main(int argc, char* argv[]) {
       throw std::runtime_error(
           "missing 'book_depth' metadata in book parquet file");
     }
-    const depth_t book_depth{atol(depth_result.ValueOrDie().c_str())};
+    const model::depth_t book_depth{atol(depth_result.ValueOrDie().c_str())};
     std::cout << "book_depth: " << book_depth << std::endl;
 
     auto level_book = model::level_book_t{book_depth};

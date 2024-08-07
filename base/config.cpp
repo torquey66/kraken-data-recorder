@@ -34,7 +34,7 @@ boost::json::object config_t::to_json_obj() const {
   return result;
 }
 
-config_t config_t::from_json(simdjson::ondemand::document &doc) {
+config_t config_t::from_json(simdjson::ondemand::document& doc) {
   config_t result;
 
   simdjson::ondemand::value optional_val;
@@ -57,7 +57,7 @@ config_t config_t::from_json(simdjson::ondemand::document &doc) {
 
   if (doc[c_book_depth].get(optional_val) == simdjson::SUCCESS) {
     const int64_t val = optional_val.get_int64();
-    result.m_book_depth = depth_t{val};
+    result.m_book_depth = model::depth_t{val};
   }
 
   return result;

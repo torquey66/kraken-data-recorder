@@ -5,6 +5,7 @@ project(KrakpotProject)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+#set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version")
 
 #add_compile_options(-fsanitize=address)
@@ -28,6 +29,8 @@ set(MODEL_FILES
 
 set(ENUM_FILES
   ${CMAKE_SOURCE_DIR}/codegen/asset_status.json
+  ${CMAKE_SOURCE_DIR}/codegen/depth.json
+  ${CMAKE_SOURCE_DIR}/codegen/ord_type.json
   ${CMAKE_SOURCE_DIR}/codegen/pair_status.json
 )
 
@@ -36,6 +39,10 @@ set(GENERATED_FILES
   ${CMAKE_SOURCE_DIR}/generated/asset.cpp
   ${CMAKE_SOURCE_DIR}/generated/asset_status.hpp
   ${CMAKE_SOURCE_DIR}/generated/asset_status.cpp
+  ${CMAKE_SOURCE_DIR}/generated/depth.hpp
+  ${CMAKE_SOURCE_DIR}/generated/depth.cpp
+  ${CMAKE_SOURCE_DIR}/generated/ord_type.hpp
+  ${CMAKE_SOURCE_DIR}/generated/ord_type.cpp
   ${CMAKE_SOURCE_DIR}/generated/pair.hpp
   ${CMAKE_SOURCE_DIR}/generated/pair.cpp
   ${CMAKE_SOURCE_DIR}/generated/pair_status.hpp
@@ -90,6 +97,10 @@ add_library(krakpot_base
   generated/asset.hpp
   generated/asset_status.cpp
   generated/asset_status.hpp
+  generated/depth.cpp
+  generated/depth.hpp
+  generated/ord_type.cpp
+  generated/ord_type.hpp
   generated/pair.cpp
   generated/pair.hpp
   generated/pair_status.cpp

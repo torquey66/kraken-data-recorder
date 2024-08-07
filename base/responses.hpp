@@ -1,8 +1,9 @@
 /* Copyright (C) 2024 John C. Finley - All rights reserved */
 #pragma once
 
-#include "../generated/asset.hpp"  // !@# temporary testing path
-#include "../generated/pair.hpp"   // !@# temporary testing path
+#include "../generated/asset.hpp"     // !@# temporary testing path
+#include "../generated/ord_type.hpp"  // !@# temporary testing path
+#include "../generated/pair.hpp"      // !@# temporary testing path
 
 #include <simdjson.h>
 #include <boost/json.hpp>
@@ -106,7 +107,7 @@ struct book_t final {
  */
 struct trades_t final {
   struct trade_t final {
-    ord_type_t ord_type;
+    model::ord_type_t ord_type;
     price_t price;
     qty_t qty;
     side_t side;
@@ -132,7 +133,7 @@ struct trades_t final {
   auto size() const { return m_trades.size(); }
 
  private:
-  static ord_type_t parse_ord_type(std::string_view);
+  //  static model::ord_type_t parse_ord_type(std::string_view);
   static side_t parse_side(std::string_view);
 
   header_t m_header;
