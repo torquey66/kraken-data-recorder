@@ -1,0 +1,27 @@
+{
+    "class" : "side",
+
+    "doc" : "side_t is based on the FIX 5.0 spec. See: https://www.onixs.biz/fix-dictionary/5.0/tagNum_54.html",
+
+    "type" : "char",
+
+    "enum_values" : [
+        { "name" : "invalid",             "value" : 0     },
+        { "name" : "buy",                 "value" : "'1'" },
+        { "name" : "sell",                "value" : "'2'" },
+        { "name" : "buy_minus",           "value" : "'3'" },
+        { "name" : "sell_plus",           "value" : "'4'" },
+        { "name" : "sell_short",          "value" : "'5'" },
+        { "name" : "sell_short_exempt",   "value" : "'6'" },
+        { "name" : "undisclosed",         "value" : "'7'" },
+        { "name" : "cross",               "value" : "'8'" },
+        { "name" : "cross_short",         "value" : "'9'" },
+        { "name" : "cross_short_exempt",  "value" : "'A'" },
+        { "name" : "as_defined",          "value" : "'B'" },
+        { "name" : "opposite",            "value" : "'C'" },
+        { "name" : "subscribe",           "value" : "'D'" },
+        { "name" : "redeem",              "value" : "'E'" },
+        { "name" : "lend",                "value" : "'F'" },
+        { "name" : "borrow",              "value" : "'G'" }
+    ]
+}

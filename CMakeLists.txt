@@ -32,6 +32,7 @@ set(ENUM_FILES
   ${CMAKE_SOURCE_DIR}/codegen/depth.json
   ${CMAKE_SOURCE_DIR}/codegen/ord_type.json
   ${CMAKE_SOURCE_DIR}/codegen/pair_status.json
+  ${CMAKE_SOURCE_DIR}/codegen/side.json
 )
 
 set(GENERATED_FILES
@@ -47,6 +48,8 @@ set(GENERATED_FILES
   ${CMAKE_SOURCE_DIR}/generated/pair.cpp
   ${CMAKE_SOURCE_DIR}/generated/pair_status.hpp
   ${CMAKE_SOURCE_DIR}/generated/pair_status.cpp
+  ${CMAKE_SOURCE_DIR}/generated/side.hpp
+  ${CMAKE_SOURCE_DIR}/generated/side.cpp
 )
 
 set(JINJA2_FILES
@@ -105,6 +108,8 @@ add_library(krakpot_base
   generated/pair.hpp
   generated/pair_status.cpp
   generated/pair_status.hpp
+  generated/side.cpp
+  generated/side.hpp
   base/config.cpp
   base/constants.hpp
   base/decimal.cpp

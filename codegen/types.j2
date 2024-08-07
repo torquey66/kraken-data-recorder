@@ -1,39 +1,51 @@
+{# Tells us how to declare a c++ member. #}
 {% set cpp_decl_types = {
-    "bool": "bool",
-    "double": "double_t",
-    "integer": "integer_t",
-    "string": "std::string",
-    "asset_status": "asset_status_t",
-    "depth": "depth_t",
-    "ord_type": "ord_type_t",
-    "pair_status": "pair_status_t",
+ "asset_status": "asset_status_t",
+ "bool":         "bool",
+ "depth":        "depth_t",
+ "double":       "double_t",
+ "integer":      "integer_t",
+ "ord_type":     "ord_type_t",
+ "pair_status":  "pair_status_t",
+ "side":         "side_t",
+ "string":       "std::string",
 } -%}
+
+{# Tells us how to expose a c++ member. #}
 {% set cpp_access_types = {
-    "bool": "bool",
-    "double": "double_t",
-    "integer": "integer_t",
-    "string": "const std::string&",
-    "asset_status": "asset_status_t",
-    "depth": "depth_t",
-    "ord_type": "ord_type_t",
-    "pair_status": "pair_status_t",
+ "asset_status": "asset_status_t",
+ "bool":         "bool",
+ "depth":        "depth_t",
+ "double":       "double_t",
+ "integer":      "integer_t",
+ "ord_type":     "ord_type_t",
+ "pair_status":  "pair_status_t",
+ "side":         "side_t",
+ "string":       "const std::string&",
 } -%}
+{
+
+{# Tells us which simdjson accessor to use. #}
 {% set simdjson_types = {
-    "bool": "bool",
-    "double": "double",
-    "integer": "int64",
-    "string": "string",
-    "asset_status": "string", 
-    "depth": "int64",
-    "ord_type": "string", 
-    "pair_status": "string", 
+ "asset_status": "string", 
+ "bool":         "bool",
+ "depth":        "int64",
+ "double":       "double",
+ "integer":      "int64",
+ "ord_type":     "string", 
+ "pair_status":  "string", 
+ "side":         "string", 
+ "string":       "string",
 } -%}
+
+{# Default values for c++ member declarations. #}
 {% set type_defaults = {
-    "bool": "false",
-    "double_t": "0.0",
-    "integer_t": "0",
-    "asset_status": "asset_status_invalid",
-    "depth": "depth_invalid",
-    "ord_type": "ord_type_invalid",
-    "pair_status": "pair_status_invalid",
+ "asset_status": "asset_status_invalid",
+ "bool":         "false",
+ "depth":        "depth_invalid",
+ "double_t":     "0.0",
+ "integer_t":    "0",
+ "ord_type":     "ord_type_invalid",
+ "pair_status":  "pair_status_invalid",
+ "side":         "side_invalid",
 } -%}
