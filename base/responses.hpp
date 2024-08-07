@@ -4,6 +4,7 @@
 #include "../generated/asset.hpp"     // !@# temporary testing path
 #include "../generated/ord_type.hpp"  // !@# temporary testing path
 #include "../generated/pair.hpp"      // !@# temporary testing path
+#include "../generated/side.hpp"      // !@# temporary testing path
 
 #include <simdjson.h>
 #include <boost/json.hpp>
@@ -110,7 +111,7 @@ struct trades_t final {
     model::ord_type_t ord_type;
     price_t price;
     qty_t qty;
-    side_t side;
+    model::side_t side;
     std::string symbol;
     timestamp_t timestamp;
     integer_t trade_id;
@@ -133,9 +134,6 @@ struct trades_t final {
   auto size() const { return m_trades.size(); }
 
  private:
-  //  static model::ord_type_t parse_ord_type(std::string_view);
-  static side_t parse_side(std::string_view);
-
   header_t m_header;
   std::vector<trade_t> m_trades;
 };

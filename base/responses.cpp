@@ -165,30 +165,6 @@ boost::json::object book_t::to_json_obj(integer_t price_precision,
   return result;
 }
 
-/*
-model::ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
-if (ord_type == c_trade_market) {
-  return e_market;
-}
-if (ord_type == c_trade_limit) {
-  return e_limit;
-}
-throw std::runtime_error{"unsupported ord_type: " +
-                         std::string{ord_type.data(), ord_type.size()}};
-}
-*/
-
-side_t trades_t::parse_side(std::string_view side) {
-  if (side == c_trade_buy) {
-    return e_buy;
-  }
-  if (side == c_trade_sell) {
-    return e_sell;
-  }
-  throw std::runtime_error{"unsupported side: " +
-                           std::string{side.data(), side.size()}};
-}
-
 trades_t trades_t::from_json(simdjson::ondemand::document& response) {
   auto result = trades_t{};
   auto buffer = std::string_view{};
@@ -206,7 +182,7 @@ trades_t trades_t::from_json(simdjson::ondemand::document& response) {
     trade.price = extract_decimal(obj, c_trade_price);
     trade.qty = extract_decimal(obj, c_trade_qty);
     buffer = obj[c_trade_side].get_string();
-    trade.side = parse_side(buffer);
+    trade.side = model::str_view_to_side_t(buffer);
     buffer = obj[c_trade_symbol].get_string();
     trade.symbol = std::string(buffer.begin(), buffer.end());
     buffer = obj[c_trade_timestamp].get_string();
