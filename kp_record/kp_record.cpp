@@ -11,6 +11,8 @@
 #include "trade_sink.hpp"
 #include "types.hpp"
 
+#include "../generated/depth.hpp"  // !@# temporary
+
 #include <boost/beast/core.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/json.hpp>
@@ -74,7 +76,7 @@ int main(int argc, char* argv[]) {
         vm[config_t::c_kraken_port].as<std::string>(), pair_filter,
         //                 pair_filter_json.get<config_t::symbol_filter_t>(),
         vm[config_t::c_parquet_dir].as<std::string>(),
-        krakpot::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
+        krakpot::model::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
         vm[config_t::c_capture_book].as<bool>(),
         vm[config_t::c_capture_trades].as<bool>()};
 

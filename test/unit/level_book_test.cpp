@@ -188,7 +188,7 @@ static const std::string snapshot_str = R"RESPONSE(
 )RESPONSE";
 
 TEST_CASE("book_t doc example snapshot") {
-  auto book = krakpot::model::level_book_t{krakpot::e_10};
+  auto book = krakpot::model::level_book_t{krakpot::model::depth_10};
 
   simdjson::ondemand::parser parser;
 

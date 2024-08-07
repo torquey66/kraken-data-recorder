@@ -1,0 +1,20 @@
+{
+    "class" : "ord_type",
+
+    "doc" : "ord_type_t is based on the FIX 5.0 spec. See: https://www.onixs.biz/fix-dictionary/5.0/tagNum_40.html",
+
+    "type" : "char",
+
+    "enum_values" : [
+        { "name" : "invalid",    "value" : 0     },
+        { "name" : "market",     "value" : "'1'" },
+        { "name" : "limit",      "value" : "'2'" },
+        { "name" : "stop",       "value" : "'3'" },
+        { "name" : "stop_limit", "value" : "'4'" },
+        { "name" : "with_or_without", "value" : "'6'" },
+        { "name" : "limit_with_or_without",      "value" : "'8'" },
+        { "name" : "on_basis",         "value" : "'9'" },
+        { "name" : "previously_quoted", "value" : "'D'" },
+        { "name" : "previously_indicated", "value" : "'E'" }
+    ]
+}

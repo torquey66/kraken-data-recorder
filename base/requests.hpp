@@ -3,6 +3,8 @@
 
 #include "types.hpp"
 
+#include "../generated/depth.hpp"  // !@# temporary
+
 #include <boost/json.hpp>
 
 #include <string>
@@ -51,7 +53,7 @@ struct subscribe_instrument_t final {
  */
 struct subscribe_book_t final {
   subscribe_book_t(req_id_t req_id,
-                   depth_t depth,
+                   model::depth_t depth,
                    bool snapshot,
                    const std::vector<std::string>& symbols)
       : m_req_id{req_id},
@@ -64,7 +66,7 @@ struct subscribe_book_t final {
 
  private:
   req_id_t m_req_id;
-  depth_t m_depth;
+  model::depth_t m_depth;
   bool m_snapshot;
   std::vector<std::string> m_symbols;
 };

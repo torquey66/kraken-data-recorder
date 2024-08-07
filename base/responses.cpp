@@ -165,16 +165,18 @@ boost::json::object book_t::to_json_obj(integer_t price_precision,
   return result;
 }
 
-ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
-  if (ord_type == c_trade_market) {
-    return e_market;
-  }
-  if (ord_type == c_trade_limit) {
-    return e_limit;
-  }
-  throw std::runtime_error{"unsupported ord_type: " +
-                           std::string{ord_type.data(), ord_type.size()}};
+/*
+model::ord_type_t trades_t::parse_ord_type(std::string_view ord_type) {
+if (ord_type == c_trade_market) {
+  return e_market;
 }
+if (ord_type == c_trade_limit) {
+  return e_limit;
+}
+throw std::runtime_error{"unsupported ord_type: " +
+                         std::string{ord_type.data(), ord_type.size()}};
+}
+*/
 
 side_t trades_t::parse_side(std::string_view side) {
   if (side == c_trade_buy) {
@@ -187,7 +189,7 @@ side_t trades_t::parse_side(std::string_view side) {
                            std::string{side.data(), side.size()}};
 }
 
-trades_t trades_t::from_json(simdjson::ondemand::document &response) {
+trades_t trades_t::from_json(simdjson::ondemand::document& response) {
   auto result = trades_t{};
   auto buffer = std::string_view{};
 
@@ -200,7 +202,7 @@ trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   for (auto obj : response[c_response_data]) {
     auto trade = trade_t{};
     buffer = obj[c_trade_ord_type].get_string();
-    trade.ord_type = parse_ord_type(buffer);
+    trade.ord_type = model::str_view_to_ord_type_t(buffer);
     trade.price = extract_decimal(obj, c_trade_price);
     trade.qty = extract_decimal(obj, c_trade_qty);
     buffer = obj[c_trade_side].get_string();

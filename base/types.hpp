@@ -33,25 +33,6 @@ using ask_t = quote_t;
 using bid_t = quote_t;
 
 /**
- * ord_type_t is based on the FIX 5.0 spec. See:
- *
- * https://www.onixs.biz/fix-dictionary/5.0/tagNum_40.html
- */
-enum ord_type_t : char {
-  // clang-format off
-  e_market                = '1',
-  e_limit                 = '2',
-  e_stop                  = '3',
-  e_stop_limit            = '4',
-  e_with_or_without       = '6',
-  e_limit_with_or_without = '8',
-  e_on_basis              = '9',
-  e_previously_quoted     = 'D',
-  e_previously_indicated  = 'E',
-  // clang-format off
-};
-
-/**
  * side_t is based on the FIX 5.0 spec. See:
  *
  * https://www.onixs.biz/fix-dictionary/5.0/tagNum_54.html
@@ -78,18 +59,6 @@ enum side_t : char {
 };
 
 /**
- * Allowed values for book subscriptions.
- */
-enum depth_t : int64_t {
-  e_invalid = -1,
-  e_10 = 10,
-  e_25 = 25,
-  e_100 = 100,
-  e_500 = 500,
-  e_1000 = 1000,
-};
-
-/**
  * AFAIK, Kraken timetamps are always ISO 8601 strings in GMT.
  *
  * TODO: consider using chrono timepoints in some fashion instead of
@@ -112,4 +81,4 @@ private:
   int64_t m_micros = 0;
 };
 
-} // namespace krakpot
+}  // namespace krakpot

@@ -4,6 +4,8 @@
     "integer": "integer_t",
     "string": "std::string",
     "asset_status": "asset_status_t",
+    "depth": "depth_t",
+    "ord_type": "ord_type_t",
     "pair_status": "pair_status_t",
 } -%}
 {% set cpp_access_types = {
@@ -12,6 +14,8 @@
     "integer": "integer_t",
     "string": "const std::string&",
     "asset_status": "asset_status_t",
+    "depth": "depth_t",
+    "ord_type": "ord_type_t",
     "pair_status": "pair_status_t",
 } -%}
 {% set simdjson_types = {
@@ -19,13 +23,17 @@
     "double": "double",
     "integer": "int64",
     "string": "string",
-    "asset_status": "int8",
-    "pair_status": "int8",
+    "asset_status": "string", 
+    "depth": "int64",
+    "ord_type": "string", 
+    "pair_status": "string", 
 } -%}
 {% set type_defaults = {
     "bool": "false",
     "double_t": "0.0",
     "integer_t": "0",
     "asset_status": "asset_status_invalid",
+    "depth": "depth_invalid",
+    "ord_type": "ord_type_invalid",
     "pair_status": "pair_status_invalid",
 } -%}

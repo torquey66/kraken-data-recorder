@@ -59,15 +59,6 @@ static constexpr char c_asset_precision[] = "precision";
 static constexpr char c_asset_precision_display[] = "precision_display";
 static constexpr char c_asset_status[] = "status";
 
-static constexpr char c_asset_status_depositonly[] = "depositonly";
-static constexpr char c_asset_status_disabled[] = "disabled";
-static constexpr char c_asset_status_enabled[] = "enabled";
-static constexpr char c_asset_status_fundingtemporarilydisabled[] =
-    "fundingtemporarilydisabled";
-static constexpr char c_asset_status_invalid[] = "invalid";
-static constexpr char c_asset_status_withdrawalonly[] = "withdrawalonly";
-static constexpr char c_asset_status_workinprogress[] = "workinprogress";
-
 static constexpr char c_pair_base[] = "base";
 static constexpr char c_pair_cost_min[] = "cost_min";
 static constexpr char c_pair_cost_precision[] = "cost_precision";
@@ -85,16 +76,6 @@ static constexpr char c_pair_qty_precision[] = "qty_precision";
 static constexpr char c_pair_quote[] = "quote";
 static constexpr char c_pair_status[] = "status";
 static constexpr char c_pair_symbol[] = "symbol";
-
-static constexpr char c_pair_status_cancel_only[] = "cancel_only";
-static constexpr char c_pair_status_delisted[] = "delisted";
-static constexpr char c_pair_status_invalid[] = "invalid";
-static constexpr char c_pair_status_limit_only[] = "limit_only";
-static constexpr char c_pair_status_maintenance[] = "maintenance";
-static constexpr char c_pair_status_online[] = "online";
-static constexpr char c_pair_status_post_only[] = "post_only";
-static constexpr char c_pair_status_reduce_only[] = "reduce_only";
-static constexpr char c_pair_status_work_in_progress[] = "work_in_progress";
 
 static constexpr char c_book_type_snapshot[] = "snapshot";
 static constexpr char c_book_type_update[] = "update";
@@ -123,4 +104,4 @@ static constexpr char c_trade_trade_id[] = "trade_id";
 static constexpr char c_metrics_num_bytes[] = "num_bytes";
 static constexpr char c_metrics_num_msgs[] = "num_msgs";
 
-} // namespace krakpot
+}  // namespace krakpot

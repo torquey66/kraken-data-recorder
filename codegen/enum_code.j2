@@ -32,6 +32,11 @@ if (it == c_str_to_{{ class }}.end()) {
 return it->second;
 }
 
+{{ classname }} str_view_to_{{ cpp_access_type }}(std::string_view str_view) {
+const std::string str{str_view.data(), str_view.size()};
+return str_to_{{ cpp_access_type }}(str);
+}
+
 std::string {{ cpp_access_type }}_to_str({{ classname }} value) {
 const auto it = c_{{ class }}_to_str.find(value);
 if (it == c_{{ class }}_to_str.end()) {
