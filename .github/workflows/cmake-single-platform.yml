@@ -1,15 +1,10 @@
-# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
-name: CMake on a single platform
+name: CMake Kraken Data Recorder for GNU/Linux
 
 on:
   push:
     branches: [ "main" ]
     tags:
       - '*'
-  pull_request:
-    branches: [ "main" ]
-
 env:
   BUILD_TYPE: Release
 
@@ -48,15 +43,20 @@ jobs:
         make -j
         ctest
 
+    - name: Get current commit hash
+      id: get_commit_hash
+      run: |
+        COMMIT_HASH=$(git rev-parse --short HEAD)
+        echo "COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+
     - name: Release
       uses: actions/create-release@v1
       id: create_release
       with:
         draft: false
         prerelease: false
-#        release_name: ${{ steps.version.outputs.version }}
-        release_name: test-${{ github.ref }}
-        tag_name: test-${{ github.ref }}
+        release_name: Release-${{ env.COMMIT_HASH }}
+        tag_name: v0.0.1-${{ env.COMMIT_HASH }}
         body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ github.token }}
@@ -67,6 +67,6 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./build/kp_record
-        asset_name: kp_record
+        asset_path: ./build/kdr_record
+        asset_name: kdr_record
         asset_content_type: application/binary
