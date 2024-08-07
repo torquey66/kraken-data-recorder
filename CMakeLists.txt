@@ -5,11 +5,7 @@ project(KrakenDataRecorder)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version")
-else()
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
-endif()
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version")
 
 #add_compile_options(-fsanitize=address)
 #add_link_options(-fsanitize=address)
