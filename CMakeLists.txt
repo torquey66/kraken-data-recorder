@@ -160,8 +160,8 @@ target_link_libraries(kdr_parquet
   kdr_base
 )
 
-add_executable(kp_record kp_record/kp_record.cpp)
-target_link_libraries(kp_record kdr_parquet)
+add_executable(kdr_record kdr_record/kdr_record.cpp)
+target_link_libraries(kdr_record kdr_parquet)
 
 add_executable(parse_instrument_snapshot test/parse_instrument_snapshot.cpp)
 target_link_libraries(parse_instrument_snapshot kdr_base)
