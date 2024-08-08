@@ -11,6 +11,11 @@
  */
 namespace kdr {
 
+static constexpr char c_license[] =
+    "kraken-data-recorder © 2023 by John C. Finley is licensed under Creative "
+    "Commons Attribution-NoDerivatives 4.0 International. To view a copy of "
+    "this license, visit https://creativecommons.org/licenses/by-nd/4.0/";
+
 static constexpr char c_app_name[] = "kdr";
 
 static constexpr double c_NaN = std::numeric_limits<double>::signaling_NaN();
