@@ -71,8 +71,8 @@ All files contain snapshot as well as update events. These can be
 replayed in an *event sourced* or *change data capture* fashion to
 repreduce state at any given time.
 
- - **assets** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument}  reference data channel
- - **pairs** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument}  reference data channel
+ - **assets** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument)  reference data channel
+ - **pairs** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument)  reference data channel
  - **book** contains snapshots and updates for all subscribed symbols on the [book](https://docs.kraken.com/websockets-v2/#book) channel
  - **trades** contains snapshots and updates for all subscribed symbols on the [trades](https://docs.kraken.com/websockets-v2/#trade) channel
 
