@@ -4,7 +4,7 @@
 
 Kraken Data Recorder (*kdr*) is a tool for recording market data from
 the Kraken crypto exchange (https://www.kraken.com/). It subscribes to
-the *book* channel on the websocket v2 endpointand stores the content
+the *book* channel on the websocket v2 endpoint and stores the content
 in a series of parquet files which can later be used for analysis,
 simulation, etc.
 
@@ -20,7 +20,13 @@ See https://docs.kraken.com/websockets-v2/#introduction
 
 ## Running *kdr_record*
 
-*kdr_record* supports these options.
+You can find prebuilt copies of *kdr_record* for Ubuntu in
+[releases](https://github.com/torquey66/kraken-data-recorder/releases)
+or build it yourself (see below).
+
+### Options
+
+*kdr_record* supports these options:
 ```
 bash-3.2$ ./kdr_record --help
 Subscribe to Kraken and serialize book/trade data:
@@ -36,7 +42,41 @@ Subscribe to Kraken and serialize book/trade data:
   --capture_trades arg (=1)          subscribe to and record trades
 ```
 
-You can find prebuilt copies of *kdr_record* for Ubuntu in [releases](https://github.com/torquey66/kraken-data-recorder/releases).
+By default, it will capture all pairs at full depth and create parquet
+files in *parquet_dir*. Last I measured these could require on the
+order of 1GB of storage per hour, so take care to set *parquet_dir* to
+a location with ample space.
+
+### Example
+```
+kdr_record --ping_interval_secs 5 --parquet_dir /tmp/example
+```
+
+will create a series of parquet files in */tmp/exampe*:
+
+```
+bash-3.2$ ls -l /tmp/example/
+total 49584
+-rw-r--r--  1 torquey  wheel      5896 Aug  8 08:09 1723122455735103.assets.pq
+-rw-r--r--  1 torquey  wheel  23606521 Aug  8 08:09 1723122455735103.book.pq
+-rw-r--r--  1 torquey  wheel     18816 Aug  8 08:09 1723122455735103.pairs.pq
+-rw-r--r--  1 torquey  wheel   1024693 Aug  8 08:09 1723122455735103.trades.pq
+```
+
+Each file is prefixed by a UTC timestamp in milliseconds. This allows
+you to wrap *kdr_record* execution in a restart script to produce a
+series of time-segmented files that can be combined after the fact.
+
+All files contain snapshot as well as update events. These can be
+replayed in an *event sourced* or *change data capture* fashion to
+repreduce state at any given time.
+
+ - **assets** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument}  reference data channel
+ - **pairs** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument}  reference data channel
+ - **book** contains snapshots and updates for all subscribed symbols on the [book](https://docs.kraken.com/websockets-v2/#book) channel
+ - **trades** contains snapshots and updates for all subscribed symbols on the [trades](https://docs.kraken.com/websockets-v2/#trade) channel
+
+**TBD** - ducdb query examples
 
 ## Building
 
