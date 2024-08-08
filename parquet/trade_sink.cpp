@@ -1,4 +1,3 @@
-/* Copyright (C) 2024 John C. Finley - All rights reserved */
 #include "trade_sink.hpp"
 
 #include <arrow/scalar.h>

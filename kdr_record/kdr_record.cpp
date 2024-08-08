@@ -1,5 +1,3 @@
-/* Copyright (C) 2024 John C. Finley - All rights reserved */
-
 #include "assets_sink.hpp"
 #include "book_sink.hpp"
 #include "config.hpp"
