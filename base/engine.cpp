@@ -1,13 +1,11 @@
-/* Copyright (C) 2024 John C. Finley - All rights reserved */
-
 #include "engine.hpp"
 
 #include "constants.hpp"
 #include "requests.hpp"
 #include "responses.hpp"
 
-#include <boost/log/trivial.hpp>
 #include <simdjson.h>
+#include <boost/log/trivial.hpp>
 
 #include <algorithm>
 #include <vector>

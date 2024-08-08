@@ -1,5 +1,3 @@
-/* Copyright (C) 2024 John C. Finley - All rights reserved */
-
 #include "metrics.hpp"
 
 #include "constants.hpp"

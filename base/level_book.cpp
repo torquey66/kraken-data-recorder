@@ -1,4 +1,3 @@
-/* Copyright (C) 2024 John C. Finley - All rights reserved */
 #include "level_book.hpp"
 
 #include <boost/log/trivial.hpp>
