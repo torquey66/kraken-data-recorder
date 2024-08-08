@@ -114,3 +114,9 @@ cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo  ..
 make -j
 ctest
 ```
+
+## License
+kraken-data-recorder © 2023 by John C. Finley is licensed under
+Creative Commons Attribution-NoDerivatives 4.0 International. To view
+a copy of this license, visit
+https://creativecommons.org/licenses/by-nd/4.0/
