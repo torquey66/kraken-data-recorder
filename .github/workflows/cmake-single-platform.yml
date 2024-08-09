@@ -25,9 +25,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        mkdir -p ~/.conan/data
-        mkdir -p ~/.conan/cache
-        mkdir -p ~/.conan/pkgs
 
     - name: Install Conan
       id: conan
@@ -39,21 +36,21 @@ jobs:
       uses: actions/cache@v3
       with:
         path: |
-          ~/.conan/data
-          ~/.conan/cache
-          ~/.conan/pkgs
+          ~/.conan2/data
+          ~/.conan2/cache
+          ~/.conan2/pkgs
         key: ${{ runner.os }}-conan-${{ hashFiles('**/conanfile.txt') }}
         restore-keys: |
           ${{ runner.os }}-conan-
 
     - name: List Conan Cache Directories
       run: |
-          echo "Listing contents of ~/.conan/data"
-          ls -la ~/.conan/data
-          echo "Listing contents of ~/.conan/cache"
-          ls -la ~/.conan/cache
-          echo "Listing contents of ~/.conan/pkgs"
-          ls -la ~/.conan/pkgs
+          echo "Listing contents of ~/.conan2/data"
+          ls -la ~/.conan2/data
+          echo "Listing contents of ~/.conan2/cache"
+          ls -la ~/.conan2/cache
+          echo "Listing contents of ~/.conan2/pkgs"
+          ls -la ~/.conan2/pkgs
 
     - name: Install dependencies
       run: |
