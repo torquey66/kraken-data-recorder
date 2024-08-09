@@ -26,22 +26,22 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Cache Conan dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.conan/data
-          ~/.conan/pkgs
-          ~/.conan/cache
-        key: ${{ runner.os }}-conan-${{ hashFiles('**/conanfile.*') }}
-        restore-keys: |
-          ${{ runner.os }}-conan-
-
     - name: Install Conan
       id: conan
       uses: turtlebrowser/get-conan@main
       with:
         version: 2.4.1
+
+    - name: Cache Conan data
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.conan/data
+          ~/.conan/cache
+          ~/.conan/pkgs
+        key: ${{ runner.os }}-conan-${{ hashFiles('**/conanfile.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-conan-
 
     - name: Build
       run: |
