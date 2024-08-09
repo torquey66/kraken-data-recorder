@@ -1,10 +1,9 @@
 #pragma once
 
 #include "constants.hpp"
+#include "depth.hpp"
 #include "responses.hpp"
 #include "types.hpp"
-
-#include "../generated/depth.hpp"  // !@# temporary
 
 #include <boost/crc.hpp>
 #include <boost/json.hpp>

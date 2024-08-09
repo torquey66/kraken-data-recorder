@@ -1,8 +1,7 @@
 #pragma once
 
+#include "depth.hpp"
 #include "types.hpp"
-
-#include "../generated/depth.hpp"
 
 #include <simdjson.h>
 #include <boost/json.hpp>

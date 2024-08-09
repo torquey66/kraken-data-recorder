@@ -1,6 +1,7 @@
 #include "assets_sink.hpp"
 #include "book_sink.hpp"
 #include "config.hpp"
+#include "depth.hpp"
 #include "engine.hpp"
 #include "level_book.hpp"
 #include "pairs_sink.hpp"
@@ -8,8 +9,6 @@
 #include "sink.hpp"
 #include "trade_sink.hpp"
 #include "types.hpp"
-
-#include "../generated/depth.hpp"  // !@# temporary
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/ssl.hpp>

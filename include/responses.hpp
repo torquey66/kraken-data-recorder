@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../generated/asset.hpp"     // !@# temporary testing path
-#include "../generated/ord_type.hpp"  // !@# temporary testing path
-#include "../generated/pair.hpp"      // !@# temporary testing path
-#include "../generated/side.hpp"      // !@# temporary testing path
+#include "asset.hpp"
+#include "ord_type.hpp"
+#include "pair.hpp"
+#include "side.hpp"
 
 #include <simdjson.h>
 #include <boost/json.hpp>
@@ -11,13 +11,6 @@
 #include <string>
 #include <vector>
 
-/**
- * These are the various messages we currently receive from the
- * venue. Ideally, this code would be generated from an OpenAPI spec
- * or the like, but that exercise is currently beyond scope. Also,
- * according to ChatGPT, Kraken has not released an OpenAPI spec for
- * its websocket interface.
- */
 namespace kdr {
 namespace response {
 
