@@ -36,21 +36,15 @@ jobs:
       uses: actions/cache@v3
       with:
         path: |
-          ~/.conan2/data
-          ~/.conan2/cache
-          ~/.conan2/pkgs
+          ~/.conan2/p
         key: ${{ runner.os }}-conan-${{ hashFiles('**/conanfile.txt') }}
         restore-keys: |
           ${{ runner.os }}-conan-
 
     - name: List Conan Cache Directories
       run: |
-          echo "Listing contents of ~/.conan2/data"
-          ls -la ~/.conan2/data
-          echo "Listing contents of ~/.conan2/cache"
-          ls -la ~/.conan2/cache
-          echo "Listing contents of ~/.conan2/pkgs"
-          ls -la ~/.conan2/pkgs
+          echo "Listing contents of ~/.conan2/p"
+          ls -la ~/.conan2/p
 
     - name: Install dependencies
       run: |
