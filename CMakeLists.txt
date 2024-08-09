@@ -5,7 +5,7 @@ project(KrakenDataRecorder)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
 #add_compile_options(-fsanitize=address)
 #add_link_options(-fsanitize=address)
@@ -35,20 +35,20 @@ set(ENUM_FILES
 )
 
 set(GENERATED_FILES
-  ${CMAKE_SOURCE_DIR}/generated/asset.hpp
-  ${CMAKE_SOURCE_DIR}/generated/asset.cpp
-  ${CMAKE_SOURCE_DIR}/generated/asset_status.hpp
-  ${CMAKE_SOURCE_DIR}/generated/asset_status.cpp
-  ${CMAKE_SOURCE_DIR}/generated/depth.hpp
-  ${CMAKE_SOURCE_DIR}/generated/depth.cpp
-  ${CMAKE_SOURCE_DIR}/generated/ord_type.hpp
-  ${CMAKE_SOURCE_DIR}/generated/ord_type.cpp
-  ${CMAKE_SOURCE_DIR}/generated/pair.hpp
-  ${CMAKE_SOURCE_DIR}/generated/pair.cpp
-  ${CMAKE_SOURCE_DIR}/generated/pair_status.hpp
-  ${CMAKE_SOURCE_DIR}/generated/pair_status.cpp
-  ${CMAKE_SOURCE_DIR}/generated/side.hpp
-  ${CMAKE_SOURCE_DIR}/generated/side.cpp
+  ${CMAKE_SOURCE_DIR}/include/generated/asset.hpp
+  ${CMAKE_SOURCE_DIR}/include/generated/asset_status.hpp
+  ${CMAKE_SOURCE_DIR}/include/generated/depth.hpp
+  ${CMAKE_SOURCE_DIR}/include/generated/ord_type.hpp
+  ${CMAKE_SOURCE_DIR}/include/generated/pair.hpp
+  ${CMAKE_SOURCE_DIR}/include/generated/pair_status.hpp
+  ${CMAKE_SOURCE_DIR}/include/generated/side.hpp
+  ${CMAKE_SOURCE_DIR}/src/generated/asset.cpp
+  ${CMAKE_SOURCE_DIR}/src/generated/asset_status.cpp
+  ${CMAKE_SOURCE_DIR}/src/generated/depth.cpp
+  ${CMAKE_SOURCE_DIR}/src/generated/ord_type.cpp
+  ${CMAKE_SOURCE_DIR}/src/generated/pair.cpp
+  ${CMAKE_SOURCE_DIR}/src/generated/pair_status.cpp
+  ${CMAKE_SOURCE_DIR}/src/generated/side.cpp
 )
 
 set(JINJA2_FILES
@@ -61,8 +61,8 @@ set(JINJA2_FILES
 
 foreach(model_file ${MODEL_FILES})
     get_filename_component(filename ${model_file} NAME_WE)
-    set(header_file ${CMAKE_SOURCE_DIR}/generated/${filename}.hpp)
-    set(code_file ${CMAKE_SOURCE_DIR}/generated/${filename}.cpp)
+    set(header_file ${CMAKE_SOURCE_DIR}/include/generated/${filename}.hpp)
+    set(code_file ${CMAKE_SOURCE_DIR}/src/generated/${filename}.cpp)
     add_custom_command(
         OUTPUT ${header_file} ${code_file}
         COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/model_header.j2 ${model_file} | clang-format --style=chromium > ${header_file}
@@ -75,8 +75,8 @@ endforeach()
 
 foreach(enum_file ${ENUM_FILES})
     get_filename_component(filename ${enum_file} NAME_WE)
-    set(header_file ${CMAKE_SOURCE_DIR}/generated/${filename}.hpp)
-    set(code_file ${CMAKE_SOURCE_DIR}/generated/${filename}.cpp)
+    set(header_file ${CMAKE_SOURCE_DIR}/include/generated/${filename}.hpp)
+    set(code_file ${CMAKE_SOURCE_DIR}/src/generated/${filename}.cpp)
     add_custom_command(
         OUTPUT ${header_file} ${code_file}
         COMMAND jinja2 ${CMAKE_SOURCE_DIR}/codegen/enum_header.j2 ${enum_file} | clang-format --style=chromium > ${header_file}
@@ -92,40 +92,39 @@ add_custom_target(generate_all
     DEPENDS ${GENERATED_FILES}
 )
 
-# TODO: split these into 'src' and 'include' directories or the like
-include_directories(${CMAKE_SOURCE_DIR}/base)
-add_library(kdr_base
-  generated/asset.cpp
-  generated/asset.hpp
-  generated/asset_status.cpp
-  generated/asset_status.hpp
-  generated/depth.cpp
-  generated/depth.hpp
-  generated/ord_type.cpp
-  generated/ord_type.hpp
-  generated/pair.cpp
-  generated/pair.hpp
-  generated/pair_status.cpp
-  generated/pair_status.hpp
-  generated/side.cpp
-  generated/side.hpp
-  base/config.cpp
-  base/constants.hpp
-  base/decimal.cpp
-  base/decimal.hpp
-  base/engine.cpp
-  base/level_book.cpp
-  base/metrics.cpp
-  base/refdata.cpp
-  base/refdata.hpp
-  base/requests.cpp
-  base/responses.cpp
-  base/responses.hpp
-  base/session.cpp
-  base/sink.hpp
-  base/types.cpp
+include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/include/generated)
+add_library(kdr
+  include/generated/asset.hpp
+  include/generated/asset_status.hpp
+  include/generated/depth.hpp
+  include/generated/ord_type.hpp
+  include/generated/pair.hpp
+  include/generated/pair_status.hpp
+  include/generated/side.hpp
+  include/constants.hpp
+  include/decimal.hpp
+  include/refdata.hpp
+  include/responses.hpp
+  include/sink.hpp
+  src/config.cpp
+  src/decimal.cpp
+  src/engine.cpp
+  src/generated/asset.cpp
+  src/generated/asset_status.cpp
+  src/generated/depth.cpp
+  src/generated/ord_type.cpp
+  src/generated/pair.cpp
+  src/generated/pair_status.cpp
+  src/generated/side.cpp
+  src/level_book.cpp
+  src/metrics.cpp
+  src/refdata.cpp
+  src/requests.cpp
+  src/responses.cpp
+  src/session.cpp
+  src/types.cpp
 )
-add_dependencies(kdr_base generate_all)
+add_dependencies(kdr generate_all)
 
 # TODO: split these into 'src' and 'include' directories or the like
 include_directories(${CMAKE_SOURCE_DIR}/parquet)
@@ -141,7 +140,7 @@ add_library(kdr_parquet
   parquet/trade_sink.hpp
 )
 
-target_link_libraries(kdr_base
+target_link_libraries(kdr
   PUBLIC
   arrow::arrow
   boost::boost
@@ -153,17 +152,17 @@ target_link_libraries(kdr_base
 target_link_libraries(kdr_parquet
   PUBLIC
   arrow::arrow
-  kdr_base
+  kdr
 )
 
 add_executable(kdr_record kdr_record/kdr_record.cpp)
 target_link_libraries(kdr_record kdr_parquet)
 
 add_executable(parse_instrument_snapshot test/parse_instrument_snapshot.cpp)
-target_link_libraries(parse_instrument_snapshot kdr_base)
+target_link_libraries(parse_instrument_snapshot kdr)
 
 add_executable(check_book test/check_book.cpp)
-target_link_libraries(check_book kdr_base)
+target_link_libraries(check_book kdr)
 
 ##
 # Unit tests
@@ -177,6 +176,6 @@ add_executable(tests
   test/unit/parquet_test.cpp
   test/unit/test_main.cpp
 )
-target_link_libraries(tests kdr_base doctest::doctest)
+target_link_libraries(tests kdr doctest::doctest)
 
 add_test(NAME unit_test COMMAND tests)

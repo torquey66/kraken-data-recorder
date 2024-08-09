@@ -1,8 +1,8 @@
 #include <doctest/doctest.h>
 
 #include <simdjson.h>
+#include <asset.hpp>
 #include <constants.hpp>
-#include "../generated/asset.hpp"  // !@# temporary for testing
 
 using namespace kdr::model;
 

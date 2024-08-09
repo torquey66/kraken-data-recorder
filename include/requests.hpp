@@ -1,21 +1,13 @@
 #pragma once
 
+#include "depth.hpp"
 #include "types.hpp"
-
-#include "../generated/depth.hpp"  // !@# temporary
 
 #include <boost/json.hpp>
 
 #include <string>
 #include <vector>
 
-/**
- * These are the various messages we currently send to the
- * venue. Ideally, this code would be generated from an OpenAPI spec
- * or the like, but that exercise is currently beyond scope. Also,
- * according to ChatGPT, Kraken has not released an OpenAPI spec for
- * its websocket interface.
- */
 namespace kdr {
 namespace request {
 
