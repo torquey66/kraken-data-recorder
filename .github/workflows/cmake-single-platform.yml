@@ -2,7 +2,9 @@ name: CMake Kraken Data Recorder for GNU/Linux
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - 'dev/**'
     tags:
       - '*'
 env:
