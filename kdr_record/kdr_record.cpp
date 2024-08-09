@@ -64,18 +64,19 @@ int main(int argc, char* argv[]) {
             .as_array()};
     config_t::symbol_filter_t pair_filter;
     for (const auto& symbol : pair_filter_json) {
-      pair_filter.insert(boost::json::serialize(symbol));
+      pair_filter.insert(
+          std::string{symbol.get_string().data(), symbol.get_string().size()});
     }
 
-    const auto config = config_t{
-        vm[config_t::c_ping_interval_secs].as<size_t>(),
-        vm[config_t::c_kraken_host].as<std::string>(),
-        vm[config_t::c_kraken_port].as<std::string>(), pair_filter,
-        //                 pair_filter_json.get<config_t::symbol_filter_t>(),
-        vm[config_t::c_parquet_dir].as<std::string>(),
-        kdr::model::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
-        vm[config_t::c_capture_book].as<bool>(),
-        vm[config_t::c_capture_trades].as<bool>()};
+    const auto config =
+        config_t{vm[config_t::c_ping_interval_secs].as<size_t>(),
+                 vm[config_t::c_kraken_host].as<std::string>(),
+                 vm[config_t::c_kraken_port].as<std::string>(),
+                 pair_filter,
+                 vm[config_t::c_parquet_dir].as<std::string>(),
+                 kdr::model::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
+                 vm[config_t::c_capture_book].as<bool>(),
+                 vm[config_t::c_capture_trades].as<bool>()};
 
     BOOST_LOG_TRIVIAL(info) << kdr::c_license;
     BOOST_LOG_TRIVIAL(info) << "starting up with config: " << config.str();
