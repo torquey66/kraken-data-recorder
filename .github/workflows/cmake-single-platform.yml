@@ -43,12 +43,24 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-conan-
 
-    - name: Build
+    - name: List Conan Cache Directories
+      run: |
+          echo "Listing contents of ~/.conan/data"
+          ls -la ~/.conan/data
+          echo "Listing contents of ~/.conan/cache"
+          ls -la ~/.conan/cache
+          echo "Listing contents of ~/.conan/pkgs"
+          ls -la ~/.conan/pkgs
+
+    - name: Install dependencies
       run: |
         echo "${{ steps.conan.outputs.version }}"
         mkdir -p /home/runner/.conan2/profiles
         cp ci.conan.txt /home/runner/.conan2/profiles/default
         conan install conanfile.py --build=missing --output-folder=build -sbuild_type=Release
+
+    - name: Build
+      run: |
         cd build
         cmake -DCMAKE_BUILD_TYPE=Release ..
         make -j
