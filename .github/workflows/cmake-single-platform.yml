@@ -57,6 +57,9 @@ jobs:
           ls -la ~/.conan2/p
 
     - name: Install dependencies
+      env:
+        CC: clang
+        CXX: clang++
       run: |
         echo "${{ steps.conan.outputs.version }}"
         mkdir -p /home/runner/.conan2/profiles
