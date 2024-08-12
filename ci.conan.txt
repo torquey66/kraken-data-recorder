@@ -1,12 +1,10 @@
 [settings]
 os=Linux
-os.version=20.04
 arch=x86_64
 build_type=Release
 compiler=clang
-compiler.version=14
+compiler.version=17  # Example version; make sure this version supports C++24
+compiler.cppstd=24    # Specify the C++ standard version
 compiler.libcxx=libc++
+
 [options]
-[env]
-CC=clang
-CXX=clang++
