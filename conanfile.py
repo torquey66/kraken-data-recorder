@@ -18,6 +18,7 @@ class KrakpotRecipe(ConanFile):
         self.options["arrow/*"].with_boost = True
         self.options["arrow/*"].with_snappy = True
         self.options["arrow/*"].with_thrift = True
+        self.options["boost/*"].with_cobolt = False
 
     def build_requirements(self):
         self.tool_requires("cmake/3.29.0")
