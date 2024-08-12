@@ -14,7 +14,7 @@ std::string format_frac_part(wide_float_t frac_part, integer_t precision) {
 }
 
 std::string decimal_t::str(integer_t precision) const {
-  if (m_value.is_zero() == true) {
+  if (m_value.is_zero()) {
     if (precision > 0) {
       std::string str = "0.";
       str.append(precision, '0');
@@ -29,7 +29,8 @@ std::string decimal_t::str(integer_t precision) const {
 
   const wide_float_t int_part = boost::multiprecision::floor(m_value);
   const wide_float_t frac_part = m_value - int_part;
-  const auto int_str = std::to_string(int_part.convert_to<uint64_t>());
+  const uint64_t converted = int_part.convert_to<uint64_t>();
+  const auto int_str = std::to_string(converted);
   const auto frac_str = format_frac_part(frac_part, precision);
   return int_str + (frac_str.empty() ? "" : "." + frac_str);
 }
