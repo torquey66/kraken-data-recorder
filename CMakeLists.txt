@@ -126,18 +126,17 @@ add_library(kdr
 )
 add_dependencies(kdr generate_all)
 
-# TODO: split these into 'src' and 'include' directories or the like
-include_directories(${CMAKE_SOURCE_DIR}/parquet)
+include_directories(${CMAKE_SOURCE_DIR}/parquet/include)
 add_library(kdr_parquet
-  parquet/assets_sink.cpp
-  parquet/assets_sink.hpp
-  parquet/book_sink.cpp
-  parquet/book_sink.hpp
-  parquet/io.hpp
-  parquet/pairs_sink.cpp
-  parquet/pairs_sink.hpp
-  parquet/trade_sink.cpp
-  parquet/trade_sink.hpp
+  parquet/include//book_sink.hpp
+  parquet/include//io.hpp
+  parquet/include//pairs_sink.hpp
+  parquet/include//trade_sink.hpp
+  parquet/include/assets_sink.hpp
+  parquet/src/assets_sink.cpp
+  parquet/src/book_sink.cpp
+  parquet/src/pairs_sink.cpp
+  parquet/src/trade_sink.cpp
 )
 
 target_link_libraries(kdr
