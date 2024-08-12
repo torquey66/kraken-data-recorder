@@ -4,7 +4,7 @@ arch=x86_64
 build_type=Release
 compiler=clang
 compiler.version=18
-compiler.cppstd=24
+compiler.cppstd=23
 compiler.libcxx=libc++
 
 [options]
