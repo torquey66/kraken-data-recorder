@@ -12,6 +12,11 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ve
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
+# Enable Clang-Tidy
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*")
+endif()
+
 include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
 
 find_package(Arrow)                                                                                                                          
