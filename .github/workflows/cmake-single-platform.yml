@@ -18,6 +18,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Set up Clang
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang clang-tidy
+
     - name: Set up Python 3.x
       uses: actions/setup-python@v4
       with:
@@ -40,7 +45,7 @@ jobs:
       with:
         path: |
           ~/.conan2/p
-        key: ${{ runner.os }}-conan-${{ hashFiles('**/conanfile.txt') }}
+        key: ${{ runner.os }}-conan-${{ hashFiles('**/conanfile.py' '**/ci.conan.txt') }}
         restore-keys: |
           ${{ runner.os }}-conan-
 
@@ -59,9 +64,14 @@ jobs:
     - name: Build
       run: |
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
         make -j
         ctest
+
+    - name: Run clang-tidy
+      run: |
+        cd build
+        clang-tidy -p=compile_commands.json $(find ../src -name '*.cpp')
 
     - name: Get current commit hash
       id: get_commit_hash
