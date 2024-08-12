@@ -1,8 +1,8 @@
 from conan import ConanFile
 
 class KrakpotRecipe(ConanFile):
-    settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeToolchain", "CMakeDeps"
+    settings = "os", "compiler", "build_type", "arch"
 
     def requirements(self):
         self.requires("arrow/16.1.0")
