@@ -71,7 +71,7 @@ jobs:
     - name: Run clang-tidy
       run: |
         cd build
-        clang-tidy -p=compile_commands.json $(find ../src -name '*.cpp')
+        clang-tidy -header-filter=.* -p=compile_commands.json $(find ../src -name '*.cpp')
 
     - name: Get current commit hash
       id: get_commit_hash
