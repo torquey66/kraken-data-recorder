@@ -14,7 +14,7 @@ std::string format_frac_part(wide_float_t frac_part, integer_t precision) {
 }
 
 std::string decimal_t::str(integer_t precision) const {
-  if (m_value.is_zero()) {
+  if (m_value.is_zero() == true) {
     if (precision > 0) {
       std::string str = "0.";
       str.append(precision, '0');
