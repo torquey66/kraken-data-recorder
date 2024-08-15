@@ -190,6 +190,11 @@ void session_t::on_read(error_code ec, size_t size) {
       stop_processing();
       return;
     }
+    if (size == 0) {
+      // !@# TODO: count number of occurrances and escalate if they accumulate
+      BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << ": received empty message";
+      return;
+    }
     //    m_read_buffer.consume(size);
     m_read_buffer.consume(m_read_msg_str.size());
     if (!m_handle_recv(std::string_view(m_read_msg_str))) {
