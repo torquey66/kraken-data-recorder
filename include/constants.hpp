@@ -18,11 +18,6 @@ static constexpr char c_license[] =
 
 static constexpr char c_app_name[] = "kdr";
 
-static constexpr double c_NaN = std::numeric_limits<double>::signaling_NaN();
-static constexpr char c_NaN_str[] = "NaN";
-
-static constexpr size_t c_book_crc32_depth = 10;
-
 /** Websocket protocol strings */
 static constexpr char c_header_recv_tm[] = "recv_tm";
 static constexpr char c_header_channel[] = "channel";
@@ -54,58 +49,6 @@ static constexpr char c_instrument_assets[] = "assets";
 static constexpr char c_instrument_pairs[] = "pairs";
 static constexpr char c_instrument_snapshot[] = "snapshot";
 static constexpr char c_instrument_update[] = "update";
-
-/*
-static constexpr char c_asset_borrowable[] = "borrowable";
-static constexpr char c_asset_collateral_value[] = "collateral_value";
-static constexpr char c_asset_id[] = "id";
-static constexpr char c_asset_margin_rate[] = "margin_rate";
-static constexpr char c_asset_precision[] = "precision";
-static constexpr char c_asset_precision_display[] = "precision_display";
-static constexpr char c_asset_status[] = "status";
-
-static constexpr char c_pair_base[] = "base";
-static constexpr char c_pair_cost_min[] = "cost_min";
-static constexpr char c_pair_cost_precision[] = "cost_precision";
-static constexpr char c_pair_has_index[] = "has_index";
-static constexpr char c_pair_margin_initial[] = "margin_initial";
-static constexpr char c_pair_marginable[] = "marginable";
-static constexpr char c_pair_pair_marginable[] = "pair_marginable";
-static constexpr char c_pair_position_limit_long[] = "position_limit_long";
-static constexpr char c_pair_position_limit_short[] = "position_limit_short";
-static constexpr char c_pair_price_increment[] = "price_increment";
-static constexpr char c_pair_price_precision[] = "price_precision";
-static constexpr char c_pair_qty_increment[] = "qty_increment";
-static constexpr char c_pair_qty_min[] = "qty_min";
-static constexpr char c_pair_qty_precision[] = "qty_precision";
-static constexpr char c_pair_quote[] = "quote";
-static constexpr char c_pair_status[] = "status";
-static constexpr char c_pair_symbol[] = "symbol";
-
-static constexpr char c_book_type_snapshot[] = "snapshot";
-static constexpr char c_book_type_update[] = "update";
-
-static constexpr char c_book_asks[] = "asks";
-static constexpr char c_book_bids[] = "bids";
-static constexpr char c_book_checksum[] = "checksum";
-static constexpr char c_book_price[] = "price";
-static constexpr char c_book_qty[] = "qty";
-static constexpr char c_book_side[] = "side";
-static constexpr char c_book_symbol[] = "symbol";
-static constexpr char c_book_timestamp[] = "timestamp";
-
-static constexpr char c_trade_buy[] = "buy";
-static constexpr char c_trade_limit[] = "limit";
-static constexpr char c_trade_market[] = "market";
-static constexpr char c_trade_ord_type[] = "ord_type";
-static constexpr char c_trade_price[] = "price";
-static constexpr char c_trade_qty[] = "qty";
-static constexpr char c_trade_sell[] = "sell";
-static constexpr char c_trade_side[] = "side";
-static constexpr char c_trade_symbol[] = "symbol";
-static constexpr char c_trade_timestamp[] = "timestamp";
-static constexpr char c_trade_trade_id[] = "trade_id";
-*/
 
 static constexpr char c_metrics_num_bytes[] = "num_bytes";
 static constexpr char c_metrics_num_msgs[] = "num_msgs";

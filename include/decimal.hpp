@@ -23,7 +23,7 @@ using wide_float_t = boost::multiprecision::number<
     boost::multiprecision::cpp_dec_float<c_num_wide_float_digits>>;
 
 struct decimal_t final {
-  decimal_t() : m_value{c_NaN} {}
+  decimal_t() {}
 
   template <typename S>
   decimal_t(S str) : m_value{str} {}
