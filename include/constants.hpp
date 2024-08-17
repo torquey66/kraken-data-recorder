@@ -19,10 +19,6 @@ static constexpr char c_license[] =
 static constexpr char c_app_name[] = "kdr";
 
 /** Websocket protocol strings */
-static constexpr char c_header_recv_tm[] = "recv_tm";
-static constexpr char c_header_channel[] = "channel";
-static constexpr char c_header_type[] = "type";
-
 static constexpr char c_request_channel[] = "channel";
 static constexpr char c_request_method[] = "method";
 static constexpr char c_request_params[] = "params";

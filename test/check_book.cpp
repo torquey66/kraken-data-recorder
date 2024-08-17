@@ -169,9 +169,9 @@ void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
     }
     const auto& batch = *maybe_batch.ValueOrDie();
     const auto recv_tm_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-        batch.GetColumnByName(c_header_recv_tm));
+        batch.GetColumnByName(std::string{response::header_t::c_recv_tm}));
     const auto type_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName(c_header_type));
+        batch.GetColumnByName(std::string{response::header_t::c_type}));
     const auto bids_array = std::dynamic_pointer_cast<arrow::ListArray>(
         batch.GetColumnByName(std::string{response::book_t::c_bids}));
     const auto asks_array = std::dynamic_pointer_cast<arrow::ListArray>(

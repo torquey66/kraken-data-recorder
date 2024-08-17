@@ -117,7 +117,7 @@ std::shared_ptr<arrow::Schema> pairs_sink_t::schema() {
   // TODO: add KeyValueMetadata for enum fields
 
   auto field_vector = arrow::FieldVector{
-      arrow::field(c_header_recv_tm, arrow::int64(),
+      arrow::field(std::string{response::header_t::c_recv_tm}, arrow::int64(),
                    false),  // TODO: replace with timestamp type
       arrow::field(std::string{model::pair_t::c_base}, arrow::utf8(), false),
       arrow::field(std::string{model::pair_t::c_cost_min}, arrow::float64(),
