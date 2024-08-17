@@ -63,7 +63,7 @@ bool engine_t::handle_msg(msg_t msg) {
 
 bool engine_t::handle_instrument_msg(doc_t& doc) {
   auto buffer = std::string_view{};
-  if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
+  if (doc[response::header_t::c_type].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__ << ": missing 'type' " << simdjson::to_json_string(doc);
     return false;
@@ -121,7 +121,7 @@ bool engine_t::handle_instrument_update(doc_t& doc) {
 
 bool engine_t::handle_book_msg(doc_t& doc) {
   auto buffer = std::string_view{};
-  if (doc[c_header_type].get(buffer) != simdjson::SUCCESS) {
+  if (doc[response::header_t::c_type].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__ << ": missing 'type' " << simdjson::to_json_string(doc);
     return false;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asset.hpp"
+#include "header.hpp"
 #include "ord_type.hpp"
 #include "pair.hpp"
 #include "side.hpp"
@@ -15,27 +16,6 @@
 
 namespace kdr {
 namespace response {
-
-/**
- * Fields common to all channel messages.
- */
-struct header_t final {
-  header_t() = default;
-  header_t(timestamp_t recv_tm, std::string channel, std::string type)
-      : m_recv_tm(recv_tm), m_channel(channel), m_type(type) {}
-
-  const timestamp_t recv_tm() const { return m_recv_tm; }
-  const std::string& channel() const { return m_channel; }
-  const std::string& type() const { return m_type; }
-
-  boost::json::object to_json_obj() const;
-  std::string str() const { return boost::json::serialize(to_json_obj()); }
-
- private:
-  timestamp_t m_recv_tm;
-  std::string m_channel;
-  std::string m_type;
-};
 
 /**
  * See https://docs.kraken.com/websockets-v2/#instrument

@@ -11,9 +11,9 @@ trades_t trades_t::from_json(simdjson::ondemand::document& response) {
   auto result = trades_t{};
   auto buffer = std::string_view{};
 
-  buffer = response[c_header_channel].get_string();
+  buffer = response[header_t::c_channel].get_string();
   const auto channel = std::string{buffer.begin(), buffer.end()};
-  buffer = response[c_header_type].get_string();
+  buffer = response[header_t::c_type].get_string();
   const auto type = std::string{buffer.begin(), buffer.end()};
   result.m_header = header_t{timestamp_t::now(), channel, type};
 
@@ -43,12 +43,10 @@ boost::json::object trades_t::to_json_obj(integer_t price_precision,
         return result;
       });
 
-  const boost::json::object result = {{c_header_channel, m_header.channel()},
+  const boost::json::object result = {{header_t::c_channel, m_header.channel()},
                                       {c_response_data, trades},
-                                      {c_header_type, m_header.type()}};
+                                      {header_t::c_type, m_header.type()}};
   return result;
-
-  return boost::json::object{};
 }
 
 }  // namespace response

@@ -105,8 +105,17 @@ add_library(kdr
   include/generated/pair_status.hpp
   include/generated/side.hpp
   include/generated/trade.hpp
+  src/generated/asset.cpp
+  src/generated/asset_status.cpp
+  src/generated/depth.cpp
+  src/generated/ord_type.cpp
+  src/generated/pair.cpp
+  src/generated/pair_status.cpp
+  src/generated/side.cpp
+  src/generated/trade.cpp
   include/constants.hpp
   include/decimal.hpp
+  include/header.hpp
   include/refdata.hpp
   include/responses.hpp
   include/sink.hpp
@@ -116,14 +125,7 @@ add_library(kdr
   src/config.cpp
   src/decimal.cpp
   src/engine.cpp
-  src/generated/asset.cpp
-  src/generated/asset_status.cpp
-  src/generated/depth.cpp
-  src/generated/ord_type.cpp
-  src/generated/pair.cpp
-  src/generated/pair_status.cpp
-  src/generated/side.cpp
-  src/generated/trade.cpp
+  src/header.cpp
   src/level_book.cpp
   src/metrics.cpp
   src/refdata.cpp
