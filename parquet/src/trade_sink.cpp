@@ -23,9 +23,10 @@ void trades_sink_t::accept(const response::trades_t& trades,
                            const model::refdata_t& refdata) {
   for (const auto& trade : trades) {
     const std::optional<model::refdata_t::pair_precision_t> precision{
-        refdata.pair_precision(trade.symbol)};
+        refdata.pair_precision(trade.symbol())};
     if (!precision) {
-      const std::string msg{"cannot find refdata for symbol: " + trade.symbol};
+      const std::string msg{"cannot find refdata for symbol: " +
+                            trade.symbol()};
       BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << msg;
       throw std::runtime_error{msg};
     }
@@ -33,15 +34,16 @@ void trades_sink_t::accept(const response::trades_t& trades,
     PARQUET_THROW_NOT_OK(
         m_recv_tm_builder.Append(trades.header().recv_tm().micros()));
     PARQUET_THROW_NOT_OK(
-        m_ord_type_builder.Append(std::string(1, trade.ord_type)));
+        m_ord_type_builder.Append(std::string(1, trade.ord_type())));
     PARQUET_THROW_NOT_OK(
-        m_price_builder.Append(trade.price.str(precision->price_precision)));
+        m_price_builder.Append(trade.price().str(precision->price_precision)));
     PARQUET_THROW_NOT_OK(
-        m_qty_builder.Append(trade.qty.str(precision->qty_precision)));
-    PARQUET_THROW_NOT_OK(m_side_builder.Append(std::string(1, trade.side)));
-    PARQUET_THROW_NOT_OK(m_symbol_builder.Append(trade.symbol));
-    PARQUET_THROW_NOT_OK(m_timestamp_builder.Append(trade.timestamp.micros()));
-    PARQUET_THROW_NOT_OK(m_trade_id_builder.Append(trade.trade_id));
+        m_qty_builder.Append(trade.qty().str(precision->qty_precision)));
+    PARQUET_THROW_NOT_OK(m_side_builder.Append(std::string(1, trade.side())));
+    PARQUET_THROW_NOT_OK(m_symbol_builder.Append(trade.symbol()));
+    PARQUET_THROW_NOT_OK(
+        m_timestamp_builder.Append(trade.timestamp().micros()));
+    PARQUET_THROW_NOT_OK(m_trade_id_builder.Append(trade.trade_id()));
 
     ++m_num_rows;
   }
@@ -88,14 +90,16 @@ std::shared_ptr<arrow::Schema> trades_sink_t::schema() {
   auto field_vector = arrow::FieldVector{
       arrow::field(c_header_recv_tm, arrow::int64(),
                    false),  // TODO: replace with timestamp type
-      arrow::field(c_trade_ord_type, arrow::utf8(), false),
-      arrow::field(c_trade_price, arrow::utf8(), false),
-      arrow::field(c_trade_qty, arrow::utf8(), false),
-      arrow::field(c_trade_side, arrow::utf8(), false),
-      arrow::field(c_trade_symbol, arrow::utf8(), false),
-      arrow::field(c_trade_timestamp, arrow::int64(),
+      arrow::field(std::string{model::trade_t::c_ord_type}, arrow::utf8(),
+                   false),
+      arrow::field(std::string{model::trade_t::c_price}, arrow::utf8(), false),
+      arrow::field(std::string{model::trade_t::c_qty}, arrow::utf8(), false),
+      arrow::field(std::string{model::trade_t::c_side}, arrow::utf8(), false),
+      arrow::field(std::string{model::trade_t::c_symbol}, arrow::utf8(), false),
+      arrow::field(std::string{model::trade_t::c_timestamp}, arrow::int64(),
                    false),  // TODO: replace with timestamp type
-      arrow::field(c_trade_trade_id, arrow::uint64(), false),
+      arrow::field(std::string{model::trade_t::c_trade_id}, arrow::uint64(),
+                   false),
   };
   return arrow::schema(field_vector);
 }

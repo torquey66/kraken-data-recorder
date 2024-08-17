@@ -142,11 +142,15 @@ std::shared_ptr<arrow::Schema> book_sink_t::schema(integer_t book_depth) {
       arrow::field(c_header_recv_tm, arrow::int64(),
                    false),  // TODO: replace with timestamp type?
       arrow::field(c_header_type, arrow::utf8(), false),
-      arrow::field(c_book_bids, arrow::list(quote_struct()), false),
-      arrow::field(c_book_asks, arrow::list(quote_struct()), false),
-      arrow::field(c_book_checksum, arrow::uint64(), false),
-      arrow::field(c_book_symbol, arrow::utf8(), false),
-      arrow::field(c_book_timestamp, arrow::int64(),
+      arrow::field(std::string{response::book_t::c_bids},
+                   arrow::list(quote_struct()), false),
+      arrow::field(std::string{response::book_t::c_asks},
+                   arrow::list(quote_struct()), false),
+      arrow::field(std::string{response::book_t::c_checksum}, arrow::uint64(),
+                   false),
+      arrow::field(std::string{response::book_t::c_symbol}, arrow::utf8(),
+                   false),
+      arrow::field(std::string{response::book_t::c_timestamp}, arrow::int64(),
                    false),  // TODO: replace with timestamp type?
   };
   return arrow::schema(field_vector)->WithMetadata(metadata);

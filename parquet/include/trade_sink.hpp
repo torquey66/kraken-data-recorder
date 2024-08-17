@@ -3,6 +3,7 @@
 #include "io.hpp"
 #include "refdata.hpp"
 #include "responses.hpp"
+#include "trades.hpp"
 
 #include <arrow/api.h>
 

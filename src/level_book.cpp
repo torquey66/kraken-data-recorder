@@ -73,8 +73,8 @@ boost::json::object sides_t::to_json_obj() const {
         return quote;
       });
 
-  const boost::json::object result = {{c_book_bids, bid_objs},
-                                      {c_book_asks, ask_objs}};
+  const boost::json::object result = {{response::book_t::c_bids, bid_objs},
+                                      {response::book_t::c_asks, ask_objs}};
   return result;
 }
 
@@ -118,10 +118,10 @@ void level_book_t::accept(const response::book_t& book) {
   }
   auto& sides = it->second;
   const auto type = book.header().type();
-  if (type == c_book_type_snapshot) {
+  if (type == response::book_t::c_snapshot) {
     return sides.accept_snapshot(book);
   }
-  if (type == c_book_type_update) {
+  if (type == response::book_t::c_update) {
     return sides.accept_update(book);
   }
   throw std::runtime_error("bogus book channel type: '" + type + "'");
@@ -138,8 +138,8 @@ uint64_t level_book_t::crc32(symbol_t symbol) const {
 
 std::string level_book_t::str(std::string symbol) const {
   const auto& side = m_sides.at(symbol);
-  const boost::json::object result{{c_book_symbol, symbol},
-                                   {c_book_side, side.str()}};
+  const boost::json::object result{{response::book_t::c_symbol, symbol},
+                                   {response::book_t::c_side, side.str()}};
   return boost::json::serialize(result);
 }
 

@@ -1,11 +1,10 @@
 #pragma once
 
 #include "decimal.hpp"
+#include "timestamp.hpp"  // !@# TODO: remove this and include timestamp only where it is required
 
 #include <cstdint>
-#include <limits>
-#include <string>
-#include <utility>
+#include <string_view>
 
 /**
  * The Kraken API spec references types such as 'float' and 'integer'
@@ -30,28 +29,5 @@ using qty_t = decimal_t;
 using quote_t = std::pair<price_t, qty_t>;
 using ask_t = quote_t;
 using bid_t = quote_t;
-
-/**
- * AFAIK, Kraken timetamps are always ISO 8601 strings in GMT.
- *
- * TODO: consider using chrono timepoints in some fashion instead of
- * raw micros.
- */
-struct timestamp_t final {
-  timestamp_t() {}
-  timestamp_t(int64_t in_micros) : m_micros(in_micros) {}
-
-  std::string str() const { return to_iso_8601(m_micros); };
-
-  int64_t micros() const { return m_micros; }
-
-  static std::string to_iso_8601(int64_t);
-  static int64_t from_iso_8601(const std::string&);
-
-  static timestamp_t now();
-
- private:
-  int64_t m_micros = 0;
-};
 
 }  // namespace kdr

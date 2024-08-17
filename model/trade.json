@@ -1,0 +1,17 @@
+{
+    "class" : "trade",
+
+    "dependencies" : [ "decimal", "ord_type", "side", "timestamp" ],
+
+    "doc" : "See: https://docs.kraken.com/websockets-v2/#trade",
+
+    "members" : [
+        { "name" : "ord_type",  "type" : "ord_type", "enum" : true },
+        { "name" : "price",     "type" : "price"                   },
+        { "name" : "qty",       "type" : "qty"                     },
+        { "name" : "side",      "type" : "side",     "enum" : true },
+        { "name" : "symbol",    "type" : "string"                  },
+        { "name" : "timestamp", "type" : "timestamp"               },
+        { "name" : "trade_id",  "type" : "integer"                 }
+    ]
+}

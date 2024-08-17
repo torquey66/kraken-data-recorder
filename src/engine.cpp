@@ -127,7 +127,8 @@ bool engine_t::handle_book_msg(doc_t& doc) {
     return false;
   }
 
-  if (buffer != c_book_type_snapshot && buffer != c_book_type_update) {
+  if (buffer != response::book_t::c_snapshot &&
+      buffer != response::book_t::c_update) {
     BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": unknown 'type' " << buffer;
     return false;
   }

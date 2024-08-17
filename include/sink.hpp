@@ -1,6 +1,7 @@
 #pragma once
 
 #include "responses.hpp"
+#include "trades.hpp"
 
 #include <functional>
 

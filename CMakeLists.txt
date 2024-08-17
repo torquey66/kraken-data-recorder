@@ -7,8 +7,8 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
-#add_compile_options(-fsanitize=address)
-#add_link_options(-fsanitize=address)
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
@@ -24,6 +24,7 @@ find_package(simdjson)
 set(MODEL_FILES
   ${CMAKE_SOURCE_DIR}/model/asset.json
   ${CMAKE_SOURCE_DIR}/model/pair.json
+  ${CMAKE_SOURCE_DIR}/model/trade.json
 )
 
 set(ENUM_FILES
@@ -42,6 +43,7 @@ set(GENERATED_FILES
   ${CMAKE_SOURCE_DIR}/include/generated/pair.hpp
   ${CMAKE_SOURCE_DIR}/include/generated/pair_status.hpp
   ${CMAKE_SOURCE_DIR}/include/generated/side.hpp
+  ${CMAKE_SOURCE_DIR}/include/generated/trade.hpp
   ${CMAKE_SOURCE_DIR}/src/generated/asset.cpp
   ${CMAKE_SOURCE_DIR}/src/generated/asset_status.cpp
   ${CMAKE_SOURCE_DIR}/src/generated/depth.cpp
@@ -49,6 +51,7 @@ set(GENERATED_FILES
   ${CMAKE_SOURCE_DIR}/src/generated/pair.cpp
   ${CMAKE_SOURCE_DIR}/src/generated/pair_status.cpp
   ${CMAKE_SOURCE_DIR}/src/generated/side.cpp
+  ${CMAKE_SOURCE_DIR}/src/generated/trade.cpp
 )
 
 set(JINJA2_FILES
@@ -101,11 +104,15 @@ add_library(kdr
   include/generated/pair.hpp
   include/generated/pair_status.hpp
   include/generated/side.hpp
+  include/generated/trade.hpp
   include/constants.hpp
   include/decimal.hpp
   include/refdata.hpp
   include/responses.hpp
   include/sink.hpp
+  include/timestamp.hpp
+  include/trades.hpp
+  include/types.hpp
   src/config.cpp
   src/decimal.cpp
   src/engine.cpp
@@ -116,13 +123,14 @@ add_library(kdr
   src/generated/pair.cpp
   src/generated/pair_status.cpp
   src/generated/side.cpp
+  src/generated/trade.cpp
   src/level_book.cpp
   src/metrics.cpp
   src/refdata.cpp
   src/requests.cpp
   src/responses.cpp
   src/session.cpp
-  src/types.cpp
+  src/trades.cpp
 )
 add_dependencies(kdr generate_all)
 
