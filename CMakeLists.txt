@@ -7,8 +7,8 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
+#add_compile_options(-fsanitize=address)
+#add_link_options(-fsanitize=address)
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
