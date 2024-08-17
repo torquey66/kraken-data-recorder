@@ -113,24 +113,28 @@ add_library(kdr
   src/generated/pair_status.cpp
   src/generated/side.cpp
   src/generated/trade.cpp
+  include/book.hpp
+  include/config.hpp
   include/constants.hpp
   include/decimal.hpp
   include/header.hpp
+  include/instrument.hpp
+  include/level_book.hpp
   include/refdata.hpp
-  include/responses.hpp
   include/sink.hpp
   include/timestamp.hpp
   include/trades.hpp
   include/types.hpp
+  src/book.cpp
   src/config.cpp
   src/decimal.cpp
   src/engine.cpp
   src/header.cpp
+  src/instrument.cpp
   src/level_book.cpp
   src/metrics.cpp
   src/refdata.cpp
   src/requests.cpp
-  src/responses.cpp
   src/session.cpp
   src/trades.cpp
 )

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "io.hpp"
-#include "responses.hpp"
+
+#include <asset.hpp>
+#include <header.hpp>
+#include <pair.hpp>
 
 #include <arrow/api.h>
 

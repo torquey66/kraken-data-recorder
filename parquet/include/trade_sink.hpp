@@ -1,9 +1,10 @@
 #pragma once
 
 #include "io.hpp"
-#include "refdata.hpp"
-#include "responses.hpp"
-#include "trades.hpp"
+
+#include <header.hpp>
+#include <refdata.hpp>
+#include <trades.hpp>
 
 #include <arrow/api.h>
 

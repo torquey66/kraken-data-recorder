@@ -1,8 +1,10 @@
 #include "engine.hpp"
 
+#include "book.hpp"
 #include "constants.hpp"
+#include "header.hpp"
+#include "instrument.hpp"
 #include "requests.hpp"
-#include "responses.hpp"
 
 #include <simdjson.h>
 #include <boost/log/trivial.hpp>

@@ -1,7 +1,6 @@
 #include "constants.hpp"
 #include "io.hpp"
 #include "level_book.hpp"
-#include "responses.hpp"
 #include "types.hpp"
 
 #include <arrow/api.h>
