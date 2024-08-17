@@ -82,10 +82,11 @@ struct level_book_t final {
 template <typename S>
 boost::crc_32_type sides_t::update_checksum(boost::crc_32_type crc32,
                                             const S& side) const {
+  static constexpr size_t c_crc32_depth = 10;
   auto& result = crc32;
   auto depth = size_t{0};
   for (const auto& kv : side) {
-    if (++depth > c_book_crc32_depth) {
+    if (++depth > c_crc32_depth) {
       break;
     }
     const auto& price = kv.first;
