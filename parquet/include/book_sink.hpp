@@ -1,8 +1,10 @@
 #pragma once
 
 #include "io.hpp"
-#include "refdata.hpp"
-#include "responses.hpp"
+
+#include <asset.hpp>
+#include <book.hpp>
+#include <refdata.hpp>
 
 #include <arrow/api.h>
 

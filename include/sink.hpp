@@ -1,6 +1,7 @@
 #pragma once
 
-#include "responses.hpp"
+#include "book.hpp"
+#include "instrument.hpp"
 #include "trades.hpp"
 
 #include <functional>

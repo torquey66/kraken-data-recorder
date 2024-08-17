@@ -1,7 +1,8 @@
 #pragma once
 
-#include "responses.hpp"
+#include "header.hpp"
 #include "trade.hpp"
+#include "types.hpp"
 
 #include <vector>
 

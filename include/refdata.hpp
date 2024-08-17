@@ -1,6 +1,9 @@
 #pragma once
 
-#include "responses.hpp"
+#include "asset.hpp"
+#include "instrument.hpp"
+#include "pair.hpp"
+#include "types.hpp"
 
 #include <optional>
 #include <unordered_map>

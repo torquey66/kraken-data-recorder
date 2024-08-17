@@ -1,8 +1,9 @@
 #pragma once
 
+#include "book.hpp"
 #include "constants.hpp"
 #include "depth.hpp"
-#include "responses.hpp"
+#include "pair.hpp"
 #include "types.hpp"
 
 #include <boost/crc.hpp>

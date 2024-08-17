@@ -1,7 +1,5 @@
 #include <doctest/doctest.h>
 
-#include <responses.hpp>
-
 #include <arrow/api.h>
 #include <arrow/io/api.h>
 #include <arrow/io/memory.h>
