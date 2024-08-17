@@ -55,6 +55,7 @@ static constexpr char c_instrument_pairs[] = "pairs";
 static constexpr char c_instrument_snapshot[] = "snapshot";
 static constexpr char c_instrument_update[] = "update";
 
+/*
 static constexpr char c_asset_borrowable[] = "borrowable";
 static constexpr char c_asset_collateral_value[] = "collateral_value";
 static constexpr char c_asset_id[] = "id";
@@ -104,6 +105,7 @@ static constexpr char c_trade_side[] = "side";
 static constexpr char c_trade_symbol[] = "symbol";
 static constexpr char c_trade_timestamp[] = "timestamp";
 static constexpr char c_trade_trade_id[] = "trade_id";
+*/
 
 static constexpr char c_metrics_num_bytes[] = "num_bytes";
 static constexpr char c_metrics_num_msgs[] = "num_msgs";

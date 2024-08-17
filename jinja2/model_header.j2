@@ -23,6 +23,16 @@ namespace model {
 
 struct {{ classname }} final {
 
+/** Field name views */
+{% for member in members -%}
+  static const std::string_view c_{{ member.name }};
+{% endfor %}
+
+/** Field name strs */
+{% for member in members -%}
+  static const std::string c_{{ member.name }}_str;
+{% endfor %}
+
 {{ classname }}() {}
 
 {{ classname }}(

@@ -6,9 +6,12 @@
  "double":       "double_t",
  "integer":      "integer_t",
  "ord_type":     "ord_type_t",
+ "price":        "price_t",
  "pair_status":  "pair_status_t",
+ "qty":          "qty_t",
  "side":         "side_t",
  "string":       "std::string",
+ "timestamp":    "timestamp_t",
 } -%}
 
 {# Tells us how to expose a c++ member. #}
@@ -20,22 +23,28 @@
  "integer":      "integer_t",
  "ord_type":     "ord_type_t",
  "pair_status":  "pair_status_t",
+ "price":        "price_t",
+ "qty":          "qty_t",
  "side":         "side_t",
  "string":       "const std::string&",
+ "timestamp":    "timestamp_t",
 } -%}
 {
 
 {# Tells us which simdjson accessor to use. #}
 {% set simdjson_types = {
- "asset_status": "string", 
- "bool":         "bool",
- "depth":        "int64",
- "double":       "double",
- "integer":      "int64",
- "ord_type":     "string", 
- "pair_status":  "string", 
- "side":         "string", 
- "string":       "string",
+ "asset_status": "get_string", 
+ "bool":         "get_bool",
+ "depth":        "get_int64",
+ "double":       "get_double",
+ "integer":      "get_int64",
+ "ord_type":     "get_string", 
+ "pair_status":  "get_string", 
+ "price":        "raw_json_token",
+ "qty":          "raw_json_token",
+ "side":         "get_string", 
+ "string":       "get_string",
+ "timestamp":    "get_string",
 } -%}
 
 {# Default values for c++ member declarations. #}
@@ -48,4 +57,10 @@
  "ord_type":     "ord_type_invalid",
  "pair_status":  "pair_status_invalid",
  "side":         "side_invalid",
+} -%}
+
+{% set json_converters = {
+ "price":     "str()",
+ "qty":       "str()",
+ "timestamp": "str()",
 } -%}

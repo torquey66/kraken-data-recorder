@@ -1,5 +1,7 @@
 #include "decimal.hpp"
 
+#include <sstream>
+
 namespace kdr {
 
 std::string format_frac_part(wide_float_t frac_part, integer_t precision) {
@@ -11,6 +13,12 @@ std::string format_frac_part(wide_float_t frac_part, integer_t precision) {
     frac_part -= int_part;
   }
   return result;
+}
+
+std::string decimal_t::str() const {
+  std::ostringstream os;
+  os << m_value;
+  return os.str();
 }
 
 std::string decimal_t::str(integer_t precision) const {

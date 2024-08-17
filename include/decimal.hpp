@@ -39,6 +39,7 @@ struct decimal_t final {
     return std::strtod(str(precision).c_str(), nullptr);
   }
 
+  std::string str() const;
   std::string str(integer_t precision) const;
 
   void process(boost::crc_32_type& crc32, integer_t precision) const;

@@ -64,13 +64,18 @@ std::shared_ptr<arrow::Schema> assets_sink_t::schema() {
   auto field_vector = arrow::FieldVector{
       arrow::field(c_header_recv_tm, arrow::int64(),
                    false),  // TODO: replace with timestamp type
-      arrow::field(c_asset_borrowable, arrow::boolean(), false),
-      arrow::field(c_asset_collateral_value, arrow::float64(), false),
-      arrow::field(c_asset_id, arrow::utf8(), false),
-      arrow::field(c_asset_margin_rate, arrow::float64(), true),
-      arrow::field(c_asset_precision, arrow::int64(), false),
-      arrow::field(c_asset_precision_display, arrow::int64(), false),
-      arrow::field(c_asset_status, arrow::int8(), false),
+      arrow::field(std::string{model::asset_t::c_borrowable}, arrow::boolean(),
+                   false),
+      arrow::field(std::string{model::asset_t::c_collateral_value},
+                   arrow::float64(), false),
+      arrow::field(std::string{model::asset_t::c_id}, arrow::utf8(), false),
+      arrow::field(std::string{model::asset_t::c_margin_rate}, arrow::float64(),
+                   true),
+      arrow::field(std::string{model::asset_t::c_precision}, arrow::int64(),
+                   false),
+      arrow::field(std::string{model::asset_t::c_precision_display},
+                   arrow::int64(), false),
+      arrow::field(std::string{model::asset_t::c_status}, arrow::int8(), false),
   };
   return arrow::schema(field_vector);
 }

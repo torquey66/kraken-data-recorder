@@ -22,10 +22,13 @@ std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
   auto result = std::vector<quote_t>{};
   const auto slice = std::dynamic_pointer_cast<arrow::StructArray>(
       quotes_array.value_slice(idx));
+
+  const auto price_field = std::string{response::book_t::c_price};
+  const auto qty_field = std::string{response::book_t::c_qty};
   const auto price_array = std::dynamic_pointer_cast<arrow::StringArray>(
-      slice->GetFieldByName(c_book_price));
+      slice->GetFieldByName(price_field));
   const auto qty_array = std::dynamic_pointer_cast<arrow::StringArray>(
-      slice->GetFieldByName(c_book_qty));
+      slice->GetFieldByName(qty_field));
   for (auto sidx = 0; sidx < slice->length(); ++sidx) {
     const auto price_view = price_array->Value(sidx);
     const auto qty_view = qty_array->Value(sidx);
@@ -74,46 +77,46 @@ void process_pairs(std::string pairs_filename,
     const auto& batch = *maybe_batch.ValueOrDie();
 
     const auto base_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName(c_pair_base));
+        batch.GetColumnByName(model::pair_t::c_base_str));
     const auto cost_min_array = std::dynamic_pointer_cast<arrow::DoubleArray>(
-        batch.GetColumnByName(c_pair_cost_min));
+        batch.GetColumnByName(model::pair_t::c_cost_min_str));
     const auto cost_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(c_pair_cost_precision));
+            batch.GetColumnByName(model::pair_t::c_cost_precision_str));
     const auto has_index_array = std::dynamic_pointer_cast<arrow::BooleanArray>(
-        batch.GetColumnByName(c_pair_has_index));
+        batch.GetColumnByName(model::pair_t::c_has_index_str));
     const auto margin_initial_array =
         std::dynamic_pointer_cast<arrow::DoubleArray>(
-            batch.GetColumnByName(c_pair_margin_initial));
+            batch.GetColumnByName(model::pair_t::c_margin_initial_str));
     const auto marginable_array =
         std::dynamic_pointer_cast<arrow::BooleanArray>(
-            batch.GetColumnByName(c_pair_marginable));
+            batch.GetColumnByName(model::pair_t::c_marginable_str));
     const auto position_limit_long_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(c_pair_position_limit_long));
+            batch.GetColumnByName(model::pair_t::c_position_limit_long_str));
     const auto position_limit_short_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(c_pair_position_limit_short));
+            batch.GetColumnByName(model::pair_t::c_position_limit_short_str));
     const auto price_increment_array =
         std::dynamic_pointer_cast<arrow::DoubleArray>(
-            batch.GetColumnByName(c_pair_price_increment));
+            batch.GetColumnByName(model::pair_t::c_price_increment_str));
     const auto price_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(c_pair_price_precision));
+            batch.GetColumnByName(model::pair_t::c_price_precision_str));
     const auto qty_increment_array =
         std::dynamic_pointer_cast<arrow::DoubleArray>(
-            batch.GetColumnByName(c_pair_qty_increment));
+            batch.GetColumnByName(model::pair_t::c_qty_increment_str));
     const auto qty_min_array = std::dynamic_pointer_cast<arrow::DoubleArray>(
-        batch.GetColumnByName(c_pair_qty_min));
+        batch.GetColumnByName(model::pair_t::c_qty_min_str));
     const auto qty_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(c_pair_qty_precision));
+            batch.GetColumnByName(model::pair_t::c_qty_precision_str));
     const auto quote_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName(c_pair_quote));
+        batch.GetColumnByName(model::pair_t::c_quote_str));
     const auto status_array = std::dynamic_pointer_cast<arrow::Int8Array>(
-        batch.GetColumnByName(c_pair_status));
+        batch.GetColumnByName(model::pair_t::c_status_str));
     const auto symbol_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName(c_pair_symbol));
+        batch.GetColumnByName(model::pair_t::c_symbol_str));
 
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
       const auto base = base_array->Value(idx);
@@ -170,15 +173,15 @@ void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
     const auto type_array = std::dynamic_pointer_cast<arrow::StringArray>(
         batch.GetColumnByName(c_header_type));
     const auto bids_array = std::dynamic_pointer_cast<arrow::ListArray>(
-        batch.GetColumnByName(c_book_bids));
+        batch.GetColumnByName(std::string{response::book_t::c_bids}));
     const auto asks_array = std::dynamic_pointer_cast<arrow::ListArray>(
-        batch.GetColumnByName(c_book_asks));
+        batch.GetColumnByName(std::string{response::book_t::c_asks}));
     const auto crc32_array = std::dynamic_pointer_cast<arrow::UInt64Array>(
-        batch.GetColumnByName(c_book_checksum));
+        batch.GetColumnByName(std::string{response::book_t::c_checksum}));
     const auto symbol_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName(c_book_symbol));
+        batch.GetColumnByName(std::string{response::book_t::c_symbol}));
     const auto timestamp_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-        batch.GetColumnByName(c_book_timestamp));
+        batch.GetColumnByName(std::string{response::book_t::c_timestamp}));
 
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
       const auto recv_tm = recv_tm_array->Value(idx);

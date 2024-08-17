@@ -4,11 +4,13 @@
 #include "ord_type.hpp"
 #include "pair.hpp"
 #include "side.hpp"
+#include "trade.hpp"
 
 #include <simdjson.h>
 #include <boost/json.hpp>
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace kdr {
@@ -63,6 +65,20 @@ struct book_t final {
   using asks_t = std::vector<ask_t>;
   using bids_t = std::vector<bid_t>;
 
+  /** Field names */
+  static const std::string_view c_asks;
+  static const std::string_view c_bids;
+  static const std::string_view c_checksum;
+  static const std::string_view c_price;
+  static const std::string_view c_qty;
+  static const std::string_view c_side;
+  static const std::string_view c_symbol;
+  static const std::string_view c_timestamp;
+
+  /** Field values */
+  static const std::string_view c_snapshot;
+  static const std::string_view c_update;
+
   book_t() = default;
   book_t(const header_t&,
          const asks_t&,
@@ -93,41 +109,6 @@ struct book_t final {
   uint64_t m_crc32;
   std::string m_symbol;
   timestamp_t m_timestamp;
-};
-
-/**
- * https://docs.kraken.com/websockets-v2/#trade
- */
-struct trades_t final {
-  struct trade_t final {
-    model::ord_type_t ord_type;
-    price_t price;
-    qty_t qty;
-    model::side_t side;
-    std::string symbol;
-    timestamp_t timestamp;
-    integer_t trade_id;
-  };
-
-  trades_t() = default;
-
-  const header_t& header() const { return m_header; }
-
-  static trades_t from_json(simdjson::ondemand::document&);
-
-  boost::json::object to_json_obj(integer_t price_precision,
-                                  integer_t qty_precision) const;
-  std::string str(integer_t price_precision, integer_t qty_precision) const {
-    return boost::json::serialize(to_json_obj(price_precision, qty_precision));
-  }
-
-  auto begin() const { return m_trades.begin(); }
-  auto end() const { return m_trades.end(); }
-  auto size() const { return m_trades.size(); }
-
- private:
-  header_t m_header;
-  std::vector<trade_t> m_trades;
 };
 
 }  // namespace response

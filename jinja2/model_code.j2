@@ -6,10 +6,25 @@
 
 #include "{{ class }}.hpp"
 
+#include <array>
+#include <string_view>
+
 namespace kdr {
 namespace model {
 
 {% set classname = class ~ '_t' %}
+
+{% for member in members -%}
+  static constexpr auto c_{{ member.name }}_field = std::to_array("{{ member.name }}" );
+{% endfor %}
+
+{% for member in members -%}
+  const std::string_view {{ classname }}::c_{{ member.name }}{ c_{{ member.name }}_field.data(), c_{{ member.name }}_field.size() - 1 };
+{% endfor %}
+
+{% for member in members -%}
+  const std::string {{ classname }}::c_{{ member.name }}_str{ c_{{ member.name }}_field.data(), c_{{ member.name }}_field.size() - 1 };
+{% endfor %}
 
 {{ classname }}::{{ classname }}(
 {% for member in members -%}
@@ -30,13 +45,16 @@ namespace model {
 
     {% set cpp_decl_type = types.cpp_decl_types[member.type] -%}
     {% set simdjson_type = types.simdjson_types[member.type] -%}
-    {% set name_constant = 'c_' ~ class ~ '_' ~ member.name -%}
+    {% set name_constant = classname ~ '::c_' ~ member.name -%}
 
     {% if not member.optional == true and not member.enum == true -%}
-      {% if not member.type == "string" -%}
-        const {{ cpp_decl_type }} {{ member.name }}{ obj[{{ name_constant}}].get_{{ simdjson_type }}()};
+      {% if simdjson_type == "raw_json_token" or cpp_decl_type == "timestamp_t" -%}
+        const std::string_view {{ member.name }}_view{obj[{{ name_constant }}].{{ simdjson_type }}()};
+        const {{ cpp_decl_type }} {{ member.name }}{ {{ member.name }}_view };
+      {% elif not member.type == "string" -%}
+        const {{ cpp_decl_type }} {{ member.name }}{ obj[{{ name_constant}}].{{ simdjson_type }}()};
       {% else -%}
-        const std::string_view {{ member.name }}_view{  obj[{{ name_constant}}].get_{{ simdjson_type }}()};
+        const std::string_view {{ member.name }}_view{obj[{{ name_constant}}].{{ simdjson_type }}()};
         const {{ cpp_decl_type }} {{ member.name }}{ {{ member.name }}_view.data(), {{ member.name }}_view.size() };
       {% endif -%}
     {% endif -%}
@@ -51,7 +69,7 @@ namespace model {
       std::optional<{{ cpp_decl_type }}> {{ member.name }}{};
       simdjson::ondemand::value optional_{{ member.name }}{};
       if (obj[{{ name_constant }}].get(optional_{{ member.name }}) == simdjson::SUCCESS) {
-         {{ member.name }} = optional_{{ member.name }}.get_{{ simdjson_type }}();
+         {{ member.name }} = optional_{{ member.name }}.{{ simdjson_type }}();
       }
     {% endif -%}
 
@@ -68,7 +86,8 @@ boost::json::object {{ classname }}::to_json_obj() const {
   boost::json::object result = {
     {% for member in members -%}
       {% if not member.optional == true and not member.enum == true -%}
-        { c_{{ class}}_{{ member.name }}, m_{{ member.name }} },
+        { {{ classname }}::c_{{ member.name }}, m_{{ member.name }}
+          {% if types.json_converters.get(member['type']) is not none -%} .{{ types.json_converters[member['type']] }} {% endif -%} },
       {% endif -%}
     {% endfor -%}
   };
@@ -76,7 +95,7 @@ boost::json::object {{ classname }}::to_json_obj() const {
   {% for member in members -%}
     {% if member.optional == true -%}
       if (m_{{ member.name }}) {
-         result[c_{{ class}}_{{ member.name }}] = *m_{{ member.name }};
+         result[{{ classname }}::c_{{ member.name }}] = *m_{{ member.name }};
       }
     {% endif -%}
   {% endfor %}
@@ -84,7 +103,7 @@ boost::json::object {{ classname }}::to_json_obj() const {
   {% for member in members -%}
     {% set cpp_access_type = types.cpp_access_types[member.type] -%}
     {% if member.enum == true -%}
-      result[c_{{ class}}_{{ member.name }}] = {{ cpp_access_type }}_to_str(m_{{ member.name }});
+      result[{{ classname }}::c_{{ member.name }}] = {{ cpp_access_type }}_to_str(m_{{ member.name }});
     {% endif -%}
   {% endfor %}
 
