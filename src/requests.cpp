@@ -25,7 +25,7 @@ boost::json::object subscribe_book_t::to_json_obj() const {
   auto symbol_objs = boost::json::array{};
   std::transform(
       m_symbols.begin(), m_symbols.end(), std::back_inserter(symbol_objs),
-      [](const std::string& symbol) { return boost::json::string{symbol}; });
+      [](const std::string &symbol) { return boost::json::string{symbol}; });
   const boost::json::object result = {{c_request_method, c_method_subscribe},
                                       {c_request_params,
                                        {{c_request_channel, c_channel_book},
@@ -40,7 +40,7 @@ boost::json::object subscribe_trade_t::to_json_obj() const {
   auto symbol_objs = boost::json::array{};
   std::transform(
       m_symbols.begin(), m_symbols.end(), std::back_inserter(symbol_objs),
-      [](const std::string& symbol) { return boost::json::string{symbol}; });
+      [](const std::string &symbol) { return boost::json::string{symbol}; });
   const boost::json::object result = {{c_request_method, c_method_subscribe},
                                       {c_request_params,
                                        {{c_request_channel, c_channel_trade},
@@ -50,5 +50,5 @@ boost::json::object subscribe_trade_t::to_json_obj() const {
   return result;
 }
 
-}  // namespace request
-}  // namespace kdr
+} // namespace request
+} // namespace kdr

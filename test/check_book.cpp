@@ -16,7 +16,7 @@
 
 using namespace kdr;
 
-std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
+std::vector<quote_t> extract(const arrow::ListArray &quotes_array,
                              int64_t idx) {
   auto result = std::vector<quote_t>{};
   const auto slice = std::dynamic_pointer_cast<arrow::StructArray>(
@@ -38,9 +38,9 @@ std::vector<quote_t> extract(const arrow::ListArray& quotes_array,
   return result;
 }
 
-void dump_sides(const model::sides_t& sides, const size_t max_depth = 10) {
-  const auto& bids = sides.bids();
-  const auto& asks = sides.asks();
+void dump_sides(const model::sides_t &sides, const size_t max_depth = 10) {
+  const auto &bids = sides.bids();
+  const auto &asks = sides.asks();
   auto bid_it = bids.begin();
   auto ask_it = asks.begin();
   for (size_t depth = 0; depth < max_depth; ++depth) {
@@ -61,7 +61,7 @@ void dump_sides(const model::sides_t& sides, const size_t max_depth = 10) {
 }
 
 void process_pairs(std::string pairs_filename,
-                   model::level_book_t& level_book) {
+                   model::level_book_t &level_book) {
   pq::reader_t reader{pairs_filename};
 
   std::shared_ptr<::arrow::RecordBatchReader> rb_reader{
@@ -73,7 +73,7 @@ void process_pairs(std::string pairs_filename,
       std::cerr << "error: " << maybe_batch.status().ToString() << std::endl;
     }
 
-    const auto& batch = *maybe_batch.ValueOrDie();
+    const auto &batch = *maybe_batch.ValueOrDie();
 
     const auto base_array = std::dynamic_pointer_cast<arrow::StringArray>(
         batch.GetColumnByName(model::pair_t::c_base_str));
@@ -157,7 +157,7 @@ void process_pairs(std::string pairs_filename,
   }
 }
 
-void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
+void process_book(pq::reader_t &reader, model::level_book_t &level_book) {
   std::shared_ptr<::arrow::RecordBatchReader> rb_reader{
       reader.record_batch_reader()};
 
@@ -166,7 +166,7 @@ void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
     if (!maybe_batch.ok()) {
       std::cerr << "error: " << maybe_batch.status().ToString() << std::endl;
     }
-    const auto& batch = *maybe_batch.ValueOrDie();
+    const auto &batch = *maybe_batch.ValueOrDie();
     const auto recv_tm_array = std::dynamic_pointer_cast<arrow::Int64Array>(
         batch.GetColumnByName(std::string{response::header_t::c_recv_tm}));
     const auto type_array = std::dynamic_pointer_cast<arrow::StringArray>(
@@ -197,7 +197,7 @@ void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
           response::book_t{header, asks, bids, crc32, symbol_str, timestamp};
       try {
         level_book.accept(response);
-      } catch (const std::exception& ex) {
+      } catch (const std::exception &ex) {
         std::cerr << "idx: " << idx << " recv_tm:  " << recv_tm << std::endl;
         dump_sides(level_book.sides(symbol_str));
         throw ex;
@@ -206,7 +206,7 @@ void process_book(pq::reader_t& reader, model::level_book_t& level_book) {
   }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   if (argc != 3) {
     std::cerr << "usage: " << argv[0] << " <pairs parquet file>"
               << " <book parquet file>" << std::endl;
@@ -238,7 +238,7 @@ int main(int argc, char* argv[]) {
     auto level_book = model::level_book_t{book_depth};
     process_pairs(pairs_filename, level_book);
     process_book(book_reader, level_book);
-  } catch (const std::exception& ex) {
+  } catch (const std::exception &ex) {
     std::cerr << ex.what() << std::endl;
     return 1;
   }

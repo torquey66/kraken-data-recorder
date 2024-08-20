@@ -25,13 +25,12 @@ using wide_float_t = boost::multiprecision::number<
 struct decimal_t final {
   decimal_t() {}
 
-  template <typename S>
-  decimal_t(S str) : m_value{str} {}
+  template <typename S> decimal_t(S str) : m_value{str} {}
 
-  bool operator<(const decimal_t& rhs) const { return m_value < rhs.m_value; }
-  bool operator>(const decimal_t& rhs) const { return m_value > rhs.m_value; }
-  bool operator==(const decimal_t& rhs) const { return m_value == rhs.m_value; }
-  bool operator!=(const decimal_t& rhs) const { return m_value != rhs.m_value; }
+  bool operator<(const decimal_t &rhs) const { return m_value < rhs.m_value; }
+  bool operator>(const decimal_t &rhs) const { return m_value > rhs.m_value; }
+  bool operator==(const decimal_t &rhs) const { return m_value == rhs.m_value; }
+  bool operator!=(const decimal_t &rhs) const { return m_value != rhs.m_value; }
 
   wide_float_t value() const { return m_value; }
 
@@ -42,10 +41,10 @@ struct decimal_t final {
   std::string str() const;
   std::string str(integer_t precision) const;
 
-  void process(boost::crc_32_type& crc32, integer_t precision) const;
+  void process(boost::crc_32_type &crc32, integer_t precision) const;
 
- private:
+private:
   wide_float_t m_value = 0.0;
 };
 
-}  // namespace kdr
+} // namespace kdr

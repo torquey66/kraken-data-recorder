@@ -20,7 +20,7 @@ struct ping_t final {
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
- private:
+private:
   req_id_t m_req_id;
 };
 
@@ -34,7 +34,7 @@ struct subscribe_instrument_t final {
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
- private:
+private:
   req_id_t m_req_id;
   bool m_snapshot;
 };
@@ -43,19 +43,15 @@ struct subscribe_instrument_t final {
  * See https://docs.kraken.com/websockets-v2/#book
  */
 struct subscribe_book_t final {
-  subscribe_book_t(req_id_t req_id,
-                   model::depth_t depth,
-                   bool snapshot,
-                   const std::vector<std::string>& symbols)
-      : m_req_id{req_id},
-        m_depth{depth},
-        m_snapshot{snapshot},
+  subscribe_book_t(req_id_t req_id, model::depth_t depth, bool snapshot,
+                   const std::vector<std::string> &symbols)
+      : m_req_id{req_id}, m_depth{depth}, m_snapshot{snapshot},
         m_symbols{symbols} {}
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
- private:
+private:
   req_id_t m_req_id;
   model::depth_t m_depth;
   bool m_snapshot;
@@ -66,19 +62,18 @@ struct subscribe_book_t final {
  * See https://docs.kraken.com/websockets-v2/#trade
  */
 struct subscribe_trade_t final {
-  subscribe_trade_t(req_id_t req_id,
-                    bool snapshot,
-                    const std::vector<std::string>& symbols)
+  subscribe_trade_t(req_id_t req_id, bool snapshot,
+                    const std::vector<std::string> &symbols)
       : m_req_id(req_id), m_snapshot(snapshot), m_symbols(symbols) {}
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
- private:
+private:
   req_id_t m_req_id;
   bool m_snapshot;
   std::vector<std::string> m_symbols;
 };
 
-}  // namespace request
-}  // namespace kdr
+} // namespace request
+} // namespace kdr

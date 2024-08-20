@@ -7,7 +7,7 @@
 namespace kdr {
 namespace response {
 
-trades_t trades_t::from_json(simdjson::ondemand::document& response) {
+trades_t trades_t::from_json(simdjson::ondemand::document &response) {
   auto result = trades_t{};
   auto buffer = std::string_view{};
 
@@ -30,7 +30,7 @@ boost::json::object trades_t::to_json_obj(integer_t price_precision,
   auto trades = boost::json::array();
   std::transform(
       m_trades.begin(), m_trades.end(), std::back_inserter(trades),
-      [price_precision, qty_precision](const model::trade_t& trade) {
+      [price_precision, qty_precision](const model::trade_t &trade) {
         const boost::json::object result = {
             {model::trade_t::c_ord_type, trade.ord_type()},
             {model::trade_t::c_price, trade.price().str(price_precision)},
@@ -49,5 +49,5 @@ boost::json::object trades_t::to_json_obj(integer_t price_precision,
   return result;
 }
 
-}  // namespace response
-}  // namespace kdr
+} // namespace response
+} // namespace kdr

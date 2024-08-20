@@ -15,10 +15,10 @@ struct metrics_t final {
 
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
- private:
+private:
   const timestamp_t m_stm = timestamp_t::now();
   size_t m_num_msgs = 0;
   size_t m_num_bytes = 0;
 };
 
-}  // namespace kdr
+} // namespace kdr
