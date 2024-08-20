@@ -15,6 +15,7 @@
 
 #include <optional>
 #include <string>
+#include <string_view>
 
 namespace kdr {
 namespace model {
@@ -57,7 +58,7 @@ bool operator!=(const {{ classname }}&) const = default;
   {% endif -%}
 {% endfor %}
 
-static {{ classname }} from_json(simdjson::ondemand::object&);
+static {{ classname }} from_json(simdjson::ondemand::object& obj);
 boost::json::object to_json_obj() const;
 
 std::string str() const { return boost::json::serialize(to_json_obj()); }

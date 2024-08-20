@@ -37,7 +37,7 @@ struct timestamp_t final {
     return from_iso_8601(std::string{view.data(), view.size()});
   }
 
-  static std::string to_iso_8601(int64_t);
+  static std::string to_iso_8601(int64_t micros);
 
   static timestamp_t now();
 
@@ -49,10 +49,10 @@ struct timestamp_t final {
 
 template <typename S>
 int64_t timestamp_t::from_iso_8601(S buffer) {
-  std::istringstream in{buffer};
-  date::sys_time<std::chrono::microseconds> tp;
-  in >> date::parse("%FT%TZ", tp);
-  const auto microseconds_since_epoch = tp.time_since_epoch().count();
+  std::istringstream ins{buffer};
+  date::sys_time<std::chrono::microseconds> tsp;
+  ins >> date::parse("%FT%TZ", tsp);
+  const auto microseconds_since_epoch = tsp.time_since_epoch().count();
   return microseconds_since_epoch;
 }
 
@@ -63,10 +63,10 @@ inline std::string timestamp_t::to_iso_8601(int64_t micros) {
   using std::chrono::time_point;
 
   const auto micros_since_epoch = microseconds{micros};
-  system_clock::time_point tp(
+  const system_clock::time_point mse_tp(
       duration_cast<system_clock::time_point::duration>(micros_since_epoch));
   std::ostringstream iso_time_ss;
-  auto gmt_tp = date::make_zoned("GMT", tp);
+  auto gmt_tp = date::make_zoned("GMT", mse_tp);
   iso_time_ss << date::format("%FT%TZ", gmt_tp);
   return iso_time_ss.str();
 }
