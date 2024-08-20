@@ -50,8 +50,8 @@ struct config_t final {
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
 
-  static config_t from_json(simdjson::ondemand::document &);
-  static config_t from_json_str(const std::string &);
+  static config_t from_json(simdjson::ondemand::document &doc);
+  static config_t from_json_str(const std::string &json_str);
 
   size_t ping_interval_secs() const { return m_ping_interval_secs; }
   std::string kraken_host() const { return m_kraken_host; }

@@ -114,7 +114,7 @@ config_t config_t::from_json(simdjson::ondemand::document &doc) {
 
 config_t config_t::from_json_str(const std::string &json_str) {
   simdjson::ondemand::parser parser;
-  simdjson::padded_string padded{json_str};
+  const simdjson::padded_string padded{json_str};
   simdjson::ondemand::document doc = parser.iterate(padded);
   return from_json(doc);
 }

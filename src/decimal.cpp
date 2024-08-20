@@ -7,7 +7,8 @@ namespace kdr {
 std::string format_frac_part(wide_float_t frac_part, integer_t precision) {
   std::string result;
   for (auto counter = 0; counter < precision; ++counter) {
-    frac_part *= 10;
+    static constexpr uint64_t frac_part_multiplier = 10;
+    frac_part *= frac_part_multiplier;
     const auto int_part = frac_part.convert_to<uint64_t>();
     result += std::to_string(int_part);
     frac_part -= int_part;
@@ -27,10 +28,11 @@ std::string decimal_t::str(integer_t precision) const {
       std::string str = "0.";
       str.append(precision, '0');
       return str;
-    } else {
-      return "0";
     }
-  } else if (m_value.sign() == -1) {
+    return "0";
+  }
+
+  if (m_value.sign() == -1) {
     const wide_float_t abs_value{-m_value};
     return "-" + abs_value.str(precision);
   }
@@ -51,7 +53,7 @@ void decimal_t::process(boost::crc_32_type &crc32, int64_t precision) const {
     if (in_trailing_digits && num_trailing_digits >= precision) {
       return;
     }
-    if (std::isdigit(ch)) {
+    if (std::isdigit(ch) != 0) {
       if (!in_leading_zeros) {
         crc32.process_byte(ch);
         if (in_trailing_digits) {
@@ -66,7 +68,6 @@ void decimal_t::process(boost::crc_32_type &crc32, int64_t precision) const {
       in_trailing_digits = true;
     }
   }
-  return;
 }
 
 } // namespace kdr
