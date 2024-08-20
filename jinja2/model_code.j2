@@ -7,7 +7,6 @@
 #include "{{ class }}.hpp"
 
 #include <array>
-#include <string_view>
 
 namespace kdr {
 namespace model {
@@ -36,7 +35,7 @@ namespace model {
 {% endfor -%}
 ) :
 {% for member in members -%}
-  m_{{ member.name }}({{ member.name }}){% if not loop.last %},{% endif %}
+  m_{{ member.name }}({{ member.name }}){% if not loop.last %},{% endif %} // NOLINT(performance-unnecessary-value-param)
 {% endfor -%}
 {}
 

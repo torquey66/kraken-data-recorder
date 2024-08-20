@@ -7,6 +7,7 @@
 #include "types.hpp"
 
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 namespace kdr {
@@ -28,9 +29,9 @@ enum {{ classname }} : {{ type }} {
 {% endfor -%}
 };
 
-{{ classname }} str_to_{{ cpp_access_type }}(std::string);
-{{ classname }} str_view_to_{{ cpp_access_type }}(std::string_view);
-std::string {{ cpp_access_type }}_to_str({{ classname }});
+{{ classname }} str_to_{{ cpp_access_type }}(const std::string& str);
+{{ classname }} str_view_to_{{ cpp_access_type }}(std::string_view view);
+std::string {{ cpp_access_type }}_to_str({{ classname }} value);
 
 } // model
 } // kdr
