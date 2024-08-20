@@ -15,14 +15,23 @@ namespace kdr {
 struct config_t final {
   using symbol_filter_t = std::unordered_set<std::string>;
 
-  static constexpr char c_book_depth[] = "book_depth";
-  static constexpr char c_capture_book[] = "capture_book";
-  static constexpr char c_capture_trades[] = "capture_trades";
-  static constexpr char c_kraken_host[] = "kraken_host";
-  static constexpr char c_kraken_port[] = "kraken_port";
-  static constexpr char c_pair_filter[] = "pair_filter";
-  static constexpr char c_parquet_dir[] = "parquet_dir";
-  static constexpr char c_ping_interval_secs[] = "ping_interval_secs";
+  static const std::string_view c_book_depth;
+  static const std::string_view c_capture_book;
+  static const std::string_view c_capture_trades;
+  static const std::string_view c_kraken_host;
+  static const std::string_view c_kraken_port;
+  static const std::string_view c_pair_filter;
+  static const std::string_view c_parquet_dir;
+  static const std::string_view c_ping_interval_secs;
+
+  static const std::string c_book_depth_str;
+  static const std::string c_capture_book_str;
+  static const std::string c_capture_trades_str;
+  static const std::string c_kraken_host_str;
+  static const std::string c_kraken_port_str;
+  static const std::string c_pair_filter_str;
+  static const std::string c_parquet_dir_str;
+  static const std::string c_ping_interval_secs_str;
 
   config_t() {}
 
@@ -35,10 +44,10 @@ struct config_t final {
            bool capture_book,
            bool capture_trades)
       : m_ping_interval_secs{ping_interval_secs},
-        m_kraken_host{kraken_host},
-        m_kraken_port{kraken_port},
-        m_pair_filter(pair_filter),
-        m_parquet_dir{parquet_dir},
+        m_kraken_host{std::move(kraken_host)},
+        m_kraken_port{std::move(kraken_port)},
+        m_pair_filter{std::move(pair_filter)},
+        m_parquet_dir{std::move(parquet_dir)},
         m_book_depth{book_depth},
         m_capture_book{capture_book},
         m_capture_trades{capture_trades} {}
@@ -60,7 +69,9 @@ struct config_t final {
   bool capture_trades() const { return m_capture_trades; }
 
  private:
-  size_t m_ping_interval_secs = 30;
+  static constexpr size_t c_default_ping_interval_secs = 30;
+
+  size_t m_ping_interval_secs = c_default_ping_interval_secs;
   std::string m_kraken_host = "ws.kraken.com";
   std::string m_kraken_port = "443";
   symbol_filter_t m_pair_filter;
