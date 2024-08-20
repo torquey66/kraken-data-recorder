@@ -3,8 +3,8 @@
 #include "header.hpp"
 #include "types.hpp"
 
-#include <simdjson.h>
 #include <boost/json.hpp>
+#include <simdjson.h>
 
 #include <string>
 #include <string_view>
@@ -35,21 +35,17 @@ struct book_t final {
   static const std::string_view c_update;
 
   book_t() = default;
-  book_t(const header_t&,
-         const asks_t&,
-         const bids_t&,
-         uint64_t,
-         std::string,
-         timestamp_t);
+  book_t(const header_t &header, const asks_t &asks, const bids_t &bids,
+         uint64_t crc32, std::string symbol, timestamp_t timestamp);
 
-  const header_t& header() const { return m_header; }
-  const bids_t& bids() const { return m_bids; }
-  const asks_t& asks() const { return m_asks; }
+  const header_t &header() const { return m_header; }
+  const bids_t &bids() const { return m_bids; }
+  const asks_t &asks() const { return m_asks; }
   uint64_t crc32() const { return m_crc32; }
-  const std::string& symbol() const { return m_symbol; }
+  const std::string &symbol() const { return m_symbol; }
   timestamp_t timestamp() const { return m_timestamp; }
 
-  static book_t from_json(simdjson::ondemand::document&);
+  static book_t from_json(simdjson::ondemand::document &response);
 
   boost::json::object to_json_obj(integer_t price_precision,
                                   integer_t qty_precision) const;
@@ -57,14 +53,14 @@ struct book_t final {
     return boost::json::serialize(to_json_obj(price_precision, qty_precision));
   }
 
- private:
+private:
   header_t m_header;
   asks_t m_asks;
   bids_t m_bids;
-  uint64_t m_crc32;
+  uint64_t m_crc32 = 0;
   std::string m_symbol;
   timestamp_t m_timestamp;
 };
 
-}  // namespace response
-}  // namespace kdr
+} // namespace response
+} // namespace kdr
