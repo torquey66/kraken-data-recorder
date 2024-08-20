@@ -18,7 +18,12 @@ session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context,
                      const config_t &config)
     : m_ioc{ioc}, m_resolver{m_ioc}, m_ws{ioc, ssl_context},
       m_ping_timer{m_ioc}, m_config{config} {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
+  if (m_config.ping_interval_secs() < 1) {
+    BOOST_LOG_TRIVIAL(error)
+        << __FUNCTION__
+        << " ping_interval_secs (=" << m_config.ping_interval_secs()
+        << ") must be at least one";
+  }
 }
 
 void session_t::fail(bst::error_code ec, char const *what) {
@@ -27,8 +32,6 @@ void session_t::fail(bst::error_code ec, char const *what) {
 }
 
 void session_t::start_processing(const recv_cb_t &handle_recv) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
-
   m_handle_recv = handle_recv;
   m_keep_processing = true;
   m_resolver.async_resolve(m_config.kraken_host(), m_config.kraken_port(),
