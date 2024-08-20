@@ -21,17 +21,15 @@ struct timestamp_t final {
   timestamp_t() {}
   timestamp_t(int64_t in_micros) : m_micros{in_micros} {}
 
-  template <typename S>
-  timestamp_t(S str) : m_micros{from_iso_8601(str)} {}
+  template <typename S> timestamp_t(S str) : m_micros{from_iso_8601(str)} {}
 
-  auto operator<=>(const timestamp_t&) const = default;
+  auto operator<=>(const timestamp_t &) const = default;
 
   std::string str() const { return to_iso_8601(m_micros); };
 
   int64_t micros() const { return m_micros; }
 
-  template <typename S>
-  static int64_t from_iso_8601(S buffer);
+  template <typename S> static int64_t from_iso_8601(S buffer);
 
   static int64_t from_iso_8601(std::string_view view) {
     return from_iso_8601(std::string{view.data(), view.size()});
@@ -41,14 +39,13 @@ struct timestamp_t final {
 
   static timestamp_t now();
 
- private:
+private:
   int64_t m_micros = 0;
 };
 
 /******************************************************************************/
 
-template <typename S>
-int64_t timestamp_t::from_iso_8601(S buffer) {
+template <typename S> int64_t timestamp_t::from_iso_8601(S buffer) {
   std::istringstream ins{buffer};
   date::sys_time<std::chrono::microseconds> tsp;
   ins >> date::parse("%FT%TZ", tsp);
@@ -78,4 +75,4 @@ inline timestamp_t timestamp_t::now() {
   return timestamp_t{micros};
 }
 
-}  // namespace kdr
+} // namespace kdr

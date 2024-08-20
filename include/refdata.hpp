@@ -17,14 +17,14 @@ struct refdata_t final {
     integer_t qty_precision = 0;
   };
 
-  void accept(const response::instrument_t&);
+  void accept(const response::instrument_t &);
 
-  std::optional<pair_precision_t> pair_precision(const std::string&) const;
+  std::optional<pair_precision_t> pair_precision(const std::string &) const;
 
- private:
+private:
   std::unordered_map<std::string, asset_t> m_assets;
   std::unordered_map<std::string, pair_t> m_pairs;
 };
 
-}  // namespace model
-}  // namespace kdr
+} // namespace model
+} // namespace kdr

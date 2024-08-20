@@ -5,7 +5,7 @@
 namespace kdr {
 namespace response {
 
-instrument_t instrument_t::from_json(simdjson::ondemand::document& response) {
+instrument_t instrument_t::from_json(simdjson::ondemand::document &response) {
   auto result = instrument_t{};
   auto buffer = std::string_view{};
 
@@ -34,11 +34,11 @@ boost::json::object instrument_t::to_json_obj() const {
   auto assets = boost::json::array{};
   std::transform(
       m_assets.begin(), m_assets.end(), std::back_inserter(assets),
-      [](const model::asset_t& asset) { return asset.to_json_obj(); });
+      [](const model::asset_t &asset) { return asset.to_json_obj(); });
 
   auto pairs = boost::json::array{};
   std::transform(m_pairs.begin(), m_pairs.end(), std::back_inserter(pairs),
-                 [](const model::pair_t& pair) { return pair.to_json_obj(); });
+                 [](const model::pair_t &pair) { return pair.to_json_obj(); });
 
   auto data = boost::json::object{};
   data[c_instrument_pairs] = pairs;
@@ -51,5 +51,5 @@ boost::json::object instrument_t::to_json_obj() const {
   return result;
 }
 
-}  // namespace response
-}  // namespace kdr
+} // namespace response
+} // namespace kdr

@@ -56,7 +56,7 @@ book_t::book_t(const header_t &header, const asks_t &asks, const bids_t &bids,
     : m_header(header), m_asks(asks), m_bids(bids), m_crc32(crc32),
       m_symbol(std::move(symbol)), m_timestamp(timestamp) {}
 
-book_t book_t::from_json(simdjson::ondemand::document& response) {
+book_t book_t::from_json(simdjson::ondemand::document &response) {
   auto result = book_t{};
   auto buffer = std::string_view{};
 
@@ -111,7 +111,7 @@ boost::json::object book_t::to_json_obj(integer_t price_precision,
                                         integer_t qty_precision) const {
   auto asks = boost::json::array();
   std::transform(m_asks.begin(), m_asks.end(), std::back_inserter(asks),
-                 [price_precision, qty_precision](const ask_t& ask) {
+                 [price_precision, qty_precision](const ask_t &ask) {
                    const boost::json::object result = {
                        {c_price, ask.first.double_value(price_precision)},
                        {c_qty, ask.second.double_value(qty_precision)}};
@@ -120,7 +120,7 @@ boost::json::object book_t::to_json_obj(integer_t price_precision,
 
   auto bids = boost::json::array();
   std::transform(m_bids.begin(), m_bids.end(), std::back_inserter(bids),
-                 [price_precision, qty_precision](const bid_t& bid) {
+                 [price_precision, qty_precision](const bid_t &bid) {
                    const boost::json::object result = {
                        {c_price, bid.first.double_value(price_precision)},
                        {c_qty, bid.second.double_value(qty_precision)}};
@@ -144,5 +144,5 @@ boost::json::object book_t::to_json_obj(integer_t price_precision,
   return result;
 }
 
-}  // namespace response
-}  // namespace kdr
+} // namespace response
+} // namespace kdr

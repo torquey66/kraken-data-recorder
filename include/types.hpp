@@ -1,7 +1,7 @@
 #pragma once
 
 #include "decimal.hpp"
-#include "timestamp.hpp"  // !@# TODO: remove this and include timestamp only where it is required
+#include "timestamp.hpp" // !@# TODO: remove this and include timestamp only where it is required
 
 #include <cstdint>
 #include <string_view>
@@ -30,4 +30,4 @@ using quote_t = std::pair<price_t, qty_t>;
 using ask_t = quote_t;
 using bid_t = quote_t;
 
-}  // namespace kdr
+} // namespace kdr

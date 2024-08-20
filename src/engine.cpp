@@ -6,17 +6,16 @@
 #include "instrument.hpp"
 #include "requests.hpp"
 
-#include <simdjson.h>
 #include <boost/log/trivial.hpp>
+#include <simdjson.h>
 
 #include <algorithm>
 #include <vector>
 
 namespace kdr {
 
-engine_t::engine_t(session_t& session,
-                   const config_t& config,
-                   const sink_t& sink)
+engine_t::engine_t(session_t &session, const config_t &config,
+                   const sink_t &sink)
     : m_session{session}, m_config{config}, m_sink(sink) {}
 
 bool engine_t::handle_msg(msg_t msg) {
@@ -54,7 +53,7 @@ bool engine_t::handle_msg(msg_t msg) {
           << ": unexpected message: " << simdjson::to_json_string(doc);
     }
 
-  } catch (const std::exception& ex) {
+  } catch (const std::exception &ex) {
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__ << ": " << ex.what() << " msg: " << msg;
     return false;
@@ -63,7 +62,7 @@ bool engine_t::handle_msg(msg_t msg) {
   return true;
 }
 
-bool engine_t::handle_instrument_msg(doc_t& doc) {
+bool engine_t::handle_instrument_msg(doc_t &doc) {
   auto buffer = std::string_view{};
   if (doc[response::header_t::c_type].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
@@ -81,20 +80,20 @@ bool engine_t::handle_instrument_msg(doc_t& doc) {
   return false;
 }
 
-bool engine_t::handle_instrument_snapshot(doc_t& doc) {
+bool engine_t::handle_instrument_snapshot(doc_t &doc) {
   const auto response = response::instrument_t::from_json(doc);
   m_sink.accept(response);
 
-  const auto& pairs = response.pairs();
+  const auto &pairs = response.pairs();
   auto symbols = std::vector<std::string>{};
   std::transform(pairs.begin(), pairs.end(), std::back_inserter(symbols),
-                 [](const auto& pair) { return pair.symbol(); });
+                 [](const auto &pair) { return pair.symbol(); });
 
-  const auto& pair_filter = m_config.pair_filter();
+  const auto &pair_filter = m_config.pair_filter();
   if (!pair_filter.empty()) {
     const auto end =
         std::remove_if(symbols.begin(), symbols.end(),
-                       [&pair_filter](const std::string& symbol) {
+                       [&pair_filter](const std::string &symbol) {
                          return pair_filter.find(symbol) == pair_filter.end();
                        });
     symbols.erase(end, symbols.end());
@@ -115,13 +114,13 @@ bool engine_t::handle_instrument_snapshot(doc_t& doc) {
   return true;
 }
 
-bool engine_t::handle_instrument_update(doc_t& doc) {
+bool engine_t::handle_instrument_update(doc_t &doc) {
   const auto response = response::instrument_t::from_json(doc);
   m_sink.accept(response);
   return true;
 }
 
-bool engine_t::handle_book_msg(doc_t& doc) {
+bool engine_t::handle_book_msg(doc_t &doc) {
   auto buffer = std::string_view{};
   if (doc[response::header_t::c_type].get(buffer) != simdjson::SUCCESS) {
     BOOST_LOG_TRIVIAL(error)
@@ -140,18 +139,18 @@ bool engine_t::handle_book_msg(doc_t& doc) {
   return true;
 }
 
-bool engine_t::handle_trade_msg(doc_t& doc) {
+bool engine_t::handle_trade_msg(doc_t &doc) {
   const auto response = response::trades_t::from_json(doc);
   m_sink.accept(response);
   return true;
 }
 
-bool engine_t::handle_heartbeat_msg(doc_t&) {
+bool engine_t::handle_heartbeat_msg(doc_t &) {
   // !@# TODO: track a stat on time between heartbeats?
   return true;
 }
 
-bool engine_t::handle_pong_msg(doc_t& /*doc*/) {
+bool engine_t::handle_pong_msg(doc_t & /*doc*/) {
   // !@# TODO: track ping/pong latency
   if (!m_subscribed) {
     const request::subscribe_instrument_t subscribe_inst{++m_inst_req_id};
@@ -162,4 +161,4 @@ bool engine_t::handle_pong_msg(doc_t& /*doc*/) {
   return true;
 }
 
-}  // namespace kdr
+} // namespace kdr

@@ -17,4 +17,4 @@ boost::json::object metrics_t::to_json_obj() const {
   return result;
 }
 
-}  // namespace kdr
+} // namespace kdr

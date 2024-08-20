@@ -42,7 +42,7 @@ std::string decimal_t::str(integer_t precision) const {
   return int_str + (frac_str.empty() ? "" : "." + frac_str);
 }
 
-void decimal_t::process(boost::crc_32_type& crc32, int64_t precision) const {
+void decimal_t::process(boost::crc_32_type &crc32, int64_t precision) const {
   const auto chars = str(precision);
   auto in_leading_zeros = true;
   auto in_trailing_digits = false;
@@ -69,4 +69,4 @@ void decimal_t::process(boost::crc_32_type& crc32, int64_t precision) const {
   return;
 }
 
-}  // namespace kdr
+} // namespace kdr

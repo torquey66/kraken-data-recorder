@@ -15,9 +15,9 @@ namespace response {
 struct trades_t final {
   trades_t() = default;
 
-  const header_t& header() const { return m_header; }
+  const header_t &header() const { return m_header; }
 
-  static trades_t from_json(simdjson::ondemand::document&);
+  static trades_t from_json(simdjson::ondemand::document &);
 
   boost::json::object to_json_obj(integer_t price_precision,
                                   integer_t qty_precision) const;
@@ -29,10 +29,10 @@ struct trades_t final {
   auto end() const { return m_trades.end(); }
   auto size() const { return m_trades.size(); }
 
- private:
+private:
   header_t m_header;
   std::vector<model::trade_t> m_trades;
 };
 
-}  // namespace response
-}  // namespace kdr
+} // namespace response
+} // namespace kdr

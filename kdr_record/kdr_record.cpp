@@ -23,13 +23,13 @@ namespace po = boost::program_options;
 
 bool shutting_down = false;
 
-void signal_handler(const boost::system::error_code& ec, int signal_number) {
+void signal_handler(const boost::system::error_code &ec, int signal_number) {
   BOOST_LOG_TRIVIAL(error) << "received signal_number: " << signal_number
                            << " error: " << ec.message() << " -- shutting down";
   shutting_down = true;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   boost::asio::io_context ioc;
   try {
     po::options_description desc(
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
         boost::json::parse(vm[config_t::c_pair_filter_str].as<std::string>())
             .as_array()};
     config_t::symbol_filter_t pair_filter;
-    for (const auto& symbol : pair_filter_json) {
+    for (const auto &symbol : pair_filter_json) {
       pair_filter.insert(
           std::string{symbol.get_string().data(), symbol.get_string().size()});
     }
@@ -104,11 +104,11 @@ int main(int argc, char* argv[]) {
 
     const auto accept_instrument =
         [&level_book, &assets_sink, &pairs_sink,
-         &refdata](const kdr::response::instrument_t& response) {
+         &refdata](const kdr::response::instrument_t &response) {
           assets_sink.accept(response.header(), response.assets());
           pairs_sink.accept(response.header(), response.pairs());
           refdata.accept(response);
-          for (const auto& pair : response.pairs()) {
+          for (const auto &pair : response.pairs()) {
             level_book.accept(pair);
             BOOST_LOG_TRIVIAL(debug)
                 << "created/updated book for symbol: " << pair.symbol();
@@ -116,16 +116,16 @@ int main(int argc, char* argv[]) {
         };
 
     // !@# TODO: replace use of level book with refdata
-    const auto noop_accept_book = [](const kdr::response::book_t&) {};
+    const auto noop_accept_book = [](const kdr::response::book_t &) {};
     const auto accept_book = [&book_sink, &level_book,
-                              &refdata](const kdr::response::book_t& response) {
+                              &refdata](const kdr::response::book_t &response) {
       book_sink.accept(response, refdata);
       level_book.accept(response);
     };
 
-    const auto noop_accept_trades = [](const kdr::response::trades_t&) {};
+    const auto noop_accept_trades = [](const kdr::response::trades_t &) {};
     const auto accept_trades =
-        [&trades_sink, &refdata](const kdr::response::trades_t& response) {
+        [&trades_sink, &refdata](const kdr::response::trades_t &response) {
           trades_sink.accept(response, refdata);
         };
     const kdr::sink_t sink{
@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
     const auto handle_recv = [&engine](kdr::msg_t msg) {
       try {
         return engine.handle_msg(msg);
-      } catch (const std::exception& ex) {
+      } catch (const std::exception &ex) {
         BOOST_LOG_TRIVIAL(error) << ex.what();
         return false;
       }
@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
     }
     BOOST_LOG_TRIVIAL(error) << "session.stop_processing()";
     session.stop_processing();
-  } catch (const std::exception& ex) {
+  } catch (const std::exception &ex) {
     ioc.stop();
     BOOST_LOG_TRIVIAL(error) << ex.what();
     return EXIT_FAILURE;

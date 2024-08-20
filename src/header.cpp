@@ -27,5 +27,5 @@ boost::json::object header_t::to_json_obj() const {
   return result;
 }
 
-}  // namespace response
-}  // namespace kdr
+} // namespace response
+} // namespace kdr

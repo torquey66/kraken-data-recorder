@@ -9,7 +9,7 @@ std::string to_string(std::string_view sv) {
   return std::string{sv.data(), sv.size()};
 }
 
-}  // namespace
+} // namespace
 
 namespace kdr {
 
@@ -68,7 +68,7 @@ boost::json::object config_t::to_json_obj() const {
   std::transform(
       pair_filter().begin(), pair_filter().end(),
       std::back_inserter(pair_filter_array),
-      [](const std::string& pair) { return boost::json::string{pair}; });
+      [](const std::string &pair) { return boost::json::string{pair}; });
 
   const boost::json::object result = {
       {c_book_depth, book_depth()},
@@ -83,7 +83,7 @@ boost::json::object config_t::to_json_obj() const {
   return result;
 }
 
-config_t config_t::from_json(simdjson::ondemand::document& doc) {
+config_t config_t::from_json(simdjson::ondemand::document &doc) {
   config_t result;
 
   simdjson::ondemand::value optional_val;
@@ -112,11 +112,11 @@ config_t config_t::from_json(simdjson::ondemand::document& doc) {
   return result;
 }
 
-config_t config_t::from_json_str(const std::string& json_str) {
+config_t config_t::from_json_str(const std::string &json_str) {
   simdjson::ondemand::parser parser;
   simdjson::padded_string padded{json_str};
   simdjson::ondemand::document doc = parser.iterate(padded);
   return from_json(doc);
 }
 
-}  // namespace kdr
+} // namespace kdr
