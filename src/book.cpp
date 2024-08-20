@@ -6,13 +6,13 @@
 namespace {
 
 template <typename O>
-kdr::decimal_t extract_decimal(O& obj, std::string_view field) {
+kdr::decimal_t extract_decimal(O &obj, std::string_view field) {
   const auto token = std::string_view{obj[field].raw_json_token()};
   const auto result = kdr::decimal_t{token};
   return result;
 }
 
-}  // namespace
+} // namespace
 
 namespace kdr {
 namespace response {
@@ -51,18 +51,10 @@ const std::string_view book_t::c_snapshot{c_snapshot_value.data(),
 const std::string_view book_t::c_update{c_update_value.data(),
                                         c_update_value.size() - 1};
 
-book_t::book_t(const header_t& header,
-               const asks_t& asks,
-               const bids_t& bids,
-               uint64_t crc32,
-               std::string symbol,
-               timestamp_t timestamp)
-    : m_header(header),
-      m_asks(asks),
-      m_bids(bids),
-      m_crc32(crc32),
-      m_symbol(symbol),
-      m_timestamp(timestamp) {}
+book_t::book_t(const header_t &header, const asks_t &asks, const bids_t &bids,
+               uint64_t crc32, std::string symbol, timestamp_t timestamp)
+    : m_header(header), m_asks(asks), m_bids(bids), m_crc32(crc32),
+      m_symbol(std::move(symbol)), m_timestamp(timestamp) {}
 
 book_t book_t::from_json(simdjson::ondemand::document& response) {
   auto result = book_t{};
