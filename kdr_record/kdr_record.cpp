@@ -40,14 +40,14 @@ int main(int argc, char* argv[]) {
     // clang-format off
     desc.add_options()
       ("help", "display program options")
-      (config_t::c_ping_interval_secs, po::value<size_t>()->default_value(30), "ping/pong delay")
-      (config_t::c_kraken_host, po::value<std::string>()->default_value("ws.kraken.com"), "Kraken websocket host")
-      (config_t::c_kraken_port, po::value<std::string>()->default_value("443"), "Kraken websocket port")
-      (config_t::c_pair_filter, po::value<std::string>()->default_value("[]"), "explicit list of pairs to subscribe to as json string")
-      (config_t::c_parquet_dir, po::value<std::string>()->default_value("/tmp"), "directory in which to write parquet output")
-      (config_t::c_book_depth, po::value<int64_t>()->default_value(1000), "one of {10, 25, 100, 500, 1000}")
-      (config_t::c_capture_book, po::value<bool>()->default_value(true), "subscribe to and record level book")
-      (config_t::c_capture_trades, po::value<bool>()->default_value(true), "subscribe to and record trades")
+      (config_t::c_ping_interval_secs_str.c_str(), po::value<size_t>()->default_value(30), "ping/pong delay")
+      (config_t::c_kraken_host_str.c_str(), po::value<std::string>()->default_value("ws.kraken.com"), "Kraken websocket host")
+      (config_t::c_kraken_port_str.c_str(), po::value<std::string>()->default_value("443"), "Kraken websocket port")
+      (config_t::c_pair_filter_str.c_str(), po::value<std::string>()->default_value("[]"), "explicit list of pairs to subscribe to as json string")
+      (config_t::c_parquet_dir_str.c_str(), po::value<std::string>()->default_value("/tmp"), "directory in which to write parquet output")
+      (config_t::c_book_depth_str.c_str(), po::value<int64_t>()->default_value(1000), "one of {10, 25, 100, 500, 1000}")
+      (config_t::c_capture_book_str.c_str(), po::value<bool>()->default_value(true), "subscribe to and record level book")
+      (config_t::c_capture_trades_str.c_str(), po::value<bool>()->default_value(true), "subscribe to and record trades")
     ;
     // clang-format on
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     }
 
     const boost::json::array pair_filter_json{
-        boost::json::parse(vm[config_t::c_pair_filter].as<std::string>())
+        boost::json::parse(vm[config_t::c_pair_filter_str].as<std::string>())
             .as_array()};
     config_t::symbol_filter_t pair_filter;
     for (const auto& symbol : pair_filter_json) {
@@ -68,15 +68,15 @@ int main(int argc, char* argv[]) {
           std::string{symbol.get_string().data(), symbol.get_string().size()});
     }
 
-    const auto config =
-        config_t{vm[config_t::c_ping_interval_secs].as<size_t>(),
-                 vm[config_t::c_kraken_host].as<std::string>(),
-                 vm[config_t::c_kraken_port].as<std::string>(),
-                 pair_filter,
-                 vm[config_t::c_parquet_dir].as<std::string>(),
-                 kdr::model::depth_t{vm[config_t::c_book_depth].as<int64_t>()},
-                 vm[config_t::c_capture_book].as<bool>(),
-                 vm[config_t::c_capture_trades].as<bool>()};
+    const auto config = config_t{
+        vm[config_t::c_ping_interval_secs_str].as<size_t>(),
+        vm[config_t::c_kraken_host_str].as<std::string>(),
+        vm[config_t::c_kraken_port_str].as<std::string>(),
+        pair_filter,
+        vm[config_t::c_parquet_dir_str].as<std::string>(),
+        kdr::model::depth_t{vm[config_t::c_book_depth_str].as<int64_t>()},
+        vm[config_t::c_capture_book_str].as<bool>(),
+        vm[config_t::c_capture_trades_str].as<bool>()};
 
     BOOST_LOG_TRIVIAL(info) << kdr::c_license;
     BOOST_LOG_TRIVIAL(info) << "starting up with config: " << config.str();
