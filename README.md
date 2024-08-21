@@ -115,6 +115,20 @@ make -j
 ctest
 ```
 
+### clang-tidy
+
+Static checking via `clang-tidy` is currently a work in progress.
+- There is a `.clang-tidy` file for the project which currently
+  disables a few problematic checks.
+- Over time this should evolve into a more complete set of appropriate
+  checks.
+- `clang-tidy` is not currently part of the CI pipeline.
+- To run manually:
+  - `cd build`
+  - `cmake` with the `-DCMAKE_EXPORT_COMPILE_COMMANDS=1` flag
+  - `clang-tidy -header-filter=.* -p=compile_commands.json $(find ../src -name '*.cpp')`
+
+
 ## License
 kraken-data-recorder © 2023 by John C. Finley is licensed under
 Creative Commons Attribution-NoDerivatives 4.0 International. To view
