@@ -19,7 +19,8 @@ const std::string_view header_t::c_type{c_type_field.data(),
                                         c_type_field.size() - 1};
 
 header_t::header_t(timestamp_t recv_tm, std::string channel, std::string type)
-    : m_recv_tm(recv_tm), m_channel(channel), m_type(type) {}
+    : m_recv_tm(recv_tm), m_channel(std::move(channel)),
+      m_type(std::move(type)) {}
 
 boost::json::object header_t::to_json_obj() const {
   const boost::json::object result = {
