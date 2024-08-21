@@ -17,7 +17,7 @@ namespace model {
 {% set cpp_access_type = types.cpp_access_types[class] -%}
 
 {% for enum_value in  enum_values -%}
-static constexpr char c_{{ class }}_{{ enum_value.name }}[] = "{{ enum_value.name }}";
+static constexpr std::string_view c_{{ class }}_{{ enum_value.name }} = "{{ enum_value.name }}";
 {% endfor %}
 
 /**

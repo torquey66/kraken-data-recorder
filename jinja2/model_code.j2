@@ -6,24 +6,10 @@
 
 #include "{{ class }}.hpp"
 
-#include <array>
-
 namespace kdr {
 namespace model {
 
 {% set classname = class ~ '_t' %}
-
-{% for member in members -%}
-  static constexpr auto c_{{ member.name }}_field = std::to_array("{{ member.name }}" );
-{% endfor %}
-
-{% for member in members -%}
-  const std::string_view {{ classname }}::c_{{ member.name }}{ c_{{ member.name }}_field.data(), c_{{ member.name }}_field.size() - 1 };
-{% endfor %}
-
-{% for member in members -%}
-  const std::string {{ classname }}::c_{{ member.name }}_str{ c_{{ member.name }}_field.data(), c_{{ member.name }}_field.size() - 1 };
-{% endfor %}
 
 {{ classname }}::{{ classname }}(
 {% for member in members -%}

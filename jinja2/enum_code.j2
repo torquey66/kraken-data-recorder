@@ -13,14 +13,14 @@ namespace model {
 static const std::unordered_map<std::string, {{ classname }} >
    c_str_to_{{ class }} = {
 {% for enum_value in  enum_values -%}
-   { c_{{ class }}_{{ enum_value.name }}, {{ class }}_{{ enum_value.name }} },
+   { std::string{c_{{ class }}_{{ enum_value.name }}}, {{ class }}_{{ enum_value.name }} },
 {% endfor -%}
 };
 
 static const std::unordered_map<{{ classname }}, std::string>
    c_{{ class }}_to_str = {
 {% for enum_value in  enum_values -%}
-   { {{ class }}_{{ enum_value.name }}, c_{{ class }}_{{ enum_value.name }} },
+   { {{ class }}_{{ enum_value.name }}, std::string{c_{{ class }}_{{ enum_value.name }}} },
 {% endfor -%}
 };
 
@@ -40,7 +40,7 @@ return str_to_{{ cpp_access_type }}(str);
 std::string {{ cpp_access_type }}_to_str({{ classname }} value) {
 const auto it = c_{{ class }}_to_str.find(value);
 if (it == c_{{ class }}_to_str.end()) {
-   return c_{{ class }}_invalid; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+   return std::string{ c_{{ class }}_invalid };
 }
 return it->second;
 }

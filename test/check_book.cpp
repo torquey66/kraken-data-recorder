@@ -76,46 +76,46 @@ void process_pairs(std::string pairs_filename,
     const auto &batch = *maybe_batch.ValueOrDie();
 
     const auto base_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName(model::pair_t::c_base_str));
+        batch.GetColumnByName(model::pair_t::c_base.data()));
     const auto cost_min_array = std::dynamic_pointer_cast<arrow::DoubleArray>(
-        batch.GetColumnByName(model::pair_t::c_cost_min_str));
+        batch.GetColumnByName(model::pair_t::c_cost_min.data()));
     const auto cost_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(model::pair_t::c_cost_precision_str));
+            batch.GetColumnByName(model::pair_t::c_cost_precision.data()));
     const auto has_index_array = std::dynamic_pointer_cast<arrow::BooleanArray>(
-        batch.GetColumnByName(model::pair_t::c_has_index_str));
+        batch.GetColumnByName(model::pair_t::c_has_index.data()));
     const auto margin_initial_array =
         std::dynamic_pointer_cast<arrow::DoubleArray>(
-            batch.GetColumnByName(model::pair_t::c_margin_initial_str));
+            batch.GetColumnByName(model::pair_t::c_margin_initial.data()));
     const auto marginable_array =
         std::dynamic_pointer_cast<arrow::BooleanArray>(
-            batch.GetColumnByName(model::pair_t::c_marginable_str));
+            batch.GetColumnByName(model::pair_t::c_marginable.data()));
     const auto position_limit_long_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(model::pair_t::c_position_limit_long_str));
+            batch.GetColumnByName(model::pair_t::c_position_limit_long.data()));
     const auto position_limit_short_array =
-        std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(model::pair_t::c_position_limit_short_str));
+        std::dynamic_pointer_cast<arrow::Int64Array>(batch.GetColumnByName(
+            model::pair_t::c_position_limit_short.data()));
     const auto price_increment_array =
         std::dynamic_pointer_cast<arrow::DoubleArray>(
-            batch.GetColumnByName(model::pair_t::c_price_increment_str));
+            batch.GetColumnByName(model::pair_t::c_price_increment.data()));
     const auto price_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(model::pair_t::c_price_precision_str));
+            batch.GetColumnByName(model::pair_t::c_price_precision.data()));
     const auto qty_increment_array =
         std::dynamic_pointer_cast<arrow::DoubleArray>(
-            batch.GetColumnByName(model::pair_t::c_qty_increment_str));
+            batch.GetColumnByName(model::pair_t::c_qty_increment.data()));
     const auto qty_min_array = std::dynamic_pointer_cast<arrow::DoubleArray>(
-        batch.GetColumnByName(model::pair_t::c_qty_min_str));
+        batch.GetColumnByName(model::pair_t::c_qty_min.data()));
     const auto qty_precision_array =
         std::dynamic_pointer_cast<arrow::Int64Array>(
-            batch.GetColumnByName(model::pair_t::c_qty_precision_str));
+            batch.GetColumnByName(model::pair_t::c_qty_precision.data()));
     const auto quote_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName(model::pair_t::c_quote_str));
+        batch.GetColumnByName(model::pair_t::c_quote.data()));
     const auto status_array = std::dynamic_pointer_cast<arrow::Int8Array>(
-        batch.GetColumnByName(model::pair_t::c_status_str));
+        batch.GetColumnByName(model::pair_t::c_status.data()));
     const auto symbol_array = std::dynamic_pointer_cast<arrow::StringArray>(
-        batch.GetColumnByName(model::pair_t::c_symbol_str));
+        batch.GetColumnByName(model::pair_t::c_symbol.data()));
 
     for (auto idx = 0; idx < batch.num_rows(); ++idx) {
       const auto base = base_array->Value(idx);
