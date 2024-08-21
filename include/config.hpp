@@ -15,23 +15,14 @@ namespace kdr {
 struct config_t final {
   using symbol_filter_t = std::unordered_set<std::string>;
 
-  static const std::string_view c_book_depth;
-  static const std::string_view c_capture_book;
-  static const std::string_view c_capture_trades;
-  static const std::string_view c_kraken_host;
-  static const std::string_view c_kraken_port;
-  static const std::string_view c_pair_filter;
-  static const std::string_view c_parquet_dir;
-  static const std::string_view c_ping_interval_secs;
-
-  static const std::string c_book_depth_str;
-  static const std::string c_capture_book_str;
-  static const std::string c_capture_trades_str;
-  static const std::string c_kraken_host_str;
-  static const std::string c_kraken_port_str;
-  static const std::string c_pair_filter_str;
-  static const std::string c_parquet_dir_str;
-  static const std::string c_ping_interval_secs_str;
+  static constexpr std::string_view c_book_depth = "book_depth";
+  static constexpr std::string_view c_capture_book = "capture_book";
+  static constexpr std::string_view c_capture_trades = "capture_trades";
+  static constexpr std::string_view c_kraken_host = "kraken_host";
+  static constexpr std::string_view c_kraken_port = "kraken_port";
+  static constexpr std::string_view c_pair_filter = "pair_filter";
+  static constexpr std::string_view c_parquet_dir = "parquet_dir";
+  static constexpr std::string_view c_ping_interval_secs = "ping_interval_secs";
 
   config_t() {}
 

@@ -13,56 +13,6 @@ std::string to_string(std::string_view sv) {
 
 namespace kdr {
 
-static constexpr auto c_book_depth_field = std::to_array("book_depth");
-static constexpr auto c_capture_book_field = std::to_array("capture_book");
-static constexpr auto c_capture_trades_field = std::to_array("capture_trades");
-static constexpr auto c_kraken_host_field = std::to_array("kraken_host");
-static constexpr auto c_kraken_port_field = std::to_array("kraken_port");
-static constexpr auto c_pair_filter_field = std::to_array("pair_filter");
-static constexpr auto c_parquet_dir_field = std::to_array("parquet_dir");
-static constexpr auto c_ping_interval_secs_field =
-    std::to_array("ping_interval_secs");
-
-/*******************************************************************************/
-
-const std::string_view config_t::c_book_depth{c_book_depth_field.data(),
-                                              c_book_depth_field.size() - 1};
-const std::string_view config_t::c_capture_book{
-    c_capture_book_field.data(), c_capture_book_field.size() - 1};
-const std::string_view config_t::c_capture_trades{
-    c_capture_trades_field.data(), c_capture_trades_field.size() - 1};
-const std::string_view config_t::c_kraken_host{c_kraken_host_field.data(),
-                                               c_kraken_host_field.size() - 1};
-const std::string_view config_t::c_kraken_port{c_kraken_port_field.data(),
-                                               c_kraken_port_field.size() - 1};
-const std::string_view config_t::c_pair_filter{c_pair_filter_field.data(),
-                                               c_pair_filter_field.size() - 1};
-const std::string_view config_t::c_parquet_dir{c_parquet_dir_field.data(),
-                                               c_parquet_dir_field.size() - 1};
-const std::string_view config_t::c_ping_interval_secs{
-    c_ping_interval_secs_field.data(), c_ping_interval_secs_field.size() - 1};
-
-/*******************************************************************************/
-
-const std::string config_t::c_book_depth_str{c_book_depth_field.data(),
-                                             c_book_depth_field.size() - 1};
-const std::string config_t::c_capture_book_str{c_capture_book_field.data(),
-                                               c_capture_book_field.size() - 1};
-const std::string config_t::c_capture_trades_str{
-    c_capture_trades_field.data(), c_capture_trades_field.size() - 1};
-const std::string config_t::c_kraken_host_str{c_kraken_host_field.data(),
-                                              c_kraken_host_field.size() - 1};
-const std::string config_t::c_kraken_port_str{c_kraken_port_field.data(),
-                                              c_kraken_port_field.size() - 1};
-const std::string config_t::c_pair_filter_str{c_pair_filter_field.data(),
-                                              c_pair_filter_field.size() - 1};
-const std::string config_t::c_parquet_dir_str{c_parquet_dir_field.data(),
-                                              c_parquet_dir_field.size() - 1};
-const std::string config_t::c_ping_interval_secs_str{
-    c_ping_interval_secs_field.data(), c_ping_interval_secs_field.size() - 1};
-
-/*******************************************************************************/
-
 boost::json::object config_t::to_json_obj() const {
   auto pair_filter_array = boost::json::array{};
   std::transform(
