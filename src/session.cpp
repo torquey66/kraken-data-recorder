@@ -14,10 +14,9 @@ namespace ws = bst::websocket;
 
 namespace kdr {
 
-session_t::session_t(ioc_t &ioc, ssl_context_t &ssl_context,
-                     const config_t &config)
-    : m_ioc{ioc}, m_resolver{m_ioc}, m_ws{ioc, ssl_context},
-      m_ping_timer{m_ioc}, m_config{config} {
+session_t::session_t(ssl_context_t &ssl_context, const config_t &config)
+    : m_resolver{m_ioc}, m_ws{m_ioc, ssl_context}, m_ping_timer{m_ioc},
+      m_config{config} {
   if (m_config.ping_interval_secs() < 1) {
     BOOST_LOG_TRIVIAL(error)
         << __FUNCTION__

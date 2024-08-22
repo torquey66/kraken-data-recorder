@@ -19,13 +19,15 @@
 namespace kdr {
 
 struct engine_t final {
-  using ioc_t = boost::asio::io_context;
   using ssl_context_t = boost::asio::ssl::context;
 
   using recv_cb_t = session_t::recv_cb_t;
 
-  engine_t(ioc_t &ioc, ssl_context_t &ssl_context, const config_t &config,
+  engine_t(ssl_context_t &ssl_context, const config_t &config,
            const sink_t &sink);
+
+  const session_t &session() const { return m_session; }
+  session_t &session() { return m_session; }
 
   void start_processing(const recv_cb_t &cb) { m_session.start_processing(cb); }
   bool keep_processing() const { return m_session.keep_processing(); }

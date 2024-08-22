@@ -32,7 +32,13 @@ struct session_t final {
 
   using recv_cb_t = std::function<bool(msg_t)>;
 
-  session_t(ioc_t &ioc, ssl_context_t &ssl_context, const config_t &config);
+  session_t(ssl_context_t &ssl_context, const config_t &config);
+
+  session_t(const session_t &rhs) = delete;
+  session_t operator=(const session_t &rhs) = delete;
+
+  const ioc_t &ioc() const { return m_ioc; }
+  ioc_t &ioc() { return m_ioc; }
 
   bool keep_processing() const { return m_keep_processing; }
   void start_processing(const recv_cb_t &);
@@ -60,7 +66,7 @@ private:
   void on_read(error_code, size_t);
   void on_close(error_code);
 
-  ioc_t &m_ioc;
+  ioc_t m_ioc;
   resolver m_resolver;
   websocket_t m_ws;
   boost::asio::deadline_timer m_ping_timer;
