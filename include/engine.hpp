@@ -19,7 +19,17 @@
 namespace kdr {
 
 struct engine_t final {
-  engine_t(session_t &, const config_t &, const sink_t &);
+  using ioc_t = boost::asio::io_context;
+  using ssl_context_t = boost::asio::ssl::context;
+
+  using recv_cb_t = session_t::recv_cb_t;
+
+  engine_t(ioc_t &ioc, ssl_context_t &ssl_context, const config_t &config,
+           const sink_t &sink);
+
+  void start_processing(const recv_cb_t &cb) { m_session.start_processing(cb); }
+  bool keep_processing() const { return m_session.keep_processing(); }
+  void stop_processing() { m_session.stop_processing(); }
 
   /** Return false to cease processing and shut down. */
   bool handle_msg(msg_t);
@@ -37,7 +47,7 @@ private:
   bool handle_heartbeat_msg(doc_t &);
   bool handle_pong_msg(doc_t &);
 
-  session_t &m_session;
+  session_t m_session;
   config_t m_config;
 
   simdjson::ondemand::parser m_parser;
