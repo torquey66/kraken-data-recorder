@@ -29,7 +29,6 @@ void signal_handler(const boost::system::error_code &ec, int signal_number) {
 }
 
 int main(int argc, char *argv[]) {
-  boost::asio::io_context ioc;
   try {
     po::options_description desc(
         "Subscribe to Kraken and serialize book/trade data");
@@ -87,9 +86,6 @@ int main(int argc, char *argv[]) {
                     boost::asio::ssl::context::no_tlsv1 |
                     boost::asio::ssl::context::no_tlsv1_1);
 
-    boost::asio::signal_set signals(ioc, SIGINT);
-    signals.async_wait(signal_handler);
-
     const auto now = kdr::timestamp_t::now().micros();
 
     kdr::pq::assets_sink_t assets_sink{config.parquet_dir(), now};
@@ -135,8 +131,7 @@ int main(int argc, char *argv[]) {
             ? kdr::sink_t::accept_trades_t{accept_trades}
             : kdr::sink_t::accept_trades_t{noop_accept_trades}};
 
-    auto engine = kdr::engine_t(ioc, ctx, config, sink);
-
+    auto engine = kdr::engine_t(ctx, config, sink);
     const auto handle_recv = [&engine](kdr::msg_t msg) {
       try {
         return engine.handle_msg(msg);
@@ -145,15 +140,24 @@ int main(int argc, char *argv[]) {
         return false;
       }
     };
-    engine.start_processing(handle_recv);
 
-    while (!shutting_down && engine.keep_processing()) {
-      ioc.run_one();
+    auto &ioc = engine.session().ioc();
+    try {
+      boost::asio::signal_set signals(ioc, SIGINT);
+      signals.async_wait(signal_handler);
+
+      engine.start_processing(handle_recv);
+
+      while (!shutting_down && engine.keep_processing()) {
+        ioc.run_one();
+      }
+      BOOST_LOG_TRIVIAL(error) << "session.stop_processing()";
+    } catch (const std::exception &ex) {
+      ioc.stop();
+      throw ex;
     }
-    BOOST_LOG_TRIVIAL(error) << "session.stop_processing()";
     engine.stop_processing();
   } catch (const std::exception &ex) {
-    ioc.stop();
     BOOST_LOG_TRIVIAL(error) << ex.what();
     return EXIT_FAILURE;
   }
