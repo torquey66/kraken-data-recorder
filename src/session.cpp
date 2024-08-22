@@ -41,7 +41,6 @@ void session_t::start_processing(const recv_cb_t &handle_recv) {
 }
 
 void session_t::send(msg_t msg) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
   const auto num_bytes_written =
       m_ws.write(asio::buffer(std::string(msg.data(), msg.size())));
@@ -51,8 +50,6 @@ void session_t::send(msg_t msg) {
                                 " actual: " + std::to_string(num_bytes_written);
     throw std::runtime_error(message);
   }
-
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " returning";
 }
 
 void session_t::on_resolve(error_code ec, resolver::results_type results) {
@@ -145,7 +142,7 @@ void session_t::on_ping_timer(error_code ec) {
   if (!m_keep_processing) {
     BOOST_LOG_TRIVIAL(debug)
         << __FUNCTION__
-        << " returning -  m_keep_processing:" << m_keep_processing;
+        << " returning -  m_keep_processing: " << m_keep_processing;
     ;
     return;
   }
@@ -166,11 +163,10 @@ void session_t::on_ping_timer(error_code ec) {
 }
 
 void session_t::on_write(error_code ec, size_t size) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   if (ec) {
+    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " size: " << size;
     fail(ec, __FUNCTION__);
   }
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded size: " << size;
 }
 
 void session_t::on_read(error_code ec, size_t size) {
