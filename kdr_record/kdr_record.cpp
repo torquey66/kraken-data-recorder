@@ -5,7 +5,6 @@
 #include "engine.hpp"
 #include "level_book.hpp"
 #include "pairs_sink.hpp"
-#include "session.hpp"
 #include "sink.hpp"
 #include "trade_sink.hpp"
 #include "types.hpp"
@@ -136,8 +135,7 @@ int main(int argc, char *argv[]) {
             ? kdr::sink_t::accept_trades_t{accept_trades}
             : kdr::sink_t::accept_trades_t{noop_accept_trades}};
 
-    auto session = kdr::session_t(ioc, ctx, config);
-    auto engine = kdr::engine_t(session, config, sink);
+    auto engine = kdr::engine_t(ioc, ctx, config, sink);
 
     const auto handle_recv = [&engine](kdr::msg_t msg) {
       try {
@@ -147,13 +145,13 @@ int main(int argc, char *argv[]) {
         return false;
       }
     };
-    session.start_processing(handle_recv);
+    engine.start_processing(handle_recv);
 
-    while (!shutting_down && session.keep_processing()) {
+    while (!shutting_down && engine.keep_processing()) {
       ioc.run_one();
     }
     BOOST_LOG_TRIVIAL(error) << "session.stop_processing()";
-    session.stop_processing();
+    engine.stop_processing();
   } catch (const std::exception &ex) {
     ioc.stop();
     BOOST_LOG_TRIVIAL(error) << ex.what();

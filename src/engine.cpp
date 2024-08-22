@@ -14,9 +14,9 @@
 
 namespace kdr {
 
-engine_t::engine_t(session_t &session, const config_t &config,
-                   const sink_t &sink)
-    : m_session{session}, m_config{config}, m_sink(sink) {}
+engine_t::engine_t(ioc_t &ioc, ssl_context_t &ssl_context,
+                   const config_t &config, const sink_t &sink)
+    : m_session{ioc, ssl_context, config}, m_config{config}, m_sink(sink) {}
 
 bool engine_t::handle_msg(msg_t msg) {
   m_metrics.accept(msg);

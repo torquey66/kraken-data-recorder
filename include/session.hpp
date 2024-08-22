@@ -32,7 +32,7 @@ struct session_t final {
 
   using recv_cb_t = std::function<bool(msg_t)>;
 
-  session_t(ioc_t &, ssl_context_t &, const config_t &);
+  session_t(ioc_t &ioc, ssl_context_t &ssl_context, const config_t &config);
 
   bool keep_processing() const { return m_keep_processing; }
   void start_processing(const recv_cb_t &);
