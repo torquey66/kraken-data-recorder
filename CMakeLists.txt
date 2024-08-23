@@ -121,6 +121,7 @@ add_library(kdr
   include/instrument.hpp
   include/level_book.hpp
   include/refdata.hpp
+  include/sides.hpp
   include/sink.hpp
   include/timestamp.hpp
   include/trades.hpp
@@ -136,6 +137,7 @@ add_library(kdr
   src/refdata.cpp
   src/requests.cpp
   src/session.cpp
+  src/sides.cpp
   src/trades.cpp
 )
 add_dependencies(kdr generate_all)
