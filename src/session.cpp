@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <format>
+#include <memory>
 
 namespace asio = boost::asio;
 namespace bst = boost::beast;
@@ -41,14 +42,21 @@ void session_t::start_processing(const recv_cb_t &handle_recv) {
 
 void session_t::send(msg_t msg) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
-  const auto num_bytes_written =
-      m_ws.write(asio::buffer(std::string(msg.data(), msg.size())));
-  if (num_bytes_written != msg.size()) {
-    const std::string message = std::string(__FUNCTION__) + " short write: " +
-                                "expected: " + std::to_string(msg.size()) +
-                                " actual: " + std::to_string(num_bytes_written);
-    throw std::runtime_error(message);
-  }
+  auto msg_str = std::make_unique<std::string>(msg.data(), msg.size());
+  m_ws.async_write(asio::buffer(msg_str->data(), msg_str->size()),
+                   [this, msg_str = std::move(msg_str)](
+                       error_code ec, size_t num_bytes_written) {
+                     if (ec) {
+                       fail(ec, __FUNCTION__);
+                     }
+                     if (num_bytes_written != msg_str->size()) {
+                       const std::string message =
+                           std::string(__FUNCTION__) + " short write: " +
+                           "expected: " + std::to_string(msg_str->size()) +
+                           " actual: " + std::to_string(num_bytes_written);
+                       throw std::runtime_error(message);
+                     }
+                   });
 }
 
 void session_t::on_resolve(error_code ec, resolver::results_type results) {
