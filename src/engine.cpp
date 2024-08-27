@@ -4,19 +4,34 @@
 #include "constants.hpp"
 #include "header.hpp"
 #include "instrument.hpp"
+#include "pong.hpp"
 #include "requests.hpp"
 
 #include <boost/log/trivial.hpp>
 #include <simdjson.h>
 
 #include <algorithm>
+#include <cassert>
 #include <vector>
 
 namespace kdr {
 
 engine_t::engine_t(ssl_context_t &ssl_context, const config_t &config,
                    const sink_t &sink)
-    : m_session{ssl_context, config}, m_config{config}, m_sink(sink) {}
+    : m_session{ssl_context, config}, m_config{config},
+      m_metrics_timer{m_session.ioc()}, m_process_timer{m_session.ioc()},
+      m_sink(sink) {
+
+  m_metrics_timer.expires_from_now(
+      boost::posix_time::seconds(c_metrics_interval_secs));
+  m_metrics_timer.async_wait(
+      [this](error_code ec) { this->on_metrics_timer(ec); });
+
+  m_process_timer.expires_after(
+      std::chrono::milliseconds(c_process_interval_millis));
+  m_process_timer.async_wait(
+      [this](error_code ec) { this->on_process_timer(ec); });
+}
 
 bool engine_t::handle_msg(msg_t msg) {
   m_metrics.accept(msg);
@@ -121,21 +136,7 @@ bool engine_t::handle_instrument_update(doc_t &doc) {
 }
 
 bool engine_t::handle_book_msg(doc_t &doc) {
-  auto buffer = std::string_view{};
-  if (doc[response::header_t::c_type].get(buffer) != simdjson::SUCCESS) {
-    BOOST_LOG_TRIVIAL(error)
-        << __FUNCTION__ << ": missing 'type' " << simdjson::to_json_string(doc);
-    return false;
-  }
-
-  if (buffer != response::book_t::c_snapshot &&
-      buffer != response::book_t::c_update) {
-    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": unknown 'type' " << buffer;
-    return false;
-  }
-
-  const auto response = response::book_t::from_json(doc);
-  m_sink.accept(response);
+  m_book_responses.push(response::book_t::from_json(doc));
   return true;
 }
 
@@ -150,15 +151,60 @@ bool engine_t::handle_heartbeat_msg(doc_t &) {
   return true;
 }
 
-bool engine_t::handle_pong_msg(doc_t & /*doc*/) {
-  // !@# TODO: track ping/pong latency
+bool engine_t::handle_pong_msg(doc_t &doc) {
+  // !@# TODO: Move this to a dedicated one-shot timer
   if (!m_subscribed) {
     const request::subscribe_instrument_t subscribe_inst{++m_inst_req_id};
     m_session.send(subscribe_inst.str());
     m_subscribed = true;
   }
-  BOOST_LOG_TRIVIAL(info) << m_metrics.str();
+
+  simdjson::fallback::ondemand::object obj = doc.get_object();
+  const auto pong = model::pong_t::from_json(obj);
+  BOOST_LOG_TRIVIAL(info) << pong.str();
+
+  // Can't reliably track ping/pong latency since pongs do not include a reqid.
+  m_metrics.pong();
   return true;
+}
+
+void engine_t::on_metrics_timer(error_code ec) {
+  if (ec) {
+    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ec.message();
+  }
+  BOOST_LOG_TRIVIAL(info) << m_metrics.str();
+  m_metrics_timer.expires_from_now(
+      boost::posix_time::seconds(c_metrics_interval_secs));
+  m_metrics_timer.async_wait(
+      [this](error_code ec) { this->on_metrics_timer(ec); });
+}
+
+void engine_t::on_process_timer(error_code ec) {
+  if (ec) {
+    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ec.message();
+  }
+
+  const auto begin = std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::steady_clock::now().time_since_epoch());
+  size_t num_consumed = 0;
+  while (!m_book_responses.empty() && num_consumed < c_process_batch_size) {
+    m_sink.accept(m_book_responses.front());
+    m_book_responses.pop();
+    ++num_consumed;
+  }
+
+  const auto end = std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::steady_clock::now().time_since_epoch());
+  const auto process_micros = (end - begin).count();
+  m_metrics.set_book_last_process_micros(process_micros);
+
+  m_metrics.set_book_queue_depth(m_book_responses.size());
+  m_metrics.set_book_last_consumed(num_consumed);
+
+  m_process_timer.expires_after(
+      std::chrono::milliseconds(c_process_interval_millis));
+  m_process_timer.async_wait(
+      [this](error_code ec) { this->on_process_timer(ec); });
 }
 
 } // namespace kdr
