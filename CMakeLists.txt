@@ -7,8 +7,8 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment version")
 
-#add_compile_options(-fsanitize=address)
-#add_link_options(-fsanitize=address)
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
 
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
@@ -24,6 +24,7 @@ find_package(simdjson)
 set(MODEL_FILES
   ${CMAKE_SOURCE_DIR}/model/asset.json
   ${CMAKE_SOURCE_DIR}/model/pair.json
+  ${CMAKE_SOURCE_DIR}/model/pong.json
   ${CMAKE_SOURCE_DIR}/model/trade.json
 )
 
@@ -42,6 +43,7 @@ set(GENERATED_FILES
   ${CMAKE_SOURCE_DIR}/include/generated/ord_type.hpp
   ${CMAKE_SOURCE_DIR}/include/generated/pair.hpp
   ${CMAKE_SOURCE_DIR}/include/generated/pair_status.hpp
+  ${CMAKE_SOURCE_DIR}/include/generated/pong.hpp
   ${CMAKE_SOURCE_DIR}/include/generated/side.hpp
   ${CMAKE_SOURCE_DIR}/include/generated/trade.hpp
   ${CMAKE_SOURCE_DIR}/src/generated/asset.cpp
@@ -50,6 +52,7 @@ set(GENERATED_FILES
   ${CMAKE_SOURCE_DIR}/src/generated/ord_type.cpp
   ${CMAKE_SOURCE_DIR}/src/generated/pair.cpp
   ${CMAKE_SOURCE_DIR}/src/generated/pair_status.cpp
+  ${CMAKE_SOURCE_DIR}/src/generated/pong.cpp
   ${CMAKE_SOURCE_DIR}/src/generated/side.cpp
   ${CMAKE_SOURCE_DIR}/src/generated/trade.cpp
 )
@@ -102,6 +105,7 @@ add_library(kdr
   include/generated/depth.hpp
   include/generated/ord_type.hpp
   include/generated/pair.hpp
+  include/generated/pong.hpp
   include/generated/pair_status.hpp
   include/generated/side.hpp
   include/generated/trade.hpp
@@ -111,6 +115,7 @@ add_library(kdr
   src/generated/ord_type.cpp
   src/generated/pair.cpp
   src/generated/pair_status.cpp
+  src/generated/pong.cpp
   src/generated/side.cpp
   src/generated/trade.cpp
   include/book.hpp
