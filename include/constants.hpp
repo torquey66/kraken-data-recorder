@@ -46,7 +46,4 @@ static constexpr char c_instrument_pairs[] = "pairs";
 static constexpr char c_instrument_snapshot[] = "snapshot";
 static constexpr char c_instrument_update[] = "update";
 
-static constexpr char c_metrics_num_bytes[] = "num_bytes";
-static constexpr char c_metrics_num_msgs[] = "num_msgs";
-
 } // namespace kdr
