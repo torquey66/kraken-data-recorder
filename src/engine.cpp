@@ -20,17 +20,27 @@ engine_t::engine_t(ssl_context_t &ssl_context, const config_t &config,
                    const sink_t &sink)
     : m_session{ssl_context, config}, m_config{config},
       m_metrics_timer{m_session.ioc()}, m_process_timer{m_session.ioc()},
-      m_sink(sink) {
+      m_sink(sink) {}
 
-  m_metrics_timer.expires_from_now(
-      boost::posix_time::seconds(c_metrics_interval_secs));
-  m_metrics_timer.async_wait(
-      [this](error_code ec) { this->on_metrics_timer(ec); });
+void engine_t::start_processing(const recv_cb_t &recv_cb) {
 
-  m_process_timer.expires_after(
-      std::chrono::milliseconds(c_process_interval_millis));
-  m_process_timer.async_wait(
-      [this](error_code ec) { this->on_process_timer(ec); });
+  const auto connected_cb = [this]() {
+    BOOST_LOG_TRIVIAL(debug) << "engine_t connected!";
+
+    BOOST_LOG_TRIVIAL(debug) << "starting metrics timer...";
+    m_metrics_timer.expires_from_now(
+        boost::posix_time::seconds(c_metrics_interval_secs));
+    m_metrics_timer.async_wait(
+        [this](error_code ec) { this->on_metrics_timer(ec); });
+
+    BOOST_LOG_TRIVIAL(debug) << "starting processing timer...";
+    m_process_timer.expires_after(
+        std::chrono::microseconds(c_process_interval_micros));
+    m_process_timer.async_wait(
+        [this](error_code ec) { this->on_process_timer(ec); });
+  };
+
+  m_session.start_processing(connected_cb, recv_cb);
 }
 
 bool engine_t::handle_msg(msg_t msg) {
@@ -184,25 +194,15 @@ void engine_t::on_process_timer(error_code ec) {
     BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ec.message();
   }
 
-  const auto begin = std::chrono::duration_cast<std::chrono::microseconds>(
-      std::chrono::steady_clock::now().time_since_epoch());
-  size_t num_consumed = 0;
-  while (!m_book_responses.empty() && num_consumed < c_process_batch_size) {
+  if (!m_book_responses.empty()) {
     m_sink.accept(m_book_responses.front());
     m_book_responses.pop();
-    ++num_consumed;
   }
 
-  const auto end = std::chrono::duration_cast<std::chrono::microseconds>(
-      std::chrono::steady_clock::now().time_since_epoch());
-  const auto process_micros = (end - begin).count();
-  m_metrics.set_book_last_process_micros(process_micros);
-
   m_metrics.set_book_queue_depth(m_book_responses.size());
-  m_metrics.set_book_last_consumed(num_consumed);
 
   m_process_timer.expires_after(
-      std::chrono::milliseconds(c_process_interval_millis));
+      std::chrono::microseconds(c_process_interval_micros));
   m_process_timer.async_wait(
       [this](error_code ec) { this->on_process_timer(ec); });
 }

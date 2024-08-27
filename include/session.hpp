@@ -30,6 +30,7 @@ struct session_t final {
   using websocket_t = boost::beast::websocket::stream<
       boost::beast::ssl_stream<boost::beast::tcp_stream>>;
 
+  using connected_cb_t = std::function<void()>;
   using recv_cb_t = std::function<bool(msg_t)>;
 
   session_t(ssl_context_t &ssl_context, const config_t &config);
@@ -41,7 +42,8 @@ struct session_t final {
   ioc_t &ioc() { return m_ioc; }
 
   bool keep_processing() const { return m_keep_processing; }
-  void start_processing(const recv_cb_t &);
+  void start_processing(const connected_cb_t &handle_connected,
+                        const recv_cb_t &handle_recv);
   void stop_processing() {
     m_keep_processing = false;
     m_ping_timer.cancel();
@@ -73,7 +75,10 @@ private:
   config_t m_config;
 
   bool m_keep_processing = false;
+
+  connected_cb_t m_handle_connected = []() {};
   recv_cb_t m_handle_recv = [](msg_t) { return true; };
+
   req_id_t m_req_id = 0;
 
   boost::beast::flat_buffer m_read_buffer;

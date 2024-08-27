@@ -31,7 +31,7 @@ struct engine_t final {
   const session_t &session() const { return m_session; }
   session_t &session() { return m_session; }
 
-  void start_processing(const recv_cb_t &cb) { m_session.start_processing(cb); }
+  void start_processing(const recv_cb_t &recv_cb);
   bool keep_processing() const { return m_session.keep_processing(); }
   void stop_processing() {
     m_metrics_timer.cancel();
@@ -44,7 +44,7 @@ struct engine_t final {
 
 private:
   static constexpr auto c_metrics_interval_secs = 10;
-  static constexpr auto c_process_interval_millis = 1;
+  static constexpr auto c_process_interval_micros = 30;
   static constexpr size_t c_process_batch_size = 64;
 
   using doc_t = simdjson::ondemand::document;

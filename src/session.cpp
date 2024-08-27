@@ -31,7 +31,9 @@ void session_t::fail(bst::error_code ec, char const *what) {
   m_keep_processing = false;
 }
 
-void session_t::start_processing(const recv_cb_t &handle_recv) {
+void session_t::start_processing(const connected_cb_t &handle_connected,
+                                 const recv_cb_t &handle_recv) {
+  m_handle_connected = handle_connected;
   m_handle_recv = handle_recv;
   m_keep_processing = true;
   m_resolver.async_resolve(m_config.kraken_host(), m_config.kraken_port(),
@@ -124,12 +126,12 @@ void session_t::on_ssl_handshake(error_code ec) {
 }
 
 void session_t::on_handshake(error_code ec) {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " entered";
   if (ec) {
     fail(ec, __FUNCTION__);
   }
 
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " succeeded";
+  m_handle_connected();
+
   m_keep_processing = true;
   m_read_buffer.clear();
   m_ws.async_read(m_read_buffer, [this](error_code ec, size_t size) {
