@@ -20,7 +20,6 @@ namespace kdr {
  * venue. Specifically, it:
  *
  * - establishes the websocket connection and performs an SSL handshake
- * - initiates a periodic ping operation
  * - invokes a callback when it receives messages from the venue
  * - enables client code to send messages to the venue
  */
@@ -44,10 +43,7 @@ struct session_t final {
   bool keep_processing() const { return m_keep_processing; }
   void start_processing(const connected_cb_t &handle_connected,
                         const recv_cb_t &handle_recv);
-  void stop_processing() {
-    m_keep_processing = false;
-    m_ping_timer.cancel();
-  }
+  void stop_processing() { m_keep_processing = false; }
   void send(msg_t);
   void send(const std::string &msg) {
     send(std::string_view(msg.data(), msg.size()));
@@ -63,7 +59,6 @@ private:
   void on_connect(error_code, resolver::results_type::endpoint_type);
   void on_ssl_handshake(error_code);
   void on_handshake(error_code);
-  void on_ping_timer(error_code);
   void on_write(error_code, size_t);
   void on_read(error_code, size_t);
   void on_close(error_code);
@@ -71,15 +66,12 @@ private:
   ioc_t m_ioc;
   resolver m_resolver;
   websocket_t m_ws;
-  boost::asio::deadline_timer m_ping_timer;
   config_t m_config;
 
   bool m_keep_processing = false;
 
   connected_cb_t m_handle_connected = []() {};
   recv_cb_t m_handle_recv = [](msg_t) { return true; };
-
-  req_id_t m_req_id = 0;
 
   boost::beast::flat_buffer m_read_buffer;
   std::string m_read_msg_str;

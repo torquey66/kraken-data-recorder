@@ -19,8 +19,16 @@ namespace kdr {
 engine_t::engine_t(ssl_context_t &ssl_context, const config_t &config,
                    const sink_t &sink)
     : m_session{ssl_context, config}, m_config{config},
-      m_metrics_timer{m_session.ioc()}, m_process_timer{m_session.ioc()},
-      m_sink(sink) {}
+      m_metrics_timer{m_session.ioc()}, m_ping_timer{m_session.ioc()},
+      m_process_timer{m_session.ioc()}, m_sink(sink) {
+
+  if (m_config.ping_interval_secs() < 1) {
+    BOOST_LOG_TRIVIAL(error)
+        << __FUNCTION__
+        << " ping_interval_secs (=" << m_config.ping_interval_secs()
+        << ") must be at least one";
+  }
+}
 
 void engine_t::start_processing(const recv_cb_t &recv_cb) {
 
@@ -36,8 +44,17 @@ void engine_t::start_processing(const recv_cb_t &recv_cb) {
     BOOST_LOG_TRIVIAL(debug) << "starting processing timer...";
     m_process_timer.expires_after(
         std::chrono::microseconds(c_process_interval_micros));
-    m_process_timer.async_wait(
-        [this](error_code ec) { this->on_process_timer(ec); });
+    m_process_timer.async_wait([this](error_code ec) {
+      this->on_process_timer(ec);
+      // Defer subscriptions until we know we're processing
+      const request::subscribe_instrument_t subscribe_inst{++m_inst_req_id};
+      m_session.send(subscribe_inst.str());
+    });
+
+    BOOST_LOG_TRIVIAL(debug) << "starting ping timer...";
+    m_ping_timer.expires_from_now(
+        boost::posix_time::seconds(m_config.ping_interval_secs()));
+    m_ping_timer.async_wait([this](error_code ec) { this->on_ping_timer(ec); });
   };
 
   m_session.start_processing(connected_cb, recv_cb);
@@ -69,9 +86,9 @@ bool engine_t::handle_msg(msg_t msg) {
         return handle_pong_msg(doc);
       }
       // !@# TODO: ultimately we will want to crack open 'subscribe'
-      // !responses and handle those which report failures.
-      BOOST_LOG_TRIVIAL(debug)
-          << __FUNCTION__ << ": " << simdjson::to_json_string(doc);
+      // responses and handle those which report failures.
+      // BOOST_LOG_TRIVIAL(debug)
+      //     << __FUNCTION__ << ": " << simdjson::to_json_string(doc);
     } else {
       BOOST_LOG_TRIVIAL(warning)
           << __FUNCTION__
@@ -157,23 +174,15 @@ bool engine_t::handle_trade_msg(doc_t &doc) {
 }
 
 bool engine_t::handle_heartbeat_msg(doc_t &) {
-  // !@# TODO: track a stat on time between heartbeats?
+  m_metrics.heartbeat();
   return true;
 }
 
 bool engine_t::handle_pong_msg(doc_t &doc) {
-  // !@# TODO: Move this to a dedicated one-shot timer
-  if (!m_subscribed) {
-    const request::subscribe_instrument_t subscribe_inst{++m_inst_req_id};
-    m_session.send(subscribe_inst.str());
-    m_subscribed = true;
-  }
-
   simdjson::fallback::ondemand::object obj = doc.get_object();
   const auto pong = model::pong_t::from_json(obj);
   BOOST_LOG_TRIVIAL(info) << pong.str();
 
-  // Can't reliably track ping/pong latency since pongs do not include a reqid.
   m_metrics.pong();
   return true;
 }
@@ -182,6 +191,7 @@ void engine_t::on_metrics_timer(error_code ec) {
   if (ec) {
     BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ec.message();
   }
+
   BOOST_LOG_TRIVIAL(info) << m_metrics.str();
   m_metrics_timer.expires_from_now(
       boost::posix_time::seconds(c_metrics_interval_secs));
@@ -189,17 +199,42 @@ void engine_t::on_metrics_timer(error_code ec) {
       [this](error_code ec) { this->on_metrics_timer(ec); });
 }
 
+void engine_t::on_ping_timer(error_code ec) {
+  if (ec) {
+    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ec.message();
+  }
+
+  const auto ping = request::ping_t{++m_ping_req_id};
+  const auto msg = ping.str();
+  m_session.send(msg);
+  m_metrics.ping();
+
+  m_ping_timer.expires_from_now(
+      boost::posix_time::seconds(m_config.ping_interval_secs()));
+  m_ping_timer.async_wait([this](error_code ec) { this->on_ping_timer(ec); });
+}
+
 void engine_t::on_process_timer(error_code ec) {
   if (ec) {
     BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << " " << ec.message();
   }
 
-  if (!m_book_responses.empty()) {
-    m_sink.accept(m_book_responses.front());
-    m_book_responses.pop();
-  }
-
   m_metrics.set_book_queue_depth(m_book_responses.size());
+  size_t num_to_process =
+      std::min(c_process_batch_size, m_book_responses.size());
+  if (num_to_process > 0) {
+    size_t num_processed = 0;
+    const timestamp_t begin = timestamp_t::now();
+    while (num_to_process > 0) {
+      m_sink.accept(m_book_responses.front());
+      m_book_responses.pop();
+      --num_to_process;
+      ++num_processed;
+    }
+    const timestamp_t end = timestamp_t::now();
+    m_metrics.set_book_last_process_micros(end.micros() - begin.micros());
+    m_metrics.set_book_last_consumed(num_processed);
+  }
 
   m_process_timer.expires_after(
       std::chrono::microseconds(c_process_interval_micros));
