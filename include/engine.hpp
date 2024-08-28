@@ -35,6 +35,7 @@ struct engine_t final {
   bool keep_processing() const { return m_session.keep_processing(); }
   void stop_processing() {
     m_metrics_timer.cancel();
+    m_ping_timer.cancel();
     m_process_timer.cancel();
     m_session.stop_processing();
   }
@@ -61,6 +62,7 @@ private:
   bool handle_pong_msg(doc_t &);
 
   void on_metrics_timer(error_code ec);
+  void on_ping_timer(error_code ec);
   void on_process_timer(error_code ec);
 
   session_t m_session;
@@ -68,13 +70,13 @@ private:
 
   simdjson::ondemand::parser m_parser;
 
-  bool m_subscribed = false;
-
   req_id_t m_book_req_id = 0;
   req_id_t m_inst_req_id = 0;
+  req_id_t m_ping_req_id = 0;
   req_id_t m_trade_req_id = 0;
 
   boost::asio::deadline_timer m_metrics_timer;
+  boost::asio::deadline_timer m_ping_timer;
   boost::asio::steady_timer m_process_timer;
   std::queue<response::book_t> m_book_responses;
 
