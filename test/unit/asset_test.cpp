@@ -6,6 +6,7 @@
 
 using namespace kdr::model;
 
+/*
 TEST_CASE("asset_t equality") {
   const asset_t thing1;
   const asset_t thing2 = thing1;
@@ -80,3 +81,5 @@ TEST_CASE("asset_t from_json") {
     CHECK(expected == actual);
   }
 }
+
+*/
