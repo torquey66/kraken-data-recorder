@@ -52,9 +52,6 @@ private:
 
   bid_side_t m_bids;
   ask_side_t m_asks;
-
-  std::string m_price_fmt;
-  std::string m_side_fmt;
 };
 
 template <typename S>
@@ -77,11 +74,14 @@ boost::crc_32_type sides_t::update_checksum(boost::crc_32_type crc32,
 
 template <typename Q, typename S>
 void sides_t::apply_update(const Q &quotes, S &side) {
+  static const std::string_view c_zero_str = "0";
+  static const decimal_t c_zero(c_zero_str);
+
   for (const auto &quote : quotes) {
     const auto &[price, qty] = quote;
     auto it = side.find(price);
     if (it != side.end()) {
-      if (qty.value() == 0) {
+      if (qty == c_zero) {
         side.erase(it);
       } else {
         it->second = qty;

@@ -18,6 +18,8 @@ static constexpr char c_license[] =
 
 static constexpr char c_app_name[] = "kdr";
 
+static constexpr size_t c_expected_cacheline_size = 64;
+
 /** Websocket protocol strings */
 static constexpr char c_request_channel[] = "channel";
 static constexpr char c_request_method[] = "method";
