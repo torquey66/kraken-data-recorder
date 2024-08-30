@@ -1,22 +1,72 @@
 #include "decimal.hpp"
 
+#include <cstdlib>
 #include <sstream>
+
+namespace {
+uint64_t to_int(std::string_view view) {
+  uint64_t result = 0;
+  for (const char ch : view) {
+    result *= 10;
+    result += ch - '0';
+  }
+  return result;
+}
+
+} // namespace
 
 namespace kdr {
 
-/*
-std::string format_frac_part(wide_float_t frac_part, integer_t precision) {
-std::string result;
-for (auto counter = 0; counter < precision; ++counter) {
-  static constexpr uint64_t frac_part_multiplier = 10;
-  frac_part *= frac_part_multiplier;
-  const auto int_part = frac_part.convert_to<uint64_t>();
-  result += std::to_string(int_part);
-  frac_part -= int_part;
+auto decimal_t::operator<=>(const decimal_t &rhs) const {
+  const std::string_view lhs_int_view = int_part();
+  const std::string_view rhs_int_view = rhs.int_part();
+  const auto lhs_int = to_int(lhs_int_view);
+  const auto rhs_int = to_int(rhs_int_view);
+  auto result = lhs_int <=> rhs_int;
+  if (result != std::strong_ordering::equal) {
+    return result;
+  }
+
+  const std::string_view lhs_frac_view = frac_part();
+  const std::string_view rhs_frac_view = rhs.frac_part();
+  const auto size = std::max(lhs_frac_view.size(), rhs_frac_view.size());
+  for (size_t idx = 0; idx < size; ++idx) {
+    const auto lhs_digit =
+        idx < lhs_frac_view.size() ? (lhs_frac_view[idx] - '0') : 0;
+    const auto rhs_digit =
+        idx < rhs_frac_view.size() ? (rhs_frac_view[idx] - '0') : 0;
+    result = lhs_digit <=> rhs_digit;
+    if (result != std::strong_ordering::equal) {
+      return result;
+    }
+  }
+  return std::strong_ordering::equal;
 }
-return result;
+
+bool decimal_t::operator<(const decimal_t &rhs) const {
+  return (*this <=> rhs) == std::strong_ordering::less;
 }
-*/
+bool decimal_t::operator>(const decimal_t &rhs) const {
+  return (*this <=> rhs) == std::strong_ordering::greater;
+}
+bool decimal_t::operator==(const decimal_t &rhs) const {
+  return (*this <=> rhs) == std::strong_ordering::equal;
+}
+bool decimal_t::operator!=(const decimal_t &rhs) const {
+  return (*this <=> rhs) != std::strong_ordering::equal;
+}
+
+bool decimal_t::is_zero() const {
+  const auto int_part_view = int_part();
+  if (int_part_view.size() > 0 && to_int(int_part_view) != 0) {
+    return false;
+  }
+  const auto frac_part_view = frac_part();
+  if (frac_part_view.size() > 0 && to_int(frac_part_view) != 0) {
+    return false;
+  }
+  return true;
+}
 
 std::string decimal_t::str(integer_t precision) const {
   if (precision < 0) {
@@ -44,30 +94,6 @@ std::string decimal_t::str(integer_t precision) const {
 
   return result;
 }
-
-/*
-std::string decimal_t::str(integer_t precision) const {
-if (m_value.is_zero()) {
-  if (precision > 0) {
-    std::string str = "0.";
-    str.append(precision, '0');
-    return str;
-  }
-  return "0";
-}
-
-if (m_value.sign() == -1) {
-  const wide_float_t abs_value{-m_value};
-  return "-" + abs_value.str(precision);
-}
-
-const wide_float_t int_part = boost::multiprecision::floor(m_value);
-const wide_float_t frac_part = m_value - int_part;
-const auto int_str = std::to_string(int_part.convert_to<uint64_t>());
-const auto frac_str = format_frac_part(frac_part, precision);
-return int_str + (frac_str.empty() ? "" : "." + frac_str);
-}
-*/
 
 void decimal_t::process(boost::crc_32_type &crc32, int64_t precision) const {
   const auto chars = str(precision);
