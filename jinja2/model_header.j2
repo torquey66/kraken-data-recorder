@@ -72,3 +72,9 @@ private:
 } // model
 } // kdr
 
+namespace std {
+inline std::ostream &operator<<(std::ostream &os, const kdr::model::{{ classname }} &) {
+// !@# TODO: implement stream operator
+return os;
+}
+}
