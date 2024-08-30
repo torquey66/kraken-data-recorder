@@ -53,6 +53,7 @@ struct decimal_t final {
 
   std::string str() const { return std::string(m_view.data(), m_view.size()); }
   std::string str(integer_t precision) const;
+  std::string_view str_view(integer_t precision) const;
 
   void process(boost::crc_32_type &crc32, integer_t precision) const;
 
@@ -65,7 +66,7 @@ private:
   static constexpr size_t c_max_num_chars =
       c_expected_cacheline_size - sizeof(std::string_view);
 
-  std::array<char, c_max_num_chars> m_chars;
+  mutable std::array<char, c_max_num_chars> m_chars;
   std::string_view m_view;
 
   static constexpr std::array<char, 3> c_zero_chars = {'0', '.', '0'};

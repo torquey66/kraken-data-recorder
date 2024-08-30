@@ -1,7 +1,10 @@
 #include "decimal.hpp"
 
+#include <cassert>
 #include <cstdlib>
 #include <sstream>
+
+#include <iostream> // !@#
 
 namespace {
 uint64_t to_int(std::string_view view) {
@@ -69,11 +72,7 @@ bool decimal_t::is_zero() const {
 }
 
 std::string decimal_t::str(integer_t precision) const {
-  if (precision < 0) {
-    std::ostringstream os;
-    os << "invalid precision: " << precision;
-    throw std::runtime_error(os.str());
-  }
+  assert(precision >= 0);
 
   auto result = std::string(m_view.data(), m_view.size());
   const auto decimal_pos = result.find('.');
@@ -95,11 +94,34 @@ std::string decimal_t::str(integer_t precision) const {
   return result;
 }
 
+std::string_view decimal_t::str_view(integer_t precision) const {
+  assert(precision >= 0);
+
+  auto result = std::string_view(m_view.data(), m_view.size());
+  const auto decimal_pos = result.find('.');
+
+  if (decimal_pos == std::string::npos) {
+    m_chars[result.size()] = '.';
+    result = std::string_view(result.data(), result.size() + precision + 1);
+    return result;
+  }
+
+  const auto chars_after_decimal = result.size() - (decimal_pos + 1);
+  if (size_t(precision) > chars_after_decimal) {
+    const auto zeros_to_add = precision - chars_after_decimal;
+    result = std::string_view(result.data(), result.size() + zeros_to_add);
+  } else {
+    result = result.substr(0, decimal_pos + 1 + precision);
+  }
+  return result;
+}
+
 void decimal_t::process(boost::crc_32_type &crc32, int64_t precision) const {
+  const auto chars = str_view(precision);
   auto in_leading_zeros = true;
   auto in_trailing_digits = false;
   auto num_trailing_digits = int64_t{0};
-  for (const auto ch : m_chars) {
+  for (const auto ch : chars) {
     if (in_trailing_digits && num_trailing_digits >= precision) {
       return;
     }
