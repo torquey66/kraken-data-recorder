@@ -73,8 +73,8 @@ private:
 } // kdr
 
 namespace std {
-inline std::ostream &operator<<(std::ostream &os, const kdr::model::{{ classname }} &) {
-// !@# TODO: implement stream operator
+inline std::ostream &operator<<(std::ostream &os, const kdr::model::{{ classname }} &value) {
+os << value.str();
 return os;
 }
 }
