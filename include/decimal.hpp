@@ -4,6 +4,7 @@
 
 #include <boost/crc.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <ostream>
@@ -19,6 +20,23 @@ using integer_t = int64_t;
 struct decimal_t final {
 
   decimal_t() : m_view(c_zero_chars.data(), c_zero_chars.size()) {}
+
+  decimal_t(const decimal_t &rhs) {
+    std::copy(rhs.m_chars.begin(), rhs.m_chars.end(), m_chars.begin());
+    m_view = std::string_view(m_chars.data(), rhs.m_view.size());
+  }
+
+  decimal_t(const decimal_t &&rhs)
+      : m_chars(std::move(rhs.m_chars)),
+        m_view(m_chars.data(), rhs.m_view.size()) {}
+
+  decimal_t &operator=(const decimal_t &rhs) {
+    std::copy(rhs.m_chars.begin(), rhs.m_chars.end(), m_chars.begin());
+    m_view = std::string_view(m_chars.data(), rhs.m_view.size());
+    return *this;
+  }
+
+  decimal_t &operator=(const decimal_t &&) = delete;
 
   template <typename S> decimal_t(S);
 
@@ -44,12 +62,11 @@ private:
 
   bool is_zero() const;
 
-  std::string_view m_view;
-
   static constexpr size_t c_max_num_chars =
-      c_expected_cacheline_size - sizeof(m_view);
+      c_expected_cacheline_size - sizeof(std::string_view);
 
   std::array<char, c_max_num_chars> m_chars;
+  std::string_view m_view;
 
   static constexpr std::array<char, 3> c_zero_chars = {'0', '.', '0'};
 };
