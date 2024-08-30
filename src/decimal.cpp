@@ -96,11 +96,10 @@ std::string decimal_t::str(integer_t precision) const {
 }
 
 void decimal_t::process(boost::crc_32_type &crc32, int64_t precision) const {
-  const auto chars = str(precision);
   auto in_leading_zeros = true;
   auto in_trailing_digits = false;
   auto num_trailing_digits = int64_t{0};
-  for (const auto ch : chars) {
+  for (const auto ch : m_chars) {
     if (in_trailing_digits && num_trailing_digits >= precision) {
       return;
     }
