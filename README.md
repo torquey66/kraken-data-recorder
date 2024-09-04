@@ -1,6 +1,6 @@
 # Kraken Data Recorder
 
-    [sol_usd book animatino](doc/sol_usd.gif)
+![sol_usd book animatino](doc/sol_usd.gif)
 
 **Caveat emptor** *This is a work in progress - your mileage may vary.*
 
