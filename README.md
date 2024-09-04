@@ -1,5 +1,7 @@
 # Kraken Data Recorder
 
+    [sol_usd book animatino](doc/sol_usd.gif)
+
 **Caveat emptor** *This is a work in progress - your mileage may vary.*
 
 Kraken Data Recorder (*kdr*) is a tool for recording market data from
