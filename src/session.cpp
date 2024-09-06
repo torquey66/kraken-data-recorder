@@ -39,21 +39,18 @@ void session_t::start_processing(const connected_cb_t &handle_connected,
 
 void session_t::send(msg_t msg) {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": " << msg;
-  auto msg_str = std::make_unique<std::string>(msg.data(), msg.size());
-  m_ws.async_write(asio::buffer(msg_str->data(), msg_str->size()),
-                   [this, msg_str = std::move(msg_str)](
-                       error_code ec, size_t num_bytes_written) {
-                     if (ec) {
-                       fail(ec, "session_t::send async_write failed");
-                     }
-                     if (num_bytes_written != msg_str->size()) {
-                       const std::string message =
-                           std::string(__FUNCTION__) + " short write: " +
-                           "expected: " + std::to_string(msg_str->size()) +
-                           " actual: " + std::to_string(num_bytes_written);
-                       fail(ec, message.c_str());
-                     }
-                   });
+  error_code ec;
+  const auto num_bytes_written =
+      m_ws.write(asio::buffer(msg.data(), msg.size()), ec);
+  if (ec) {
+    fail(ec, "session_t::send async_write failed");
+  }
+  if (num_bytes_written != msg.size()) {
+    const std::string message = std::string(__FUNCTION__) + " short write: " +
+                                "expected: " + std::to_string(msg.size()) +
+                                " actual: " + std::to_string(num_bytes_written);
+    fail(ec, message.c_str());
+  }
 }
 
 void session_t::on_resolve(error_code ec, resolver::results_type results) {
