@@ -6,8 +6,9 @@
     "doc" : "See: https://docs.kraken.com/websockets-v2/#ping",
 
     "members" : [
-        { "name" : "method",   "type" : "string"    },
-        { "name" : "time_in",  "type" : "timestamp" },
-        { "name" : "time_out", "type" : "timestamp" }
+        { "name" : "method",   "type" : "string"  },
+        { "name" : "req_id",   "type" : "integer" },
+        { "name" : "time_in",  "type" : "string"  },
+        { "name" : "time_out", "type" : "string"  }
     ]
 }
