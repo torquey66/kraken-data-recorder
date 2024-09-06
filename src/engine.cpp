@@ -83,7 +83,13 @@ bool engine_t::handle_msg(msg_t msg) {
       }
     } else if (doc[c_response_method].get(buffer) == simdjson::SUCCESS) {
       if (buffer == c_method_pong) {
-        return handle_pong_msg(doc);
+        // We have to crack the message to know that it's a pong, but
+        // then we have to reparse it so that the pong_t deserializer
+        // can see the method field.
+        simdjson::padded_string padded_pong_msg{msg};
+        simdjson::ondemand::document pong_doc =
+            m_parser.iterate(padded_pong_msg);
+        return handle_pong_msg(pong_doc);
       }
       // !@# TODO: ultimately we will want to crack open 'subscribe'
       // responses and handle those which report failures.
