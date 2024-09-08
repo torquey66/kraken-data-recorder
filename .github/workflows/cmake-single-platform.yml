@@ -114,7 +114,7 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile
-          push: false
+          push: true
           tags: kdr-ubuntu:latest
           build-args: |
             CACHEBUST=${{ github.sha }}
