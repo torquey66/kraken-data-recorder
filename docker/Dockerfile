@@ -27,7 +27,7 @@ RUN conan profile detect
 # Set up the default work directory
 WORKDIR /workspace
 
-COPY conan.profile.default /workspace
+COPY docker/conan.profile.default /workspace
 RUN git clone https://github.com/torquey66/kraken-data-recorder.git && \
     cd kraken-data-recorder && \
     git checkout dev/update-README-and-fix-bugs && \
