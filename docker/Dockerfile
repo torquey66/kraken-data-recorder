@@ -25,7 +25,6 @@ ENV PATH="/venv/bin:$PATH"
 RUN pip3 install --no-cache-dir jinja2 jinja2-cli conan==2.*
 RUN conan profile detect
 
-# Set up the default work directory
 WORKDIR /workspace
 
 COPY docker/conan.profile.default /workspace
@@ -36,14 +35,8 @@ RUN git clone https://github.com/torquey66/kraken-data-recorder.git && \
 
 RUN cd kraken-data-recorder/build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
-    make -j
-RUN conan cache clean --temp --source --build
+    make -j && \
+    conan cache clean --temp --source --build
 
-# Set socket buffer sizes
-RUN echo 'net.core.rmem_max=16777216' >> /etc/sysctl.conf && \
-    echo 'net.core.rmem_default=1048576' >> /etc/sysctl.conf
-RUN sysctl -p
-
-# Run a command (optional)
 CMD ["/bin/bash"]
 
