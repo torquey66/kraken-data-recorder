@@ -1,9 +1,9 @@
+# Start with the latest Ubuntu base image
+FROM ubuntu:latest
+
 LABEL org.opencontainers.image.source=https://github.com/torquey66/kraken-data-recorder
 LABEL org.opencontainers.image.description="Kraken Data Recorder"
 LABEL org.opencontainers.image.licenses="Creative Commons Attribution-NoDerivatives 4.0 International"
-
-# Start with the latest Ubuntu base image
-FROM ubuntu:latest
 
 # Install necessary packages and tools
 RUN apt-get update && apt-get install -y \
