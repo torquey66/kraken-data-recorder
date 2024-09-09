@@ -11,7 +11,6 @@
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/ssl.hpp>
-#include <boost/json.hpp>
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/trivial.hpp>
@@ -41,14 +40,17 @@ int main(int argc, char *argv[]) {
 
   using kdr::config_t;
 
+  std::vector<std::string> pairs_filter_vector;
+
   // clang-format off
     desc.add_options()
       ("help", "display program options")
       (config_t::c_ping_interval_secs.data(), po::value<size_t>()->default_value(30), "ping/pong delay")
       (config_t::c_kraken_host.data(), po::value<std::string>()->default_value("ws.kraken.com"), "Kraken websocket host")
       (config_t::c_kraken_port.data(), po::value<std::string>()->default_value("443"), "Kraken websocket port")
-      (config_t::c_pair_filter.data(), po::value<std::string>()->default_value("[]"), "explicit list of pairs to subscribe to as json string")
-      (config_t::c_parquet_dir.data(), po::value<std::string>()->default_value("/tmp"), "directory in which to write parquet output")
+      (config_t::c_pair_filter.data(), po::value<std::vector<std::string>>(&pairs_filter_vector)->multitoken(),
+       "pairs to record or empty to record all")
+       (config_t::c_parquet_dir.data(), po::value<std::string>()->default_value("/tmp"), "directory in which to write parquet output")
       (config_t::c_book_depth.data(), po::value<int64_t>()->default_value(1000), "one of {10, 25, 100, 500, 1000}")
       (config_t::c_capture_book.data(), po::value<bool>()->default_value(true), "subscribe to and record level book")
       (config_t::c_capture_trades.data(), po::value<bool>()->default_value(true), "subscribe to and record trades")
@@ -63,14 +65,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  const boost::json::array pair_filter_json{
-      boost::json::parse(vm[config_t::c_pair_filter.data()].as<std::string>())
-          .as_array()};
-  config_t::symbol_filter_t pair_filter;
-  for (const auto &symbol : pair_filter_json) {
-    pair_filter.insert(
-        std::string{symbol.get_string().data(), symbol.get_string().size()});
-  }
+  const config_t::symbol_filter_t pair_filter{pairs_filter_vector.begin(),
+                                              pairs_filter_vector.end()};
 
   const auto config = config_t{
       vm[config_t::c_ping_interval_secs.data()].as<size_t>(),
