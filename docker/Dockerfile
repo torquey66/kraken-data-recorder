@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     clang-format \
     clang-tidy \
     emacs-nox \
+    procps \
     python3 \
     python3-pip \
     python3-venv \
@@ -36,6 +37,12 @@ RUN git clone https://github.com/torquey66/kraken-data-recorder.git && \
 RUN cd kraken-data-recorder/build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
     make -j
+RUN conan cache clean --temp --source --build
+
+# Set socket buffer sizes
+RUN echo 'net.core.rmem_max=16777216' >> /etc/sysctl.conf && \
+    echo 'net.core.rmem_default=1048576' >> /etc/sysctl.conf
+RUN sysctl -p
 
 # Run a command (optional)
 CMD ["/bin/bash"]
