@@ -1,3 +1,7 @@
+LABEL org.opencontainers.image.source=https://github.com/torquey66/kraken-data-recorder
+LABEL org.opencontainers.image.description="Kraken Data Recorder"
+LABEL org.opencontainers.image.licenses="Creative Commons Attribution-NoDerivatives 4.0 International"
+
 # Start with the latest Ubuntu base image
 FROM ubuntu:latest
 
@@ -36,7 +40,8 @@ RUN git clone https://github.com/torquey66/kraken-data-recorder.git && \
 RUN cd kraken-data-recorder/build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
     make -j && \
-    conan cache clean --temp --source --build
+    conan cache clean --temp --source --build && \
+    rm -rf /root/.conan2
 
 CMD ["/bin/bash"]
 
