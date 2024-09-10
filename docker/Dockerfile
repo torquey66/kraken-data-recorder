@@ -47,6 +47,10 @@ RUN wget https://github.com/duckdb/duckdb/releases/download/v1.1.0/duckdb_cli-li
 
 FROM alpine as main
 
+RUN apk update && \
+    apk upgrade && \
+    apk add bash
+
 COPY --from=build /workspace /
 
 CMD ["/bin/bash"]
