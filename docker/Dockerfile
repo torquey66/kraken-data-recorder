@@ -45,11 +45,7 @@ RUN wget https://github.com/duckdb/duckdb/releases/download/v1.1.0/duckdb_cli-li
     unzip duckdb_cli-linux-amd64.zip
 
 
-FROM alpine as main
-
-RUN apk update && \
-    apk upgrade && \
-    apk add bash
+FROM ubuntu:latest as main
 
 COPY --from=build /workspace /
 
