@@ -20,24 +20,114 @@ for each book update.
 
 See https://docs.kraken.com/websockets-v2/#introduction
 
+## Quickstart
+
+If you're familiar with Docker, the easiest way to try out *kdr* is by
+running it in a container:
+
+```/bin/bash
+bash-3.2$  docker run -it --network=host  ghcr.io/torquey66/kraken-data-recorder:main
+Unable to find image 'ghcr.io/torquey66/kraken-data-recorder:main' locally
+main: Pulling from torquey66/kraken-data-recorder
+eb993dcd6942: Pull complete 
+69cd47597ee2: Pull complete 
+Digest: sha256:cb49c0c7f1d2bbcdf5d43ee457a6bc93662b2527529531eacbdef074becf1b67
+Status: Downloaded newer image for ghcr.io/torquey66/kraken-data-recorder:main
+root@docker-desktop:/#
+```
+
+Once inside the container you can `kdr_record` some market data like this:
+```/bin/bash
+./kraken-data-recorder/build/kdr_record --book_depth=10 --pair_filter BTC/USD SOL/USD ETH/USD
+```
+
+This will record all `BTC/USD`, `SOL/USD`, and `ETH/USD` at
+depth 10. Let it run for a bit and `ctrl-C` to terminate the
+program. The output should look something like this:
+```/bin/bash
+root@docker-desktop:/# ./kraken-data-recorder/build/kdr_record --book_depth=10 --pair_filter BTC/USD SOL/USD ETH/USD 
+[2024-09-10 20:23:54.585197] [0x00007f8b726e3800] [info]    kraken-data-recorder © 2023 by John C. Finley is licensed under Creative Commons Attribution-NoDerivatives 4.0 International. To view a copy of this license, visit https://creativecommons.org/licenses/by-nd/4.0/
+[2024-09-10 20:23:54.585250] [0x00007f8b726e3800] [info]    starting up with config: {"book_depth":10,"capture_book":true,"capture_trades":true,"kraken_host":"ws.kraken.com","kraken_port":"443","pair_filter":["ETH/USD","SOL/USD","BTC/USD"],"parquet_dir":"/tmp","ping_interval_secs":30}
+[2024-09-10 20:23:54.590222] [0x00007f8b726e3800] [info]    resolve suceeded
+[2024-09-10 20:23:54.608940] [0x00007f8b726e3800] [info]    connect succeeded
+[2024-09-10 20:23:54.629620] [0x00007f8b726e3800] [info]    ssl handshake succeeded
+[2024-09-10 20:23:56.088102] [0x00007f8b726e3800] [info]    handshake succeeded
+[2024-09-10 20:24:06.088550] [0x00007f8b726e3800] [info]    {"num_msgs":1678,"num_bytes":604858,"book_queue_depth":0,"book_max_queue_depth":20,"book_last_consumed":1,"book_last_process_micros":9,"num_heartbeats":10,"num_pings":0,"num_pongs":0}
+[2024-09-10 20:24:16.089448] [0x00007f8b726e3800] [info]    {"num_msgs":3587,"num_bytes":976168,"book_queue_depth":0,"book_max_queue_depth":20,"book_last_consumed":1,"book_last_process_micros":9,"num_heartbeats":20,"num_pings":0,"num_pongs":0}
+[2024-09-10 20:24:26.090441] [0x00007f8b726e3800] [info]    {"num_msgs":4997,"num_bytes":1251876,"book_queue_depth":0,"book_max_queue_depth":20,"book_last_consumed":6,"book_last_process_micros":20,"num_heartbeats":30,"num_pings":1,"num_pongs":0}
+[2024-09-10 20:24:26.234504] [0x00007f8b726e3800] [info]    {"method":"pong","req_id":1,"time_in":"2024-09-10T20:24:26.280373Z","time_out":"2024-09-10T20:24:26.280397Z"}
+[2024-09-10 20:24:36.090649] [0x00007f8b726e3800] [info]    {"num_msgs":6000,"num_bytes":1445750,"book_queue_depth":0,"book_max_queue_depth":20,"book_last_consumed":3,"book_last_process_micros":8,"num_heartbeats":40,"num_pings":1,"num_pongs":1}
+[2024-09-10 20:24:46.091632] [0x00007f8b726e3800] [info]    {"num_msgs":7211,"num_bytes":1680544,"book_queue_depth":0,"book_max_queue_depth":20,"book_last_consumed":1,"book_last_process_micros":11,"num_heartbeats":50,"num_pings":1,"num_pongs":1}
+^C[2024-09-10 20:24:50.369376] [0x00007f8b726e3800] [error]   received signal_number: 2 error: Success -- shutting down
+[2024-09-10 20:24:50.369410] [0x00007f8b726e3800] [info]    session.stop_processing()
+```
+
+Results of the run will by default be left in `/tmp`:
+```/bin/bash
+root@docker-desktop:/# ls -l /tmp/*.pq
+-rw-r--r-- 1 root root   5978 Sep 10 20:24 /tmp/1725999834586832.assets.pq
+-rw-r--r-- 1 root root 252313 Sep 10 20:24 /tmp/1725999834586832.book.pq
+-rw-r--r-- 1 root root  19200 Sep 10 20:24 /tmp/1725999834586832.pairs.pq
+-rw-r--r-- 1 root root   6537 Sep 10 20:24 /tmp/1725999834586832.trades.pq
+```
+Each file is prefixed by a UTC timestamp in milliseconds. This allows
+you to wrap *kdr_record* execution in a restart script to produce a
+series of time-segmented files that can be combined after the fact.
+
+You can take a peek at the capture using the `duckdb` utility,
+included in the Docker image.
+```/bin/bash
+root@docker-desktop:/# ./duckdb 
+v1.1.0 fa5c2fe15f
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+D select * from read_parquet('/tmp/*.book.pq') limit 10;
+┌──────────────────┬──────────┬──────────────────────┬─────────────────────────────────────────┬────────────┬─────────┬──────────────────┐
+│     recv_tm      │   type   │         bids         │                  asks                   │  checksum  │ symbol  │    timestamp     │
+│      int64       │ varchar  │ struct(price varch…  │  struct(price varchar, qty varchar)[]   │   uint64   │ varchar │      int64       │
+├──────────────────┼──────────┼──────────────────────┼─────────────────────────────────────────┼────────────┼─────────┼──────────────────┤
+│ 1725999836935616 │ snapshot │ [{'price': 57770.1…  │ [{'price': 57770.2, 'qty': 26.9509494…  │ 2820638371 │ BTC/USD │                0 │
+│ 1725999836935641 │ snapshot │ [{'price': 2387.02…  │ [{'price': 2387.11, 'qty': 0.15325149…  │ 2178420705 │ ETH/USD │                0 │
+│ 1725999836935657 │ snapshot │ [{'price': 136.20,…  │ [{'price': 136.21, 'qty': 0.15922645}…  │ 3213347641 │ SOL/USD │                0 │
+│ 1725999836971483 │ update   │ [{'price': 57744.2…  │ []                                      │ 2803136326 │ BTC/USD │ 1725999837014760 │
+│ 1725999836977233 │ update   │ [{'price': 57744.5…  │ []                                      │  982401181 │ BTC/USD │ 1725999837019996 │
+│ 1725999836980007 │ update   │ []                   │ [{'price': 136.25, 'qty': 384.7172126…  │  887231010 │ SOL/USD │ 1725999837021538 │
+│ 1725999836981043 │ update   │ [{'price': 136.17,…  │ []                                      │ 4106307791 │ SOL/USD │ 1725999837025648 │
+│ 1725999836984317 │ update   │ []                   │ [{'price': 136.25, 'qty': 461.8836606…  │ 2059157472 │ SOL/USD │ 1725999837028122 │
+│ 1725999836984387 │ update   │ [{'price': 136.19,…  │ []                                      │ 1936270871 │ SOL/USD │ 1725999837028596 │
+│ 1725999836995023 │ update   │ []                   │ [{'price': 2387.23, 'qty': 104.724251…  │ 1424581938 │ ETH/USD │ 1725999837038709 │
+├──────────────────┴──────────┴──────────────────────┴─────────────────────────────────────────┴────────────┴─────────┴──────────────────┤
+│ 10 rows                                                                                                                      7 columns │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+All files contain snapshot as well as update events. These can be
+replayed in an *event sourced* or *change data capture* fashion to
+reproduce state at any given time.
+
+ - **assets** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument)  reference data channel
+ - **pairs** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument)  reference data channel
+ - **book** contains snapshots and updates for all subscribed symbols on the [book](https://docs.kraken.com/websockets-v2/#book) channel
+ - **trades** contains snapshots and updates for all subscribed symbols on the [trades](https://docs.kraken.com/websockets-v2/#trade) channel
+
 ## Running *kdr_record*
 
-You can find prebuilt copies of *kdr_record* for Ubuntu in
+In addition to the aforementioned Docker image, you can find prebuilt
+copies of *kdr_record* for Ubuntu in
 [releases](https://github.com/torquey66/kraken-data-recorder/releases)
 or build it yourself (see below).
 
 ### Options
 
 *kdr_record* supports the following options:
-```
-bash-3.2$ ./kdr_record --help
+```/bin/bash
+bash-3.2$ kdr_record --help
 Subscribe to Kraken and serialize book/trade data:
   --help                             display program options
   --ping_interval_secs arg (=30)     ping/pong delay
   --kraken_host arg (=ws.kraken.com) Kraken websocket host
   --kraken_port arg (=443)           Kraken websocket port
-  --pair_filter arg (=[])            explicit list of pairs to subscribe to as 
-                                     json string
+  --pair_filter arg                  pairs to record or empty to record all
   --parquet_dir arg (=/tmp)          directory in which to write parquet output
   --book_depth arg (=1000)           one of {10, 25, 100, 500, 1000}
   --capture_book arg (=1)            subscribe to and record level book
@@ -48,35 +138,6 @@ By default, it will capture all pairs at depth 1000 and create parquet
 files in *parquet_dir*. Last I measured these could require on the
 order of 1GB of storage per hour, so take care to set *parquet_dir* to
 a location with ample space.
-
-### Example
-```
-kdr_record --ping_interval_secs 5 --parquet_dir /tmp/example
-```
-
-will create a series of parquet files in */tmp/exampe*:
-
-```
-bash-3.2$ ls -l /tmp/example/
-total 49584
--rw-r--r--  1 torquey  wheel      5896 Aug  8 08:09 1723122455735103.assets.pq
--rw-r--r--  1 torquey  wheel  23606521 Aug  8 08:09 1723122455735103.book.pq
--rw-r--r--  1 torquey  wheel     18816 Aug  8 08:09 1723122455735103.pairs.pq
--rw-r--r--  1 torquey  wheel   1024693 Aug  8 08:09 1723122455735103.trades.pq
-```
-
-Each file is prefixed by a UTC timestamp in milliseconds. This allows
-you to wrap *kdr_record* execution in a restart script to produce a
-series of time-segmented files that can be combined after the fact.
-
-All files contain snapshot as well as update events. These can be
-replayed in an *event sourced* or *change data capture* fashion to
-reproduce state at any given time.
-
- - **assets** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument)  reference data channel
- - **pairs** contains the asset portion of the [instruments](https://docs.kraken.com/websockets-v2/#instrument)  reference data channel
- - **book** contains snapshots and updates for all subscribed symbols on the [book](https://docs.kraken.com/websockets-v2/#book) channel
- - **trades** contains snapshots and updates for all subscribed symbols on the [trades](https://docs.kraken.com/websockets-v2/#trade) channel
 
 ### Query examples
 
