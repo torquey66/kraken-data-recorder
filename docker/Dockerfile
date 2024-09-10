@@ -42,7 +42,8 @@ RUN cd kraken-data-recorder/build && \
     rm -rf /root/.conan2
 
 RUN wget https://github.com/duckdb/duckdb/releases/download/v1.1.0/duckdb_cli-linux-amd64.zip && \
-    unzip duckdb_cli-linux-amd64.zip
+    unzip duckdb_cli-linux-amd64.zip && \
+    rm duckdb_cli-linux-amd64.zip
 
 
 FROM ubuntu:latest as main
