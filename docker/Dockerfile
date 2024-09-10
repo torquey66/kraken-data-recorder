@@ -36,7 +36,7 @@ RUN git clone https://github.com/torquey66/kraken-data-recorder.git && \
     conan install . --profile=/workspace/conan.profile.default --build=missing --output-folder=build -sbuild_type=Release
 
 RUN cd kraken-data-recorder/build && \
-    cmake -DCMAKE_BUILD_TYPE=Release .. && \
+    cmake -DCMAKE_BUILD_TYPE=Release  -DBUILD_SHARED_LIBS=OFF .. && \
     make -j && \
     conan cache clean --temp --source --build && \
     rm -rf /root/.conan2
