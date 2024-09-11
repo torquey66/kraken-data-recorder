@@ -1,6 +1,6 @@
 # Kraken Data Recorder
 
-![sol_usd book animatino](doc/eth_usd.gif)
+![sol_usd book animation](doc/sol_usd.gif)
 
 **Caveat emptor** *This project is under active development*
 
