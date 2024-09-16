@@ -9,6 +9,7 @@ class KrakpotRecipe(ConanFile):
         self.requires("boost/1.85.0", force=True)
         self.requires("date/3.0.1")
         self.requires("doctest/2.4.11")
+        self.requires("duckdb/1.1.0")
         self.requires("openssl/3.2.0")
         self.requires("simdjson/3.6.1")
         self.requires("thrift/0.17.0")
@@ -21,3 +22,6 @@ class KrakpotRecipe(ConanFile):
 
     def build_requirements(self):
         self.tool_requires("cmake/3.29.0")
+
+#    def layout(self):
+#        cmake_layout(self)
