@@ -126,6 +126,7 @@ add_library(kdr
   include/instrument.hpp
   include/level_book.hpp
   include/refdata.hpp
+  include/shmem_sink.hpp
   include/sides.hpp
   include/sink.hpp
   include/timestamp.hpp
@@ -142,6 +143,7 @@ add_library(kdr
   src/refdata.cpp
   src/requests.cpp
   src/session.cpp
+  src/shmem_sink.cpp
   src/sides.cpp
   src/trades.cpp
 )
