@@ -1,14 +1,21 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/sync/named_mutex.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 
 #include "depth.hpp"
 #include "shmem_sink.hpp"
 #include "types.hpp"
+
+#include <boost/log/trivial.hpp>
 
 #include <array>
 
 namespace kdr {
 namespace shmem {
 
+/**
+ * Shared memory representation of book state.
+ */
 struct book_content_t final {
   static constexpr size_t c_max_depth = kdr::model::depth_1000;
 
@@ -20,6 +27,9 @@ private:
   std::array<kdr::quote_t, c_max_depth> m_quotes;
 };
 
+/**
+ * RAII wrapper of named shared memory object.
+ */
 struct book_obj_t final {
   book_obj_t(std::string symbol) : m_obj_name{"kdr::book_obj_t::" + symbol} {
     boost::interprocess::shared_memory_object::remove(m_obj_name.c_str());
@@ -35,13 +45,36 @@ private:
   const std::string m_obj_name;
 };
 
+/**
+ * RAII wrapper of named mutex.
+ */
+struct book_mutex_t final {
+  book_mutex_t(std::string symbol)
+      : m_mutex_name{"kdr::book_mutex_t::" + symbol} {
+    boost::interprocess::named_mutex::remove(m_mutex_name.c_str());
+  }
+
+  ~book_mutex_t() {
+    boost::interprocess::named_mutex::remove(m_mutex_name.c_str());
+  }
+
+  const std::string &mutex_name() const { return m_mutex_name; }
+
+private:
+  const std::string m_mutex_name;
+};
+
+/**
+ * RAII wrapper of shared memory segment, etc.
+ */
 struct book_segment_t final {
   book_segment_t(std::string symbol)
       : m_book_obj{symbol},
         m_segment{boost::interprocess::create_only,
                   m_book_obj.obj_name().c_str(), sizeof(book_content_t)},
         m_name{"kdr::book_content_t::" + symbol},
-        m_content{m_segment.construct<book_content_t>(m_name.c_str())()} {}
+        m_content{m_segment.construct<book_content_t>(m_name.c_str())()},
+        m_book_mutex(symbol) {}
 
   ~book_segment_t() {
     if (m_content) {
@@ -54,6 +87,7 @@ private:
   boost::interprocess::managed_shared_memory m_segment;
   std::string m_name;
   book_content_t *m_content = nullptr;
+  book_mutex_t m_book_mutex;
 };
 
 void shmem_sink_t::accept(const response::instrument_t &response) {
@@ -68,7 +102,14 @@ void shmem_sink_t::accept(const response::instrument_t &response) {
   }
 }
 
-void shmem_sink_t::accept(const response::book_t & /*response*/) {}
+void shmem_sink_t::accept(const response::book_t &response) {
+  auto it = m_book_segments.find(response.symbol());
+  if (it == m_book_segments.end()) {
+    BOOST_LOG_TRIVIAL(warning)
+        << __FUNCTION__
+        << " received update for unknown symbol: " << response.symbol();
+  }
+}
 
 } // namespace shmem
 } // namespace kdr
