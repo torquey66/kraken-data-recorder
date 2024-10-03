@@ -2,6 +2,7 @@
 
 #include "book.hpp"
 #include "instrument.hpp"
+#include "level_book.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -14,7 +15,8 @@ struct book_segment_t;
 struct shmem_sink_t final {
 
   void accept(const response::instrument_t &response);
-  void accept(const response::book_t &response);
+  void accept(const response::book_t &response,
+              const model::level_book_t &level_book);
 
 private:
   using book_segment_ptr = std::unique_ptr<book_segment_t>;
