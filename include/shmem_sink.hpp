@@ -14,7 +14,7 @@ struct book_segment_t;
 struct shmem_sink_t final {
 
   void accept(const response::instrument_t &response);
-  void accept(const response::book_t & /*response*/);
+  void accept(const response::book_t &response);
 
 private:
   using book_segment_ptr = std::unique_ptr<book_segment_t>;
