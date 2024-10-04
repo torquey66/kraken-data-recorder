@@ -5,6 +5,7 @@
 #include "engine.hpp"
 #include "level_book.hpp"
 #include "pairs_sink.hpp"
+#include "shmem_sink.hpp"
 #include "sink.hpp"
 #include "trade_sink.hpp"
 #include "types.hpp"
@@ -99,9 +100,11 @@ int main(int argc, char *argv[]) {
   kdr::model::level_book_t level_book{config.book_depth()};
   kdr::model::refdata_t refdata;
 
+  kdr::shmem::shmem_sink_t shmem_sink;
+
   const auto accept_instrument =
-      [&level_book, &assets_sink, &pairs_sink,
-       &refdata](const kdr::response::instrument_t &response) {
+      [&level_book, &assets_sink, &pairs_sink, &refdata,
+       &shmem_sink](const kdr::response::instrument_t &response) {
         assets_sink.accept(response.header(), response.assets());
         pairs_sink.accept(response.header(), response.pairs());
         refdata.accept(response);
@@ -110,14 +113,15 @@ int main(int argc, char *argv[]) {
           BOOST_LOG_TRIVIAL(debug)
               << "created/updated book for symbol: " << pair.symbol();
         }
+        shmem_sink.accept(response);
       };
 
-  // !@# TODO: replace use of level book with refdata
   const auto noop_accept_book = [](const kdr::response::book_t &) {};
-  const auto accept_book = [&book_sink, &level_book,
-                            &refdata](const kdr::response::book_t &response) {
+  const auto accept_book = [&book_sink, &level_book, &refdata, &shmem_sink](
+                               const kdr::response::book_t &response) {
     book_sink.accept(response, refdata);
     level_book.accept(response);
+    shmem_sink.accept(response, level_book);
   };
 
   const auto noop_accept_trades = [](const kdr::response::trades_t &) {};
