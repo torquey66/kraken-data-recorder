@@ -4,14 +4,20 @@
 
 #include <csignal>
 #include <iostream>
+#include <memory>
 #include <string>
 
 namespace bip = boost::interprocess;
 
+std::unique_ptr<bip::named_mutex> mutex_ptr;
+
 void signal_handler(int signal) {
   if (signal == SIGSEGV) {
     std::cerr << "Segmentation fault caught!" << std::endl;
-    exit(1);
+    if (mutex_ptr) {
+      mutex_ptr->unlock();
+    }
+    exit(-1);
   }
 }
 
@@ -33,15 +39,17 @@ int main(int argc, char *argv[]) {
     bip::managed_shared_memory segment{bip::open_only, segment_name.c_str()};
 
     kdr::shmem::book_content_t content;
-    bip::named_mutex mutex{bip::open_only, mutex_name.c_str()};
+    mutex_ptr =
+        std::make_unique<bip::named_mutex>(bip::open_only, mutex_name.c_str());
+
+    std::pair<kdr::shmem::book_content_t *,
+              bip::managed_shared_memory::size_type>
+        result{segment.find<kdr::shmem::book_content_t>(content_name.c_str())};
+    kdr::shmem::book_content_t *content_ptr =
+        reinterpret_cast<kdr::shmem::book_content_t *>(result.first);
+
     {
-      bip::scoped_lock<bip::named_mutex> lock(mutex);
-      std::pair<kdr::shmem::book_content_t *,
-                bip::managed_shared_memory::size_type>
-          result{
-              segment.find<kdr::shmem::book_content_t>(content_name.c_str())};
-      kdr::shmem::book_content_t *content_ptr =
-          reinterpret_cast<kdr::shmem::book_content_t *>(result.first);
+      bip::scoped_lock<bip::named_mutex> lock(*mutex_ptr);
       content = *content_ptr;
     }
     std::cout << content.str();
