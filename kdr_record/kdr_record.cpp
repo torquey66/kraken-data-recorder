@@ -55,6 +55,7 @@ int main(int argc, char *argv[]) {
       (config_t::c_book_depth.data(), po::value<int64_t>()->default_value(1000), "one of {10, 25, 100, 500, 1000}")
       (config_t::c_capture_book.data(), po::value<bool>()->default_value(true), "subscribe to and record level book")
       (config_t::c_capture_trades.data(), po::value<bool>()->default_value(true), "subscribe to and record trades")
+      (config_t::c_enable_shmem.data(), po::value<bool>()->default_value(false), "enable shared memory sink")
     ;
   // clang-format on
 
@@ -77,7 +78,8 @@ int main(int argc, char *argv[]) {
       vm[config_t::c_parquet_dir.data()].as<std::string>(),
       kdr::model::depth_t{vm[config_t::c_book_depth.data()].as<int64_t>()},
       vm[config_t::c_capture_book.data()].as<bool>(),
-      vm[config_t::c_capture_trades.data()].as<bool>()};
+      vm[config_t::c_capture_trades.data()].as<bool>(),
+      vm[config_t::c_enable_shmem.data()].as<bool>()};
 
   BOOST_LOG_TRIVIAL(info) << kdr::c_license;
   BOOST_LOG_TRIVIAL(info) << "starting up with config: " << config.str();
@@ -102,9 +104,30 @@ int main(int argc, char *argv[]) {
 
   kdr::shmem::shmem_sink_t shmem_sink;
 
+  using shmem_accept_instrument_t =
+      std::function<void(const kdr::response::instrument_t &)>;
+  const shmem_accept_instrument_t noop_shmem_accept_instrument{
+      [](const kdr::response::instrument_t &) {}};
+  shmem_accept_instrument_t shmem_accept_instrument{
+      config.enable_shmem()
+          ? [&shmem_sink](const kdr::response::instrument_t
+                              &response) { shmem_sink.accept(response); }
+          : noop_shmem_accept_instrument};
+
+  using shmem_accept_book_t =
+      std::function<void(const kdr::response::book_t &)>;
+  const shmem_accept_book_t noop_shmem_accept_book{
+      [](const kdr::response::book_t &) {}};
+  shmem_accept_book_t shmem_accept_book{
+      config.enable_shmem()
+          ? [&shmem_sink, &level_book](
+                const kdr::response::book_t
+                    &response) { shmem_sink.accept(response, level_book); }
+          : noop_shmem_accept_book};
+
   const auto accept_instrument =
       [&level_book, &assets_sink, &pairs_sink, &refdata,
-       &shmem_sink](const kdr::response::instrument_t &response) {
+       &shmem_accept_instrument](const kdr::response::instrument_t &response) {
         assets_sink.accept(response.header(), response.assets());
         pairs_sink.accept(response.header(), response.pairs());
         refdata.accept(response);
@@ -113,16 +136,17 @@ int main(int argc, char *argv[]) {
           BOOST_LOG_TRIVIAL(debug)
               << "created/updated book for symbol: " << pair.symbol();
         }
-        shmem_sink.accept(response);
+        shmem_accept_instrument(response);
       };
 
   const auto noop_accept_book = [](const kdr::response::book_t &) {};
-  const auto accept_book = [&book_sink, &level_book, &refdata, &shmem_sink](
-                               const kdr::response::book_t &response) {
-    book_sink.accept(response, refdata);
-    level_book.accept(response);
-    shmem_sink.accept(response, level_book);
-  };
+  const auto accept_book =
+      [&book_sink, &level_book, &refdata,
+       &shmem_accept_book](const kdr::response::book_t &response) {
+        book_sink.accept(response, refdata);
+        level_book.accept(response);
+        shmem_accept_book(response);
+      };
 
   const auto noop_accept_trades = [](const kdr::response::trades_t &) {};
   const auto accept_trades =
