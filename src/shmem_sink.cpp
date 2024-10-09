@@ -1,9 +1,36 @@
 #include "shmem_sink.hpp"
 
+#include <boost/log/trivial.hpp>
+
 #include <cstdlib>
 
 namespace kdr {
 namespace shmem {
+
+/******************************************************************************/
+/**                                                                          **/
+/**  n a m i n g  u t i l i t i e s                                          **/
+/**                                                                          **/
+/******************************************************************************/
+std::string normalized_symbol(std::string symbol) {
+  const auto replaced = symbol | std::views::transform([](char ch) {
+                          return ch == '/' ? '_' : ch;
+                        });
+  const std::string result(replaced.begin(), replaced.end());
+  return result;
+}
+
+std::string segment_name(std::string suffix) {
+  return "kdr_book_segment_t_" + suffix;
+}
+
+std::string content_name(std::string suffix) {
+  return "kdr_book_content_t_" + suffix;
+}
+
+std::string mutex_name(std::string suffix) {
+  return "kdr_book_mutex_t_" + suffix;
+}
 
 /******************************************************************************/
 /**                                                                          **/
@@ -23,8 +50,14 @@ void book_content_t::accept(const model::sides_t &sides) {
                          " exceeds c_max_depth: " + std::to_string(c_max_depth);
     throw std::runtime_error(message);
   }
+  m_price_precision = sides.price_precision();
+  m_qty_precision = sides.qty_precision();
   update_side(m_bids, m_num_bids, sides.bids());
   update_side(m_asks, m_num_asks, sides.asks());
+}
+
+boost::json::object book_content_t::to_json_obj() const {
+  return boost::json::object{};
 }
 
 /******************************************************************************/
@@ -35,18 +68,18 @@ void book_content_t::accept(const model::sides_t &sides) {
 
 static const size_t c_page_size = sysconf(_SC_PAGE_SIZE);
 static const size_t c_book_segment_size =
-    sizeof(book_content_t) +
-    (c_page_size - sizeof(book_content_t) % c_page_size);
+    sizeof(shmem::book_content_t) +
+    (c_page_size - sizeof(shmem::book_content_t) % c_page_size);
 
-book_segment_t::book_segment_t(std::string symbol)
-    : m_book_obj{symbol},
-      m_segment{boost::interprocess::create_only, m_book_obj.obj_name().c_str(),
+book_segment_t::book_segment_t(std::string suffix)
+    : m_segment_remover{suffix},
+      m_segment{bip::create_only, m_segment_remover.name().c_str(),
                 c_book_segment_size},
-      m_content{m_segment.construct<book_content_t>(m_name.c_str())()},
-      m_book_mutex(symbol), m_mutex{boost::interprocess::create_only,
-                                    m_book_mutex.mutex_name().c_str()} {
-  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__
-                           << " created segment for symbol: " << symbol;
+      m_content{
+          m_segment.construct<book_content_t>(content_name(suffix).c_str())()},
+      m_mutex_remover(suffix),
+      m_mutex{bip::create_only, m_mutex_remover.name().c_str()} {
+  BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " created segment: " << m_name;
 }
 
 book_segment_t::~book_segment_t() {
@@ -62,7 +95,7 @@ void book_segment_t::accept(const model::sides_t &sides) {
     throw std::runtime_error(message);
   }
 
-  boost::interprocess::scoped_lock<boost::interprocess::named_mutex> lock;
+  bip::scoped_lock<bip::named_mutex> lock;
   m_content->accept(sides);
 }
 
@@ -84,7 +117,7 @@ void shmem_sink_t::accept(const response::instrument_t &response) {
     const auto it = m_book_segments.find(pair.symbol());
     if (it == m_book_segments.end()) {
       book_segment_ptr book_segment =
-          std::make_unique<book_segment_t>(segment_name(pair.symbol()));
+          std::make_unique<book_segment_t>(normalized_symbol(pair.symbol()));
       m_book_segments.insert(
           std::make_pair(pair.symbol(), std::move(book_segment)));
     }
@@ -104,14 +137,6 @@ void shmem_sink_t::accept(const response::book_t &response,
   }
   book_segment_t &segment = *(it->second);
   segment.accept(sides);
-}
-
-std::string shmem_sink_t::segment_name(std::string symbol) {
-  const auto replaced = symbol | std::views::transform([](char ch) {
-                          return ch == '/' ? '_' : ch;
-                        });
-  const std::string result(replaced.begin(), replaced.end());
-  return result;
 }
 
 } // namespace shmem

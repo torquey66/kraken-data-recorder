@@ -31,6 +31,15 @@ TEST_SUITE("decimal_t") {
     CHECK(decimal_t(std::string("13600.00000000")).str() == "13600");
   }
 
+  TEST_CASE("assignment operator") {
+    const auto src = decimal_t(std::string("1234.567"));
+    auto dst = decimal_t();
+    CHECK(dst == decimal_t());
+    dst = src;
+    CHECK(dst == src);
+    CHECK(dst.str_view(3) == src.str_view(3));
+  }
+
   TEST_CASE("str with precision") {
     CHECK(decimal_t().str(3) == std::string("0.000"));
     CHECK(decimal_t(std::string("123")).str(2) == std::string("123.00"));

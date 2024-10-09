@@ -9,7 +9,7 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/sync/named_mutex.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/log/trivial.hpp>
+#include <boost/json.hpp>
 
 #include <array>
 #include <memory>
@@ -21,10 +21,22 @@ namespace shmem {
 namespace bip = boost::interprocess;
 
 /**
+ * Naming functions.
+ */
+std::string normalized_symbol(std::string symbol);
+std::string segment_name(std::string suffix);
+std::string content_name(std::string suffix);
+std::string mutex_name(std::string suffix);
+
+/**
  * Shared memory representation of book state.
  */
 struct book_content_t final {
   static constexpr size_t c_max_depth = kdr::model::depth_1000;
+
+  book_content_t() {}
+  book_content_t(const book_content_t &) = default;
+  book_content_t &operator=(const book_content_t &) = default;
 
   size_t num_bids() const { return m_num_bids; }
   const kdr::quote_t &bid(size_t idx) const { return m_bids.at(idx); }
@@ -33,6 +45,9 @@ struct book_content_t final {
   const kdr::quote_t &ask(size_t idx) const { return m_asks.at(idx); }
 
   void accept(const model::sides_t &sides);
+
+  boost::json::object to_json_obj() const;
+  std::string str() const { return boost::json::serialize(to_json_obj()); }
 
 private:
   template <typename S>
@@ -45,6 +60,8 @@ private:
     }
   }
 
+  integer_t m_price_precision = 0;
+  integer_t m_qty_precision = 0;
   size_t m_num_bids = 0;
   size_t m_num_asks = 0;
   std::array<kdr::quote_t, c_max_depth> m_bids;
@@ -54,39 +71,35 @@ private:
 /**
  * RAII wrapper of named shared memory object.
  */
-struct book_obj_t final {
+struct segment_remover_t final {
 
-  book_obj_t(std::string symbol) : m_obj_name{"kdr_book_obj_t_" + symbol} {
-    BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " removing: " << m_obj_name;
-    bip::shared_memory_object::remove(m_obj_name.c_str());
-    BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " removed: " << m_obj_name;
+  segment_remover_t(std::string suffix) : m_name{segment_name(suffix)} {
+    bip::shared_memory_object::remove(m_name.c_str());
   }
 
-  ~book_obj_t() { bip::shared_memory_object::remove(m_obj_name.c_str()); }
+  ~segment_remover_t() { bip::shared_memory_object::remove(m_name.c_str()); }
 
-  const std::string &obj_name() const { return m_obj_name; }
+  const std::string &name() const { return m_name; }
 
 private:
-  const std::string m_obj_name;
+  const std::string m_name;
 };
 
 /**
  * RAII wrapper of named mutex.
  */
-struct book_mutex_t final {
+struct mutex_remover_t final {
 
-  book_mutex_t(std::string symbol)
-      : m_mutex_name{"kdr_book_mutex_t_" + symbol} {
-    bip::named_mutex::remove(m_mutex_name.c_str());
-    BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " removed: " << m_mutex_name;
+  mutex_remover_t(std::string suffix) : m_name{mutex_name(suffix)} {
+    bip::named_mutex::remove(m_name.c_str());
   }
 
-  ~book_mutex_t() { bip::named_mutex::remove(m_mutex_name.c_str()); }
+  ~mutex_remover_t() { bip::named_mutex::remove(m_name.c_str()); }
 
-  const std::string &mutex_name() const { return m_mutex_name; }
+  const std::string &name() const { return m_name; }
 
 private:
-  const std::string m_mutex_name;
+  const std::string m_name;
 };
 
 /**
@@ -94,18 +107,18 @@ private:
  */
 struct book_segment_t final {
 
-  book_segment_t(std::string symbol);
+  book_segment_t(std::string name);
   ~book_segment_t();
 
   void accept(const model::sides_t &sides);
 
 private:
-  book_obj_t m_book_obj;
-  boost::interprocess::managed_shared_memory m_segment;
+  segment_remover_t m_segment_remover;
+  bip::managed_shared_memory m_segment;
   const std::string m_name;
   book_content_t *m_content = nullptr;
-  book_mutex_t m_book_mutex;
-  boost::interprocess::named_mutex m_mutex;
+  mutex_remover_t m_mutex_remover;
+  bip::named_mutex m_mutex;
 };
 
 /**
@@ -126,8 +139,6 @@ struct shmem_sink_t final {
               const model::level_book_t &level_book);
 
 private:
-  static std::string segment_name(std::string symbol);
-
   using book_segment_ptr = std::unique_ptr<book_segment_t>;
   std::unordered_map<std::string, book_segment_ptr> m_book_segments;
 };

@@ -177,6 +177,9 @@ target_link_libraries(kdr_parquet
   kdr
 )
 
+add_executable(kdr_observe kdr_observe/kdr_observe.cpp)
+target_link_libraries(kdr_observe kdr)
+
 add_executable(kdr_record kdr_record/kdr_record.cpp)
 target_link_libraries(kdr_record kdr_parquet)
 
