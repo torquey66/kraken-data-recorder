@@ -44,20 +44,8 @@ int main(int argc, char *argv[]) {
           reinterpret_cast<kdr::shmem::book_content_t *>(result.first);
       content = *content_ptr;
     }
+    std::cout << content.str();
 
-    std::cout << "num_asks: " << content.num_asks() << std::endl;
-    for (size_t idx = 0; idx < content.num_asks(); ++idx) {
-      const auto &quote = content.ask(idx);
-      std::cout << quote.second.str() << " @ " << quote.first.str()
-                << std::endl;
-    }
-    std::cout << std::endl;
-    std::cout << "num_bids: " << content.num_bids() << std::endl;
-    for (size_t idx = 0; idx < content.num_bids(); ++idx) {
-      const auto &quote = content.bid(idx);
-      std::cout << quote.second.str() << " @ " << quote.first.str()
-                << std::endl;
-    }
   } catch (const std::exception &ex) {
     std::cerr << "ex: " << ex.what() << std::endl;
     return 1;
