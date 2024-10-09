@@ -57,7 +57,26 @@ void book_content_t::accept(const model::sides_t &sides) {
 }
 
 boost::json::object book_content_t::to_json_obj() const {
-  return boost::json::object{};
+  auto bid_objs = boost::json::array{};
+  for (size_t idx = 0; idx < m_num_bids; ++idx) {
+    const quote_t &quote = m_bids[idx];
+    bid_objs.push_back(
+        boost::json::object{{quote.first.str(m_price_precision),
+                             quote.second.str(m_qty_precision)}});
+  }
+  auto ask_objs = boost::json::array{};
+  for (size_t idx = 0; idx < m_num_asks; ++idx) {
+    const quote_t &quote = m_asks[idx];
+    ask_objs.push_back(
+        boost::json::object{{quote.first.str(m_price_precision),
+                             quote.second.str(m_qty_precision)}});
+  }
+
+  boost::json::object result = {{"price_precision", m_price_precision},
+                                {"qty_precision", m_qty_precision},
+                                {response::book_t::c_bids, bid_objs},
+                                {response::book_t::c_asks, ask_objs}};
+  return result;
 }
 
 /******************************************************************************/
