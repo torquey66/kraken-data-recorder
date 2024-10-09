@@ -30,6 +30,38 @@ void signal_handler(const boost::system::error_code &ec, int signal_number) {
   shutting_down = true;
 }
 
+using shmem_accept_instrument_t =
+    std::function<void(const kdr::response::instrument_t &)>;
+
+shmem_accept_instrument_t
+shmem_accept_instrument_fun(const kdr::config_t &config,
+                            kdr::shmem::shmem_sink_t &shmem_sink) {
+  const shmem_accept_instrument_t noop_shmem_accept_instrument{
+      [](const kdr::response::instrument_t &) {}};
+  const shmem_accept_instrument_t result{
+      config.enable_shmem()
+          ? [&shmem_sink](const kdr::response::instrument_t
+                              &response) { shmem_sink.accept(response); }
+          : noop_shmem_accept_instrument};
+  return result;
+}
+
+using shmem_accept_book_t = std::function<void(const kdr::response::book_t &)>;
+shmem_accept_book_t
+shmem_accept_book_fun(const kdr::config_t &config,
+                      kdr::shmem::shmem_sink_t &shmem_sink,
+                      kdr::model::level_book_t &level_book) {
+  const shmem_accept_book_t noop_shmem_accept_book{
+      [](const kdr::response::book_t &) {}};
+  const shmem_accept_book_t result{
+      config.enable_shmem()
+          ? [&shmem_sink, &level_book](
+                const kdr::response::book_t
+                    &response) { shmem_sink.accept(response, level_book); }
+          : noop_shmem_accept_book};
+  return result;
+}
+
 int main(int argc, char *argv[]) {
 
   // !@# TODO: add program option to engage debug level...
@@ -104,26 +136,11 @@ int main(int argc, char *argv[]) {
 
   kdr::shmem::shmem_sink_t shmem_sink;
 
-  using shmem_accept_instrument_t =
-      std::function<void(const kdr::response::instrument_t &)>;
-  const shmem_accept_instrument_t noop_shmem_accept_instrument{
-      [](const kdr::response::instrument_t &) {}};
   shmem_accept_instrument_t shmem_accept_instrument{
-      config.enable_shmem()
-          ? [&shmem_sink](const kdr::response::instrument_t
-                              &response) { shmem_sink.accept(response); }
-          : noop_shmem_accept_instrument};
+      shmem_accept_instrument_fun(config, shmem_sink)};
 
-  using shmem_accept_book_t =
-      std::function<void(const kdr::response::book_t &)>;
-  const shmem_accept_book_t noop_shmem_accept_book{
-      [](const kdr::response::book_t &) {}};
   shmem_accept_book_t shmem_accept_book{
-      config.enable_shmem()
-          ? [&shmem_sink, &level_book](
-                const kdr::response::book_t
-                    &response) { shmem_sink.accept(response, level_book); }
-          : noop_shmem_accept_book};
+      shmem_accept_book_fun(config, shmem_sink, level_book)};
 
   const auto accept_instrument =
       [&level_book, &assets_sink, &pairs_sink, &refdata,
