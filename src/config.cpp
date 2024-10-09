@@ -24,6 +24,7 @@ boost::json::object config_t::to_json_obj() const {
       {c_book_depth, book_depth()},
       {c_capture_book, capture_book()},
       {c_capture_trades, capture_trades()},
+      {c_enable_shmem, enable_shmem()},
       {c_kraken_host, kraken_host()},
       {c_kraken_port, kraken_port()},
       {c_pair_filter, pair_filter_array},
