@@ -12,6 +12,7 @@ namespace shmem {
 /**  n a m i n g  u t i l i t i e s                                          **/
 /**                                                                          **/
 /******************************************************************************/
+/*
 std::string normalized_symbol(std::string symbol) {
   const auto replaced = symbol | std::views::transform([](char ch) {
                           return ch == '/' ? '_' : ch;
@@ -31,6 +32,7 @@ std::string content_name(std::string suffix) {
 std::string mutex_name(std::string suffix) {
   return "kdr_book_mutex_t_" + suffix;
 }
+*/
 
 /******************************************************************************/
 /**                                                                          **/
@@ -90,13 +92,12 @@ static const size_t c_book_segment_size =
     sizeof(shmem::book_content_t) +
     (c_page_size - sizeof(shmem::book_content_t) % c_page_size);
 
-book_segment_t::book_segment_t(std::string suffix)
-    : m_segment_remover{suffix},
+book_segment_t::book_segment_t(const shmem_names_t &names)
+    : m_segment_remover{names},
       m_segment{bip::create_only, m_segment_remover.name().c_str(),
                 c_book_segment_size},
-      m_content{
-          m_segment.construct<book_content_t>(content_name(suffix).c_str())()},
-      m_mutex_remover(suffix),
+      m_content{m_segment.construct<book_content_t>(names.content().c_str())()},
+      m_mutex_remover(names),
       m_mutex{bip::create_only, m_mutex_remover.name().c_str()} {
   BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << " created segment: " << m_name;
 }
@@ -133,12 +134,14 @@ void shmem_sink_t::accept(const response::instrument_t &response) {
                            << alignof(book_content_t);
 
   for (const model::pair_t &pair : response.pairs()) {
-    const auto it = m_book_segments.find(pair.symbol());
+    const std::string &symbol{pair.symbol()};
+    const auto it = m_book_segments.find(symbol);
     if (it == m_book_segments.end()) {
+      const shmem_names_t shmem_names{symbol,
+                                      std::string{shmem_names_t::c_book_kind}};
       book_segment_ptr book_segment =
-          std::make_unique<book_segment_t>(normalized_symbol(pair.symbol()));
-      m_book_segments.insert(
-          std::make_pair(pair.symbol(), std::move(book_segment)));
+          std::make_unique<book_segment_t>(shmem_names);
+      m_book_segments.insert(std::make_pair(symbol, std::move(book_segment)));
     }
   }
 }
