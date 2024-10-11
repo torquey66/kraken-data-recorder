@@ -126,6 +126,7 @@ add_library(kdr
   include/instrument.hpp
   include/level_book.hpp
   include/refdata.hpp
+  include/shmem_names.hpp
   include/shmem_sink.hpp
   include/sides.hpp
   include/sink.hpp

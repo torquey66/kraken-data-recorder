@@ -4,6 +4,7 @@
 #include "depth.hpp"
 #include "instrument.hpp"
 #include "level_book.hpp"
+#include "shmem_names.hpp"
 #include "types.hpp"
 
 #include <boost/interprocess/managed_shared_memory.hpp>
@@ -19,14 +20,6 @@ namespace kdr {
 namespace shmem {
 
 namespace bip = boost::interprocess;
-
-/**
- * Naming functions.
- */
-std::string normalized_symbol(std::string symbol);
-std::string segment_name(std::string suffix);
-std::string content_name(std::string suffix);
-std::string mutex_name(std::string suffix);
 
 /**
  * Shared memory representation of book state.
@@ -73,7 +66,7 @@ private:
  */
 struct segment_remover_t final {
 
-  segment_remover_t(std::string suffix) : m_name{segment_name(suffix)} {
+  segment_remover_t(const shmem_names_t &names) : m_name{names.segment()} {
     bip::shared_memory_object::remove(m_name.c_str());
   }
 
@@ -90,7 +83,7 @@ private:
  */
 struct mutex_remover_t final {
 
-  mutex_remover_t(std::string suffix) : m_name{mutex_name(suffix)} {
+  mutex_remover_t(const shmem_names_t &names) : m_name{names.mutex()} {
     bip::named_mutex::remove(m_name.c_str());
   }
 
@@ -107,7 +100,7 @@ private:
  */
 struct book_segment_t final {
 
-  book_segment_t(std::string name);
+  book_segment_t(const shmem_names_t &names);
   ~book_segment_t();
 
   void accept(const model::sides_t &sides);

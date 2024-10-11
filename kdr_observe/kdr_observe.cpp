@@ -30,21 +30,20 @@ int main(int argc, char *argv[]) {
   }
 
   const std::string pair{argv[1]};
-  const std::string suffix{kdr::shmem::normalized_symbol(pair)};
-  const std::string segment_name{kdr::shmem::segment_name(suffix)};
-  const std::string content_name{kdr::shmem::content_name(suffix)};
-  const std::string mutex_name{kdr::shmem::mutex_name(suffix)};
+
+  using kdr::shmem::shmem_names_t;
+  const kdr::shmem::shmem_names_t names{
+      pair, std::string{shmem_names_t::c_book_kind}};
 
   try {
-    bip::managed_shared_memory segment{bip::open_only, segment_name.c_str()};
-
+    bip::managed_shared_memory segment{bip::open_only, names.segment().c_str()};
     kdr::shmem::book_content_t content;
-    mutex_ptr =
-        std::make_unique<bip::named_mutex>(bip::open_only, mutex_name.c_str());
-
+    mutex_ptr = std::make_unique<bip::named_mutex>(bip::open_only,
+                                                   names.mutex().c_str());
     std::pair<kdr::shmem::book_content_t *,
               bip::managed_shared_memory::size_type>
-        result{segment.find<kdr::shmem::book_content_t>(content_name.c_str())};
+        result{
+            segment.find<kdr::shmem::book_content_t>(names.content().c_str())};
     kdr::shmem::book_content_t *content_ptr =
         reinterpret_cast<kdr::shmem::book_content_t *>(result.first);
 
