@@ -39,6 +39,8 @@ boost::json::object observe(std::string pair, std::string kind) {
     bip::scoped_lock<bip::named_mutex> lock(*mutex_ptr);
     content = *content_ptr;
   }
+  mutex_ptr = nullptr;
+
   return content.to_json_obj();
 }
 
