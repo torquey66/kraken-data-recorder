@@ -70,12 +70,13 @@ void trade_content_t::accept(const model::trade_t &trade) {
 }
 
 boost::json::object trade_content_t::to_json_obj() const {
-  boost::json::object result = {{model::trade_t::c_ord_type, m_ord_type},
-                                {model::trade_t::c_price, m_price.str()},
-                                {model::trade_t::c_qty, m_qty.str()},
-                                {model::trade_t::c_side, m_side},
-                                {model::trade_t::c_timestamp, m_timestamp},
-                                {model::trade_t::c_trade_id, m_trade_id}};
+  boost::json::object result = {
+      {model::trade_t::c_ord_type, model::ord_type_t_to_str(m_ord_type)},
+      {model::trade_t::c_price, m_price.str()},
+      {model::trade_t::c_qty, m_qty.str()},
+      {model::trade_t::c_side, model::side_t_to_str(m_side)},
+      {model::trade_t::c_timestamp, m_timestamp},
+      {model::trade_t::c_trade_id, m_trade_id}};
   return result;
 }
 
