@@ -96,6 +96,7 @@ book_segment_t::book_segment_t(const shmem_names_t &names)
     : m_segment_remover{names},
       m_segment{bip::create_only, m_segment_remover.name().c_str(),
                 c_book_segment_size},
+      m_name(names.segment()),
       m_content{m_segment.construct<book_content_t>(names.content().c_str())()},
       m_mutex_remover(names),
       m_mutex{bip::create_only, m_mutex_remover.name().c_str()} {
