@@ -5,6 +5,7 @@
 
 #include <boost/json.hpp>
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -46,7 +47,7 @@ struct subscribe_book_t final {
   subscribe_book_t(req_id_t req_id, model::depth_t depth, bool snapshot,
                    const std::vector<std::string> &symbols)
       : m_req_id{req_id}, m_depth{depth}, m_snapshot{snapshot},
-        m_symbols{symbols} {}
+        m_symbols{symbols.begin(), symbols.end()} {}
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
@@ -55,7 +56,7 @@ private:
   req_id_t m_req_id;
   model::depth_t m_depth;
   bool m_snapshot;
-  std::vector<std::string> m_symbols;
+  std::set<std::string> m_symbols;
 };
 
 /**
@@ -64,7 +65,8 @@ private:
 struct subscribe_trade_t final {
   subscribe_trade_t(req_id_t req_id, bool snapshot,
                     const std::vector<std::string> &symbols)
-      : m_req_id(req_id), m_snapshot(snapshot), m_symbols(symbols) {}
+      : m_req_id(req_id), m_snapshot(snapshot),
+        m_symbols(symbols.begin(), symbols.end()) {}
 
   boost::json::object to_json_obj() const;
   std::string str() const { return boost::json::serialize(to_json_obj()); }
@@ -72,7 +74,7 @@ struct subscribe_trade_t final {
 private:
   req_id_t m_req_id;
   bool m_snapshot;
-  std::vector<std::string> m_symbols;
+  std::set<std::string> m_symbols;
 };
 
 } // namespace request
