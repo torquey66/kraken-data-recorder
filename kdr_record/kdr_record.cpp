@@ -33,6 +33,8 @@ void signal_handler(const boost::system::error_code &ec, int signal_number) {
 using shmem_accept_instrument_t =
     std::function<void(const kdr::response::instrument_t &)>;
 using shmem_accept_book_t = std::function<void(const kdr::response::book_t &)>;
+using shmem_accept_trades_t =
+    std::function<void(const kdr::response::trades_t &)>;
 
 /**
  * Make a function that allows us to dispatch instrument refdata to a
@@ -69,11 +71,29 @@ make_shmem_accept_book(bool enable_shmem, kdr::shmem::shmem_sink_t &shmem_sink,
   return result;
 }
 
+/**
+ * Make a function that allows us to dispatch trade updates to a
+ * shmem_sink_t but only if shmem is enabled in the configuration.
+ */
+shmem_accept_trades_t
+make_shmem_accept_trades(bool enable_shmem,
+                         kdr::shmem::shmem_sink_t &shmem_sink) {
+  const shmem_accept_trades_t noop_shmem_accept_trades{
+      [](const kdr::response::trades_t &) {}};
+  const shmem_accept_trades_t result{
+      enable_shmem
+          ? [&shmem_sink](const kdr::response::trades_t
+                              &response) { shmem_sink.accept(response); }
+          : noop_shmem_accept_trades};
+  return result;
+}
+
 int main(int argc, char *argv[]) {
 
   // !@# TODO: add program option to engage debug level...
   boost::log::core::get()->set_filter(boost::log::trivial::severity >=
-                                      boost::log::trivial::info);
+                                      boost::log::trivial::debug);
+  //                                      boost::log::trivial::info);
 
   po::options_description desc(
       "Subscribe to Kraken and serialize book/trade data");
@@ -149,6 +169,9 @@ int main(int argc, char *argv[]) {
   const shmem_accept_book_t shmem_accept_book{
       make_shmem_accept_book(config.enable_shmem(), shmem_sink, level_book)};
 
+  const shmem_accept_trades_t shmem_accept_trades{
+      make_shmem_accept_trades(config.enable_shmem(), shmem_sink)};
+
   const auto accept_instrument =
       [&level_book, &assets_sink, &pairs_sink, &refdata,
        shmem_accept_instrument](const kdr::response::instrument_t &response) {
@@ -173,10 +196,12 @@ int main(int argc, char *argv[]) {
       };
 
   const auto noop_accept_trades = [](const kdr::response::trades_t &) {};
-  const auto accept_trades =
-      [&trades_sink, &refdata](const kdr::response::trades_t &response) {
-        trades_sink.accept(response, refdata);
-      };
+  const auto accept_trades = [&trades_sink, &refdata, shmem_accept_trades](
+                                 const kdr::response::trades_t &response) {
+    trades_sink.accept(response, refdata);
+    shmem_accept_trades(response);
+  };
+
   const kdr::sink_t sink{
       accept_instrument,
       config.capture_book() ? kdr::sink_t::accept_book_t{accept_book}
