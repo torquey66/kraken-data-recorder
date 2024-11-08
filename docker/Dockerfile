@@ -32,7 +32,7 @@ WORKDIR /workspace
 COPY docker/conan.profile.default /workspace
 RUN git clone https://github.com/torquey66/kraken-data-recorder.git && \
     cd kraken-data-recorder && \
-    git checkout dev/update-README-and-fix-bugs && \
+    git checkout main && \
     conan install . --profile=/workspace/conan.profile.default --build=missing --output-folder=build -sbuild_type=Release
 
 RUN cd kraken-data-recorder/build && \
