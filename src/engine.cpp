@@ -156,8 +156,9 @@ bool engine_t::handle_instrument_snapshot(doc_t &doc) {
   while (begin != symbols.end()) {
     // !@# TODO: clean up a little...
     auto end =
-        begin + std::min(size_t{32}, static_cast<std::size_t>(
-                                         std::distance(begin, symbols.end())));
+        begin +
+        std::min(size_t{c_subscription_batch_size},
+                 static_cast<std::size_t>(std::distance(begin, symbols.end())));
     if (m_config.capture_book()) {
       const request::subscribe_book_t subscribe_book{
           ++m_book_req_id, m_config.book_depth(), true,
