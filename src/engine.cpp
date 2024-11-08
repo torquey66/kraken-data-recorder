@@ -5,13 +5,13 @@
 #include "header.hpp"
 #include "instrument.hpp"
 #include "pong.hpp"
-#include "requests.hpp"
 
 #include <boost/log/trivial.hpp>
 #include <simdjson.h>
 
 #include <algorithm>
 #include <cassert>
+#include <ranges>
 #include <vector>
 
 namespace kdr {
@@ -82,6 +82,7 @@ bool engine_t::handle_msg(msg_t msg) {
         return handle_heartbeat_msg(doc);
       }
     } else if (doc[c_response_method].get(buffer) == simdjson::SUCCESS) {
+      assert(buffer == c_method_pong || buffer = c_method_subscribe);
       if (buffer == c_method_pong) {
         // We have to crack the message to know that it's a pong, but
         // then we have to reparse it so that the pong_t deserializer
@@ -91,10 +92,14 @@ bool engine_t::handle_msg(msg_t msg) {
             m_parser.iterate(padded_pong_msg);
         return handle_pong_msg(pong_doc);
       }
-      // !@# TODO: ultimately we will want to crack open 'subscribe'
-      // responses and handle those which report failures.
-      // BOOST_LOG_TRIVIAL(debug)
-      //     << __FUNCTION__ << ": " << simdjson::to_json_string(doc);
+      if (buffer == c_method_subscribe) {
+        // !@# TODO: ultimately we will want to crack open 'subscribe'
+        simdjson::padded_string padded_msg{msg};
+        simdjson::ondemand::document doc = m_parser.iterate(padded_msg);
+        BOOST_LOG_TRIVIAL(debug)
+            << __FUNCTION__ << ": " << simdjson::to_json_string(doc);
+        return true;
+      }
     } else {
       BOOST_LOG_TRIVIAL(warning)
           << __FUNCTION__
@@ -147,16 +152,26 @@ bool engine_t::handle_instrument_snapshot(doc_t &doc) {
     symbols.erase(end, symbols.end());
   };
 
-  if (m_config.capture_book()) {
-    const request::subscribe_book_t subscribe_book{
-        ++m_book_req_id, m_config.book_depth(), true, symbols};
-    m_session.send(subscribe_book.str());
-  }
+  auto begin = symbols.begin();
+  while (begin != symbols.end()) {
+    // !@# TODO: clean up a little...
+    auto end =
+        begin + std::min(size_t{32}, static_cast<std::size_t>(
+                                         std::distance(begin, symbols.end())));
+    if (m_config.capture_book()) {
+      const request::subscribe_book_t subscribe_book{
+          ++m_book_req_id, m_config.book_depth(), true,
+          std::vector<std::string>{begin, end}};
+      m_book_subs.push(subscribe_book);
+    }
 
-  if (m_config.capture_trades()) {
-    const request::subscribe_trade_t subscribe_trade{++m_trade_req_id, true,
-                                                     symbols};
-    m_session.send(subscribe_trade.str());
+    if (m_config.capture_trades()) {
+      const request::subscribe_trade_t subscribe_trade{
+          ++m_trade_req_id, true, std::vector<std::string>{begin, end}};
+      m_trade_subs.push(subscribe_trade);
+    }
+
+    begin = end;
   }
 
   return true;
@@ -240,6 +255,18 @@ void engine_t::on_process_timer(error_code ec) {
     const timestamp_t end = timestamp_t::now();
     m_metrics.set_book_last_process_micros(end.micros() - begin.micros());
     m_metrics.set_book_last_consumed(num_processed);
+  }
+
+  if (!m_book_subs.empty()) {
+    const auto &book_sub = m_book_subs.front();
+    m_session.send(book_sub.str());
+    m_book_subs.pop();
+  }
+
+  if (!m_trade_subs.empty()) {
+    const auto &trade_sub = m_trade_subs.front();
+    m_session.send(trade_sub.str());
+    m_trade_subs.pop();
   }
 
   m_process_timer.expires_after(

@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include "metrics.hpp"
 #include "refdata.hpp"
+#include "requests.hpp"
 #include "session.hpp"
 #include "sink.hpp"
 
@@ -79,6 +80,8 @@ private:
   boost::asio::deadline_timer m_ping_timer;
   boost::asio::steady_timer m_process_timer;
   std::queue<response::book_t> m_book_responses;
+  std::queue<request::subscribe_book_t> m_book_subs;
+  std::queue<request::subscribe_trade_t> m_trade_subs;
 
   sink_t m_sink;
 
